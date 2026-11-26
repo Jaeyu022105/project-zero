@@ -95,7 +95,7 @@ Our own mechanic, not in Solo Leveling.
   - **[Built]** Resets the player's level back to the level they first got a job (level 10 by default). XP resets to 0, stats reset to base, and stat points are refunded to `(level - 1) × 5`.
   - **[Built]** Keeps **3 random skills** from the previous job (`SkillService.retainRandomJobSkillsOnReroll`). The rest are lost. Basic skills, milestone skills and skillbook skills are always kept.
 - **[Built] Reawakening vision (owner idea 2026-11-26):** offering the shard plays a short vision instead of an instant reroll (`ReawakeningVision`, about 14 s). The player's eyes close (eyelid overlay), they stand on a dark mirror sea in a starry void with a sea of face-down cards drifting over the water, one card glides up to them, trembles (heartbeat), then flips to show the new job while the rest burn away. Eyes close again, open back home, and a split-second aura bursts around the player in the job's rarity color (bigger for rarer jobs, visible to everyone nearby). The reroll is saved before the vision starts, so a logout cannot lose the shard. Test with `/pz reawaken`.
-- **Cost [Built]** (owner decision 2026-11-26): each reroll consumes one **Awakening Shard** on success. Shards will only drop from gate bosses (**[Planned]**; `/pz shard give` for testing).
+- **Cost [Built]** (owner decision 2026-11-26): each reroll consumes one **Awakening Shard** on success. Shards drop from gate dungeon bosses (`GateService.onDungeonBossKilled`), plus `/pz shard give` for testing.
 - **Shard Vessel: charging a shard [Built]** (owner idea 2026-11-26; Vessel art & golden vision sea **[Planned]** for Claude). A carried item that charges an Awakening Shard for a better reroll, paid for with your own XP:
   - Put a shard into the Vessel. While the Vessel is in your inventory, **half the XP from each kill goes into the shard** instead of to you (the ×0.3 / ×1 / ×3 / ×10 mob multipliers still apply, so gate monsters and bosses charge it fastest). Take the shard out at any time; the charge stays on the shard.
   - The charge fills **five tiers** (Dim, Glowing, Radiant, Blazing, Resplendent). Each tier shifts the reroll's rarity weights toward rarer jobs. Never a guarantee: even a full shard can roll Common. Starting point to tune:
@@ -127,10 +127,10 @@ Our own mechanic, not in Solo Leveling.
 
 ## 9. Gates and dungeons
 
-- **[Planned]** Gates are portals that spawn in the world. Two things show how dangerous a gate is:
-  - **Color** sets the rank. Placeholder ladder: blue E, green D, yellow C, orange B, purple A, **red** S. Red gates are special: once entered, the exit closes until the boss dies (a "red gate" emergency).
-  - **Size** sets the scale: small gates are short dungeons; huge gates are big multi-floor dungeons with more loot.
-- Dungeons are separate dimensions generated from room templates. Each has mobs from the gate's theme, a mini-boss, and a final boss.
+- **[Built] (backend skeleton; custom portal art & room-template dungeon generator [Planned] for Claude)** Gates (`GateBlock` + `GateBlockEntity`, `/pz gate spawn <rank> <size>`, natural spawning gated by `projectzero:gateSpawning` gamerule, default `false`) are portals that spawn in the world. Two things show how dangerous a gate is:
+  - **Color** sets the rank (`E..S`: blue E, green D, yellow C, orange B, purple A, **red** S).
+  - **Size** (`SMALL`, `MEDIUM`, `LARGE`) sets the portal frame scale, hall size, and monster count.
+- **[Built]** Entering a gate teleports the player into a linked instance slot in the `projectzero:dungeon` void dimension (`GateDungeonArena`, placeholder deepslate hall), populated with rank-scaled gate monsters (`MobScaling` + `projectzero:gate_monster` NBT) and a scaled Dungeon Boss (`projectzero:gate_boss` NBT). Killing the boss drops an **Awakening Shard** (+ guaranteed accessory via `AccessoryLootModifier`), increments `gatesCleared`, opens the Dungeon Exit portal, and seals the overworld gate. Multi-room template generation and Souls-like boss attack state machines are **[Planned]**.
 - A gate that stays uncleared for too long can **break**: its monsters spill into the overworld. **[Idea]**
 - Gate monsters go in the `projectzero:gate_monsters` entity tag so they give the ×3 XP.
 - Loot: skillbooks, gear, Awakening Shards, mana crystals.

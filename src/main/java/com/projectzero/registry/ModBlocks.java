@@ -6,6 +6,7 @@ import com.projectzero.awakening.AwakeningCrystalBlock;
 import com.projectzero.awakening.AwakeningStoneBlock;
 import com.projectzero.domain.VoidMoteBlock;
 import com.projectzero.domain.VoidSeaBlock;
+import com.projectzero.gates.GateBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -77,6 +78,18 @@ public final class ModBlocks {
                     .noCollission()
                     .noOcclusion()
                     .emissiveRendering((state, level, pos) -> true)
+                    .pushReaction(PushReaction.BLOCK)));
+
+    /** Rank-colored Gate portal block (TODO(claude-art): swirling rift visuals). */
+    public static final RegistryObject<Block> GATE_PORTAL = BLOCKS.register("gate_portal",
+            () -> new GateBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PURPLE)
+                    .strength(-1.0F, 3600000.0F)
+                    .noLootTable()
+                    .noCollission()
+                    .noOcclusion()
+                    .lightLevel(state -> 13)
+                    .sound(SoundType.GLASS)
                     .pushReaction(PushReaction.BLOCK)));
 
     private static BlockBehaviour.Properties crystalProperties(int light) {

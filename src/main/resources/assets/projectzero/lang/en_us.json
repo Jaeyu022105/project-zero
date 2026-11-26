@@ -128,5 +128,7 @@
   "item.projectzero.obsidian_earrings": "Obsidian Earrings",
   "item.projectzero.leather_belt": "Leather Belt",
   "item.projectzero.hunter_charm": "Hunter Charm",
-  "item.projectzero.mana_charm": "Mana Charm"
+  "item.projectzero.mana_charm": "Mana Charm",
+  "block.projectzero.gate_portal": "Gate Portal",
+  "gamerule.projectzero:gateSpawning": "Natural Gate Spawning"
 }

@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -14,7 +15,7 @@ import java.util.Locale;
  * Gate and monster rank ladder E..S (DESIGN-DOCUMENT.md §9, §12).
  * Each rank doubles health/damage multipliers and defines a target player level range.
  */
-public enum GateRank {
+public enum GateRank implements StringRepresentable {
     E(1.0, 1, 15, ChatFormatting.BLUE, 0xFF4CA8FF),
     D(2.0, 15, 30, ChatFormatting.GREEN, 0xFF55E075),
     C(4.0, 30, 50, ChatFormatting.YELLOW, 0xFFFFE04D),
@@ -58,6 +59,11 @@ public enum GateRank {
 
     public int randomLevel(RandomSource random) {
         return minLevel + random.nextInt(Math.max(1, maxLevel - minLevel + 1));
+    }
+
+    @Override
+    public String getSerializedName() {
+        return name().toLowerCase(Locale.ROOT);
     }
 
     public static @Nullable GateRank byName(String raw) {

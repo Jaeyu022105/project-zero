@@ -1,6 +1,8 @@
 package com.projectzero;
 
+import com.projectzero.gates.GateRules;
 import com.projectzero.network.ModNetwork;
+import com.projectzero.registry.ModBlockEntities;
 import com.projectzero.registry.ModBlocks;
 import com.projectzero.registry.ModCreativeTabs;
 import com.projectzero.registry.ModDataComponents;
@@ -36,12 +38,14 @@ public final class ProjectZero {
         IEventBus modBus = context.getModEventBus();
         ModDataComponents.DATA_COMPONENTS.register(modBus);
         ModBlocks.BLOCKS.register(modBus);
+        ModBlockEntities.BLOCK_ENTITIES.register(modBus);
         ModItems.ITEMS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
         ModEntities.ENTITIES.register(modBus);
         ModMenus.MENUS.register(modBus);
         ModLootModifiers.LOOT_MODIFIERS.register(modBus);
 
+        GateRules.init();
         ModNetwork.register();
         LOGGER.info("[System] Project Zero loaded. Welcome, Player.");
     }

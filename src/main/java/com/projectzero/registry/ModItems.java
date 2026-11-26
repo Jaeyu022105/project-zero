@@ -46,6 +46,9 @@ public final class ModItems {
     public static final RegistryObject<Item> AWAKENING_CLUSTER = ITEMS.register("awakening_cluster",
             () -> new BlockItem(ModBlocks.AWAKENING_CLUSTER.get(), new Item.Properties().rarity(Rarity.RARE)));
 
+    public static final RegistryObject<Item> GATE_PORTAL = ITEMS.register("gate_portal",
+            () -> new BlockItem(ModBlocks.GATE_PORTAL.get(), new Item.Properties().rarity(Rarity.EPIC)));
+
     // ---- Starter Accessories (TODO(claude-art): placeholder 16x16 icons & worn gauntlet model) ----
     public static final RegistryObject<Item> IRON_GAUNTLETS = ITEMS.register("iron_gauntlets",
             () -> new AccessoryItem(AccessorySlotType.GAUNTLETS, new Item.Properties().stacksTo(1)));

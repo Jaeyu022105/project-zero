@@ -21,8 +21,8 @@ Status: ✅ done · 🔨 in progress · ⏳ next · ⬜ later
 
 ## Phase 2: The world
 5. ⬜ **New terrain:** medieval to comic-fantasy biomes (e.g. banner-dotted highlands, giant-mushroom woods, floating-rock fields, crystal tundra). Claude. *Needs the owner's OK on a biome library (TerraBlender), see Open decisions.*
-6. 🔨 **Gates:** portals by color (rank) and size (scale). Mob rank & scaling infrastructure (`GateRank`, `MobScaling`, `XpRewards` rank & level-gap formula, `/pz mob spawn`) ✅ built; gate block & dungeon skeleton next. Claude: look and spawning.
-7. ⬜ **First dungeon** (generated rooms, mobs, chests with skillbooks).
+6. ✅ **Gates (backend skeleton):** `GateBlock` + `GateBlockEntity` by color (`E..S`) and size (`SMALL`/`MEDIUM`/`LARGE`), `GateRank` & `MobScaling`, `XpRewards` rank & level-gap formula, `projectzero:gateSpawning` gamerule (default `false`), `/pz gate spawn|leave` & `/pz mob spawn` built & verified (Claude rift shader/model later).
+7. 🔨 **First dungeon:** `projectzero:dungeon` void dimension, `DungeonSavedData` instance slots, placeholder `GateDungeonArena` hall with scaled gate monsters + boss + Awakening Shard drop + exit portal + overworld gate closure ✅ built; Claude's room-template generator & skillbook chests next.
 8. ⬜ **First gate monsters** (2-3 original mobs, models + animation). Claude.
 9. ⬜ **Hidden ruins and hidden dungeons:** ruins in the overworld that hide a sealed dungeon, and "a dungeon inside the dungeon": a secret second dungeon behind a normal one, far more dangerous. Claude: structures. Gemini: triggers and seals.
 10. ⬜ **Civilizations:** two village styles, *medieval* and *new/fantasy*, every town built around its Awakening Stone formation (bigger town, bigger stone). Claude: buildings and layouts.

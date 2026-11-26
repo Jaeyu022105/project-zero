@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "exit=false,rank=e": { "model": "projectzero:block/gate_portal_e" },
+    "exit=false,rank=d": { "model": "projectzero:block/gate_portal_d" },
+    "exit=false,rank=c": { "model": "projectzero:block/gate_portal_c" },
+    "exit=false,rank=b": { "model": "projectzero:block/gate_portal_b" },
+    "exit=false,rank=a": { "model": "projectzero:block/gate_portal_a" },
+    "exit=false,rank=s": { "model": "projectzero:block/gate_portal_s" },
+    "exit=true,rank=e":  { "model": "projectzero:block/gate_portal_exit" },
+    "exit=true,rank=d":  { "model": "projectzero:block/gate_portal_exit" },
+    "exit=true,rank=c":  { "model": "projectzero:block/gate_portal_exit" },
+    "exit=true,rank=b":  { "model": "projectzero:block/gate_portal_exit" },
+    "exit=true,rank=a":  { "model": "projectzero:block/gate_portal_exit" },
+    "exit=true,rank=s":  { "model": "projectzero:block/gate_portal_exit" }
+  }
+}

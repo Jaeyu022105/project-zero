@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Task 6: Mob ranks and scaling infrastructure).
+Last caught up: **2026-11-27** (Task 7: Gate backend skeleton + full 12h backend sprint complete).
 
 ---
 
@@ -28,8 +28,8 @@ Last caught up: **2026-11-27** (Task 6: Mob ranks and scaling infrastructure).
 - A leveling system: levels, XP from kills, five stats, a System-style status window.
 - A job system: Job Change Quest at level 10 (auto-complete for now), weighted random jobs by rarity loaded from JSON.
 - Basic skills, job signature skills, milestone titles and milestone skills, and skillbooks.
-- Awakening Stones & Awakening Shards: two-block crystal block, shard item, and real job reroll backend (custom village worldgen and gate boss loot drops still planned).
-- (Planned) Gates and dungeons by color and size, with Souls-like bosses.
+- Awakening Stones & Awakening Shards: two-block crystal block, crystal formations, shard item + Shard Vessel, real job reroll backend, and Gate boss shard drops (custom village worldgen still planned).
+- Gates & Dungeons (backend skeleton): rank-colored `GateBlock` + `GateBlockEntity` (`E..S`, `SMALL`/`MEDIUM`/`LARGE`), `projectzero:dungeon` void dimension with code-built placeholder chambers, rank-scaled gate monsters & boss, boss exit portal + overworld gate closure, and `projectzero:gateSpawning` gamerule (multi-room template generator and Souls-like boss state machines still planned).
 - (Long term) A Monarch path.
 
 **What Project Zero is not** (see Exclusions section below).
@@ -69,7 +69,7 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Mod scaffold: Forge 52.1.0 for Minecraft 1.21.1, Java 21, Gradle 8.10.2 wrapper, official Mojang mappings.
 - Leveling: levels 1 to 100, progressively harder XP curve, 5 ability points per level, full heal and "LEVEL UP!" title on level up.
 - XP from kills: every non-player mob gives XP. Vanilla ×0.3, other mods ×1, gate monsters ×3 (`projectzero:gate_monsters` tag or `projectzero:gate_monster` NBT), bosses ×10, multiplied by `GateRank` (`×1..×32`) and level-gap penalty (`−5%` per level past a 5-level gap, `10%` floor).
-- Mob Ranks & Scaling (`gates/`): `GateRank` (`E..S`), `MobScaling.apply(entity, rank, level)` (`ADD_MULTIPLIED_BASE` permanent health/damage modifiers, persistent rank/level tags, `[C · Lv 34] Zombie` nameplates), and `/pz mob spawn <entity> <rank> [level]`.
+- Mob Ranks, Gates & Dungeon Skeleton (`gates/`): `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `MobScaling.apply(entity, rank, level)` (`[C · Lv 34] Zombie` nameplates), `GateBlock` + `GateBlockEntity` (stores rank, size, open time, dungeon slot, anchor pos), `projectzero:dungeon` void dimension (`DungeonSavedData` + placeholder `GateDungeonArena`), boss kill loop (drops `Awakening Shard` + 100% rolled accessory, increments `gatesCleared` milestone, opens Dungeon Exit portal, seals overworld Gate), `projectzero:gateSpawning` gamerule (default `false`), `/pz mob spawn <entity> <rank> [level]`, and `/pz gate spawn <rank> <size> | leave`.
 - Stats: Strength, Agility, Vitality, Sense, Intelligence, rebalanced onto diminishing-return soft-cap curves (`LevelingRules.soft(p, k)`).
 - Jobs & Library Domain: at level 10 the System opens the **Library domain** (`projectzero:library` void dimension) where 7 face-down `JobCardEntity` cards orbit the frozen player; right-clicking one (or waiting out the 90s timeout) flips it, burns the others away, assigns the pre-rolled job, and returns the player home. Jobs are JSON data in `data/projectzero/jobs/` (10 placeholder jobs, 2 per rarity).
 - Awakening Stones, Crystal Formations & Reawakening Vision: small two-block crystal (`awakening_stone`), glassy shell `awakening_crystal`, opaque interior `awakening_crystal_deep`, glowing `awakening_core` veins, surface `awakening_cluster` spikes, procedural `CrystalFormation` (`small`, `large`, `colossal`), and `awakening_shard`. Offering a shard applies `JobService.awakeningRerollQuiet` immediately (logout-safe) and plays the ~14s `ReawakeningVision` (eyelid overlay `VisionOverlayRenderer`, mirror `void_sea` + `void_mote`, 64 drifting cards, rising card with heartbeat, reveal, return home, and rarity-colored particle aura burst).
@@ -79,7 +79,7 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Equipment & Accessories (`equipment/`): 8 active custom slots (`gauntlets`, `ring` ×2, `amulet`, `earrings`, `belt`, `charm` ×2) + 1 spare locked `relic` slot (`PlayerAccessories` in `projectzero:accessories` NBT; copied on clone, dropped on death only when `keepInventory` is false). 9 starter `AccessoryItem`s (`iron_gauntlets`, `copper_ring`, `silver_ring`, `gold_ring`, `bone_amulet`, `obsidian_earrings`, `leather_belt`, `hunter_charm`, `mana_charm`) with rolled `AccessoryData` component (rarity, `GateRank` E..S, flat stats, optional `crit_chance`/`mana_regen`/`lifesteal`/`xp_bonus`/`damage_vs_undead` affix), `AccessoryMenu` + `AccessoryScreen`, and `AccessoryLootModifier` (1.5% vanilla hostile, 3% modded, 8% gate monster, 100% boss).
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
 - Data saved with the player and kept on death (accessories follow `keepInventory`).
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`.
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`, `/pz gate spawn <rank> <size>`, `/pz gate leave`.
 
 **Built and verified in a loaded world (`gradlew runClient`).**
 
@@ -630,3 +630,31 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 **Remaining Recommendations**
 
 1. Task 7 (Stretch): Gate backend skeleton (`GateBlock` + `GateBlockEntity`, `projectzero:dungeon` void dimension, code-built dungeon arena with scaled gate monsters + boss + Awakening Shard drop + exit portal, `projectzero:gateSpawning` gamerule, `/pz gate spawn <rank> <size>`).
+
+---
+
+### Session Log — 2026-11-27 (Task 7: Gate backend skeleton)
+
+**Context & Direction Check**
+
+- Implemented Stretch Task 7 (`DESIGN-DOCUMENT.md` §9): `GateBlock` + `GateBlockEntity`, `projectzero:dungeon` void dimension, code-built placeholder dungeon chamber (`GateDungeonArena`) with rank-scaled gate monsters and boss, boss kill loop (Awakening Shard drop, `gatesCleared` milestone, exit portal activation, overworld gate sealing), `projectzero:gateSpawning` gamerule (default `false`), and `/pz gate spawn <rank> <size>` + `/pz gate leave`.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/gates/`: `GateSize` (`SMALL`, `MEDIUM`, `LARGE`), `GateRules` (`RULE_GATE_SPAWNING`, spawn interval/chance/distances, boss extra HP), `GateBlock` & `GateBlockEntity` (`ModBlocks.GATE_PORTAL`, `ModBlockEntities.GATE_PORTAL`), `DungeonSavedData`, `GateDungeonArena` (`TODO(claude-art)`: placeholder deepslate hall), `GateService`, `GateCommands` (`/pz gate spawn <rank> <size>`, `/pz gate leave`), and `MobEvents` boss-death & natural-spawn hooks.
+- `src/main/java/com/projectzero/registry/` & `ProjectZero.java`: registered `ModBlockEntities`, `GATE_PORTAL` block/item, and `GateRules.init()`.
+- `src/main/resources/`: `data/projectzero/dimension/dungeon.json`, `dimension_type/dungeon.json`, `assets/projectzero/blockstates/gate_portal.json`, `models/block/gate_portal_{e,d,c,b,a,s,exit}.json`, `models/item/gate_portal.json`, 7 `TODO(claude-art)` 16x16 translucent portal PNGs (`textures/block/gate_portal_{e,d,c,b,a,s,exit}.png`), `en_us.json`.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded world):
+  - Verified `projectzero:gateSpawning` gamerule defaults to `false`.
+  - Ran `/pz gate spawn c small`, verified `GateBlockEntity` (`rank=C`, `size=SMALL`, `slot=0`), entered gate into `projectzero:dungeon`, verified 4 C-rank gate monsters + `[C · BOSS · Lv 50] Vindicator` spawned and exit sealed behind iron bars.
+  - Killed the boss: verified `exitOpened=true`, `shardDrops=1` (`Awakening Shard`), `gatesCleared=1`, and `overworldClosed=true`.
+  - Stepped through the Exit Portal and verified return to `minecraft:overworld`. Zero errors in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): `textures/block/gate_portal_{e,d,c,b,a,s,exit}.png` + cube models (flat colored translucent portal blocks) and `GateDungeonArena.java` (code-built deepslate chamber).
+
+**Remaining Recommendations**
+
+1. Append final sprint summary in `HANDOFF.md` for Claude and the owner.
