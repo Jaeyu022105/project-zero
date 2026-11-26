@@ -1,0 +1,6 @@
+{
+  "id": "projectzero:hexblade",
+  "rarity": "rare",
+  "upgradesTo": "projectzero:stormweaver",
+  "trial": "projectzero:trial/stormweaver"
+}

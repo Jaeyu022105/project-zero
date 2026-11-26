@@ -2,6 +2,7 @@ package com.projectzero.leveling;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.LongArgumentType;
+import com.projectzero.jobs.JobService;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -11,7 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
  * Testing commands (operators only):
  *   /pz xp <amount>   grant XP to yourself
  *   /pz info          print your level and stats
- *   /pz reset         back to level 1
+ *   /pz reset         back to level 1 and clear your job
  */
 public final class LevelingCommands {
     private LevelingCommands() {}
@@ -41,8 +42,10 @@ public final class LevelingCommands {
                         }))
                 .then(Commands.literal("reset")
                         .executes(ctx -> {
-                            LevelingService.reset(ctx.getSource().getPlayerOrException());
-                            ctx.getSource().sendSuccess(() -> Component.literal("Stats reset."), false);
+                            ServerPlayer player = ctx.getSource().getPlayerOrException();
+                            LevelingService.reset(player);
+                            JobService.clear(player);
+                            ctx.getSource().sendSuccess(() -> Component.literal("Stats and job reset."), false);
                             return 1;
                         })));
     }

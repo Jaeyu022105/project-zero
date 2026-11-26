@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
 
 /**
  * Server-side API for the leveling system. Everything else (kill rewards, quests,
@@ -55,6 +56,8 @@ public final class LevelingService {
 
         if (levelsGained > 0) {
             onLevelUp(player, stats, levelsGained);
+            MinecraftForge.EVENT_BUS.post(
+                    new PlayerLevelUpEvent(player, stats.level() - levelsGained, stats.level()));
         }
     }
 

@@ -1,5 +1,8 @@
 package com.projectzero.client;
 
+import com.projectzero.jobs.Job;
+import com.projectzero.jobs.JobRarity;
+import com.projectzero.jobs.PlayerJob;
 import com.projectzero.leveling.PlayerStats;
 import com.projectzero.leveling.Stat;
 import com.projectzero.leveling.StatEffects;
@@ -105,7 +108,7 @@ public class StatusScreen extends Screen {
         int col2 = left + WIDTH / 2 + 6;
         field(g, "NAME", name, col1, top + 32);
         field(g, "LEVEL", String.valueOf(s.level()), col2, top + 32);
-        field(g, "JOB", "None", col1, top + 46);
+        boolean jobHovered = jobField(g, col1, top + 46, mouseX, mouseY);
         field(g, "TITLE", "None", col2, top + 46);
 
         // HP / MP
@@ -145,9 +148,30 @@ public class StatusScreen extends Screen {
         g.drawString(font, String.valueOf(s.unspentPoints()),
                 col1 + font.width("Available Ability Points: "), pointsY, pointColor, false);
 
+        if (jobHovered) {
+            JobRarity rarity = ClientJobCache.rarity();
+            hovered = Component.translatable("projectzero.job.tooltip",
+                    rarity != null ? rarity.displayName() : Component.literal("?"),
+                    ClientJobCache.get().jobLevel());
+        }
         if (hovered != null) {
             g.renderTooltip(font, hovered, mouseX, mouseY);
         }
+    }
+
+    /** JOB: name in its rarity color. Returns true if the mouse is over the job name. */
+    private boolean jobField(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+        PlayerJob job = ClientJobCache.get();
+        g.drawString(font, "JOB: ", x, y, LABEL, false);
+        int valueX = x + font.width("JOB: ");
+        if (!job.hasJob()) {
+            g.drawString(font, Component.translatable("projectzero.job.none"), valueX, y, VALUE, false);
+            return false;
+        }
+        JobRarity rarity = ClientJobCache.rarity();
+        Component name = Job.displayName(job.jobId());
+        g.drawString(font, name, valueX, y, rarity != null ? rarity.argb() : MUTED, false);
+        return mouseX >= valueX && mouseX < valueX + font.width(name) && mouseY >= y - 1 && mouseY < y + 9;
     }
 
     private void field(GuiGraphics g, String label, String value, int x, int y) {

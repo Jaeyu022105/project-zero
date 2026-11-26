@@ -1,0 +1,6 @@
+{
+  "id": "projectzero:duelist",
+  "rarity": "uncommon",
+  "upgradesTo": "projectzero:veilstalker",
+  "trial": "projectzero:trial/veilstalker"
+}

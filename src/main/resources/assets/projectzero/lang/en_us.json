@@ -11,5 +11,22 @@
   "stat.projectzero.agility.desc": "Faster movement and attack speed",
   "stat.projectzero.vitality.desc": "+1 max health per point",
   "stat.projectzero.sense.desc": "Chance to evade incoming attacks",
-  "stat.projectzero.intelligence.desc": "Raises max mana (used by future skills)"
+  "stat.projectzero.intelligence.desc": "Raises max mana (used by future skills)",
+  "job.projectzero.brawler": "Brawler",
+  "job.projectzero.slinger": "Slinger",
+  "job.projectzero.duelist": "Duelist",
+  "job.projectzero.bulwark": "Bulwark",
+  "job.projectzero.hexblade": "Hexblade",
+  "job.projectzero.beastcaller": "Beastcaller",
+  "job.projectzero.stormweaver": "Stormweaver",
+  "job.projectzero.veilstalker": "Veilstalker",
+  "job.projectzero.gravewarden": "Gravewarden",
+  "job.projectzero.sunbreaker": "Sunbreaker",
+  "rarity.projectzero.common": "Common",
+  "rarity.projectzero.uncommon": "Uncommon",
+  "rarity.projectzero.rare": "Rare",
+  "rarity.projectzero.epic": "Epic",
+  "rarity.projectzero.legendary": "Legendary",
+  "projectzero.job.none": "None",
+  "projectzero.job.tooltip": "%s job, job level %s"
 }

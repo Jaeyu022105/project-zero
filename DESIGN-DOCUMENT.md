@@ -62,8 +62,8 @@ Up to 4 active skill slots on keys, more slots as the player levels. **[Idea]**
 
 ## 5. Jobs
 
-- **[Planned]** At **level 10** the System gives the player a **Job Change Quest**. Clearing it assigns a job. (Solo Leveling uses level 40; 10 keeps the early game short. Tune once we can playtest.)
-- **The job is random**, weighted by rarity. The player does not choose it. Rarities and draft weights:
+- **[Built]** At **level 10** the System gives the player a **Job Change Quest**. Clearing it assigns a job. For now the quest completes instantly; the trial dungeon is **[Planned]**. (Solo Leveling uses level 40; 10 keeps the early game short. Tune once we can playtest.)
+- **[Built]** **The job is random**, weighted by rarity. The player does not choose it. Jobs are JSON data (`data/<ns>/jobs/*.json`); the data files use their own placeholder names (see `HANDOFF.md`). Rarities and draft weights:
 
 | Rarity | Weight | Example jobs (placeholders) |
 |---|---|---|
@@ -86,11 +86,7 @@ Our own mechanic, not in Solo Leveling.
   - Draws a new random job with the same rarity weights.
   - Resets the player's level back to the level they first got a job (level 10 by default). Stat points are refunded to match the new level.
   - Keeps **3 random skills** from the previous job. The rest are lost. Basic skills, milestone skills and skillbook skills are always kept.
-- **Unlock conditions [Idea, owner to pick]**: rerolling should not be free. Options to choose from:
-  - Requires an item that only drops from high-rank gate bosses (an "Awakening Shard").
-  - Requires reaching a minimum level since the last reroll (e.g. 20 levels).
-  - A cooldown in in-game days.
-  - A one-time trial at the stone itself.
+- **Cost [Planned]** (owner decision 2026-11-26): each reroll consumes one **Awakening Shard**. Shards only drop from gate bosses.
 
 ## 7. Titles and milestones
 

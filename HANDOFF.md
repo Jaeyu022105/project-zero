@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-26** (first commit: v0.1.0 leveling system and project docs).
+Last caught up: **2026-11-26** (job system: random job by rarity at level 10).
 
 ---
 
@@ -26,8 +26,9 @@ Last caught up: **2026-11-26** (first commit: v0.1.0 leveling system and project
 
 **What Project Zero is**:
 - A leveling system: levels, XP from kills, five stats, a System-style status window.
-- (Planned) Jobs with rarity, job skills, basic skills, milestone titles and skills, skillbooks.
-- (Planned) Awakening Stones in custom villages for job rerolls.
+- A job system: Job Change Quest at level 10 (auto-complete for now), weighted random jobs by rarity loaded from JSON.
+- (Planned) Basic skills, job skills, milestone titles and skills, skillbooks.
+- (Planned) Awakening Stones in custom villages for job rerolls (each reroll consumes one Awakening Shard, dropped only by gate bosses).
 - (Planned) Gates and dungeons by color and size, with Souls-like bosses.
 - (Long term) A Monarch path.
 
@@ -49,6 +50,7 @@ Last caught up: **2026-11-26** (first commit: v0.1.0 leveling system and project
 ## Context Sources Used
 
 - Owner's messages in the Claude project "Project Zero" (2026-11-26): the pitch, the leveling design, Awakening Stones, gates by color and size, the Monarch goal.
+- Owner decision (2026-11-26): each job reroll at an Awakening Stone consumes one Awakening Shard, which only drops from gate bosses (`DESIGN-DOCUMENT.md` §6).
 - The owner's `HANDOFF.md` from another project (Kogane), used only as the template for this file's structure.
 
 The durable project context lives in:
@@ -62,17 +64,18 @@ The durable project context lives in:
 
 ## Current App State
 
-Version **0.1.0**. Implemented:
+Version **0.1.0** plus the job system (no new version number yet). Implemented:
 
 - Mod scaffold: Forge 52.1.0 for Minecraft 1.21.1, Java 21, Gradle 8.10.2 wrapper, official Mojang mappings.
 - Leveling: levels 1 to 100, progressively harder XP curve, 5 ability points per level, full heal and "LEVEL UP!" title on level up.
 - XP from kills: every non-player mob gives XP. Vanilla ×0.3, other mods ×1, gate monsters ×3 (`projectzero:gate_monsters` tag, empty for now), bosses ×10.
 - Stats: Strength, Agility, Vitality, Sense, Intelligence, each with an effect (Intelligence only shows max mana for now).
-- Status window on **K**: name, level, job (always "None"), title (always "None"), HP, MP, XP bar, stats with + buttons, available points, hover descriptions.
+- Jobs: at level 10 the System gives a Job Change Quest that completes on the spot (trial dungeon comes later) and rolls a random job weighted by rarity (Common 50, Uncommon 28, Rare 15, Epic 6, Legendary 1). Jobs are JSON data in `data/projectzero/jobs/`; 10 placeholder jobs, 2 per rarity. Jobs have no skills or effects yet.
+- Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), title (always "None"), HP, MP, XP bar, stats with + buttons, available points, hover descriptions.
 - Data saved with the player and kept on death.
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`.
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`. (`/pz reset` resets both stats and job; `/pz job clear` clears only the job.)
 
-**Not yet verified in game.** The first compile and `runClient` have not been done yet (see Known Gaps).
+**Builds and boots, in-game playtest pending.** `gradlew build` passes and `gradlew runClient` boots cleanly to the title screen (`[System] Project Zero loaded. Welcome, Player.`); in-world gameplay test is still to do (see Known Gaps).
 
 ---
 
@@ -96,12 +99,25 @@ Package layout (`src/main/java/com/projectzero/`):
   - `XpRewards.java`: XP per kill, `GATE_MONSTERS` tag, `register(type, xp)` for fixed values.
   - `LevelingEvents.java`: Forge event handlers (login, clone, respawn, dimension change, kill, attacked, commands).
   - `LevelingCommands.java`: `/pz` operator commands.
+  - `PlayerLevelUpEvent.java`: posted on the Forge bus after a level up (once per XP grant). Other systems hook levels through this instead of `LevelingService` calling them.
+- `jobs/`
+  - `JobService.java`: **the** server API for jobs: `get`, `set`, `sync`, `tryJobChangeQuest`, `assign`, `reroll`, `clear`, `copy`.
+  - `JobRules.java`: job change level (10), starting job level.
+  - `JobRarity.java`: rarities with draw weights and colors (chat + ARGB).
+  - `Job.java`: one job definition (id, rarity, optional `upgradesTo`, optional `trial`). Lang key `job.<ns>.<path>`.
+  - `JobRegistry.java`: datapack reload listener for `data/<ns>/jobs/*.json` (file name = id), weighted random draw. Server side only.
+  - `PlayerJob.java`: plain data (job id, job level, first-job level) with NBT and network methods.
+  - `JobEvents.java`: reload listener registration, level up -> quest, login/clone/respawn/dimension sync, commands.
+  - `JobCommands.java`: `/pz job set|reroll|clear` (merged into the `/pz` node).
 - `network/`
-  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version 1. Bump the version when a packet's format changes.
+  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version 2. Bump the version when a packet's format changes.
   - `SyncStatsPacket.java`: server → client, full stats.
   - `AllocateStatPacket.java`: client → server, spend one point (server validates).
+  - `SyncJobPacket.java`: server → client, the player's job plus its rarity (the client has no job definitions).
 - `client/`
   - `ClientStatsCache.java`: last stats received. Has no client-only imports on purpose, so packet handlers can call it on either side.
+  - `ClientJobCache.java`: last job and rarity received. Same rule.
+  - `ClientEvents.java`: `Dist.CLIENT` Forge bus subscriber; resets `ClientStatsCache` and `ClientJobCache` on `ClientPlayerNetworkEvent.LoggingOut`.
   - `ModKeyBindings.java`: K opens the status window.
   - `StatusScreen.java`: the System-style status window.
 
@@ -110,6 +126,7 @@ Resources:
 - `META-INF/mods.toml`, `pack.mcmeta` (pack format 34): filled from `gradle.properties` at build time.
 - `assets/projectzero/lang/en_us.json`: all user-facing text that goes through translation keys.
 - `data/projectzero/tags/entity_type/gate_monsters.json`: gate monster tag (empty).
+- `data/projectzero/jobs/*.json`: job definitions. Format: `{"id": "projectzero:duelist", "rarity": "uncommon", "upgradesTo": "projectzero:veilstalker", "trial": "projectzero:trial/veilstalker"}`; `upgradesTo` and `trial` are optional, `id` is only checked against the file name. Placeholder jobs: Brawler, Slinger (common); Duelist (upgrades to Veilstalker), Bulwark (uncommon); Hexblade (upgrades to Stormweaver), Beastcaller (rare); Stormweaver, Veilstalker (epic); Gravewarden, Sunbreaker (legendary).
 
 ---
 
@@ -124,7 +141,15 @@ Player data lives in the player's persistent NBT under `projectzero:stats`:
 
 It is copied to the new player entity in `PlayerEvent.Clone`, so it survives death and leaving the End. Attribute modifiers are transient and re-applied on login and respawn, so they never pile up in saves.
 
-Planned additions (see `DESIGN-DOCUMENT.md`): job id and job level, first-job level (for rerolls), learned skills with levels, unlocked and equipped titles, milestone counters.
+Job data lives next to it under `projectzero:job` (empty compound = no job):
+
+- `job` (string, job id such as `projectzero:duelist`)
+- `jobLevel` (int, starts at 1; no job XP yet)
+- `firstJobLevel` (int, always `JobRules.JOB_CHANGE_LEVEL` = 10 for now; kept across rerolls, which will reset the player to it)
+
+Also copied in `PlayerEvent.Clone`. If a saved job id is missing from the datapack, the player keeps it; the status window shows it in gray.
+
+Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlocked and equipped titles, milestone counters.
 
 ---
 
@@ -141,12 +166,12 @@ Planned additions (see `DESIGN-DOCUMENT.md`): job id and job level, first-job le
 
 ### Critical / Blocking
 
-- **Never compiled.** v0.1.0 was written without access to Forge's Maven (the AI sandbox could not reach it). Run `gradlew build` and `gradlew runClient` and fix any API mismatches. Most likely spots: `ModNetwork` (Forge 1.21 `ChannelBuilder` / `messageBuilder` signatures), `StatEffects` (attribute `Holder`s and `AttributeModifier` with `ResourceLocation` ids), `StatusScreen` (`renderBackground` override).
+- **Built OK and `runClient` boots cleanly; in-world playtest still pending.** `gradlew build` passed on the owner's PC on 2026-11-26 (commit `52fa9ff` and the jobs pass), using the JDK 21 that ships with the Minecraft launcher. `gradlew runClient` boots cleanly to the title screen after fixing `build.gradle`, but in-world gameplay verification (`/pz xp 20000`, K window, death/relog) has not yet been completed.
 
 ### High Priority
 
 - Basic skills, mana and cooldowns (`DESIGN-DOCUMENT.md` §4).
-- Job change quest at level 10 and random job by rarity (§5).
+- Job content: job skills, job leveling, the real Job Change Quest trial dungeon, job advancement trials (§5). The random job itself is built.
 - Titles and milestone tracking (§7).
 
 ### Medium Priority
@@ -205,10 +230,102 @@ Planned additions (see `DESIGN-DOCUMENT.md`): job id and job level, first-job le
 
 **Verification Executed**
 
-- None in game yet. The AI sandbox had no access to `maven.minecraftforge.net` or Mojang's servers, so it could not compile. First build to run on the owner's PC.
+- Built OK on the owner's PC on 2026-11-26 (commit `52fa9ff`), JDK 21 from the Minecraft launcher. `runClient` not yet tested.
 
 **Remaining Recommendations**
 
 1. Compile and fix API mismatches (see Known Gaps → Critical).
 2. Playtest: `/pz xp 1000`, spend points, check health/speed/damage change, die and respawn, relog.
-3. Then start jobs and basic skills (§4–5 of the design doc). Owner still needs to pick the reroll unlock condition (§6).
+3. Then start jobs and basic skills (§4–5 of the design doc).
+
+---
+
+### Session Log — 2026-11-26 (Gemini CLI skills setup)
+
+**Context & Direction Check**
+
+- Owner asked to set up the Project Zero skills from `.agents/skills/` for Gemini CLI as well (Antigravity already auto-loads `.agents/skills/`).
+
+**Changes Made**
+
+- Copied `.agents/skills/` into `.gemini/skills/` (all 5 skill folders: `add-game-content`, `forge-mod-dev`, `handoff-update`, `review-and-direct`, `system-ui-style`).
+- Added `.gemini/` to `.gitignore` so local Gemini CLI skill copies stay untracked and do not duplicate `.agents/skills/` in Git.
+- Updated `HANDOFF.md`.
+
+**Verification Executed**
+
+- Verified all 5 `SKILL.md` files exist under `.gemini/skills/<skill>/SKILL.md`.
+- Ran `git status` and confirmed `.gemini/` is ignored and only `.gitignore` (plus `HANDOFF.md`) is modified.
+- `gradlew build` / `gradlew runClient` were not run (no mod code or resource files changed).
+
+**Remaining Recommendations**
+
+1. Run the first `gradlew build` and `gradlew runClient` to compile v0.1.0 and fix any Forge 1.21.1 API mismatches.
+2. Playtest the leveling system and then move on to basic skills and jobs (§4–5 of `DESIGN-DOCUMENT.md`).
+
+---
+
+### Session Log — 2026-11-26 (Job system: random job by rarity at level 10)
+
+**Context & Direction Check**
+
+- Reviewer's command: fix the stale build status in the handoff, then build §5 jobs: rarity enum, JSON job data, Job Change Quest at level 10 (auto-complete for now), weighted random job stored in player NBT and synced, JOB field on the status window, `/pz job set|reroll`. No Awakening Stones, no skills.
+- Small additions beyond the command: `/pz job clear` (needed to re-test the level-10 quest, since `/pz reset` leaves the job alone), a hover tooltip on the JOB field (rarity + job level), and a `PlayerLevelUpEvent` so the leveling package does not call into jobs directly (titles and basic skills can hook the same event).
+- On login, a player who is level 10+ with no job gets the quest then. Covers saves from before jobs existed.
+- `firstJobLevel` is always the job change level (10), even if one XP grant jumps past 10, because the quest belongs to level 10.
+
+**Changes Made**
+
+- `HANDOFF.md`: replaced "Never compiled" (Known Gaps) and the first session log's Verification line with: built OK on owner's PC 2026-11-26 (commit `52fa9ff`), JDK 21 from the Minecraft launcher, `runClient` not yet tested. Updated Current App State, Architecture Notes, Data Model Notes, Known Gaps.
+- New `jobs/` package: `JobRarity`, `Job`, `JobRegistry`, `JobRules`, `PlayerJob`, `JobService`, `JobEvents`, `JobCommands`.
+- `leveling/PlayerLevelUpEvent.java` (new); `LevelingService.grantXp` posts it after a level up.
+- `network/SyncJobPacket.java` (new), registered in `ModNetwork`; protocol version 1 -> 2.
+- `client/ClientJobCache.java` (new); `client/StatusScreen.java` JOB field.
+- `data/projectzero/jobs/*.json`: 10 placeholder jobs (listed in Architecture Notes). Duelist upgrades to Veilstalker and Hexblade to Stormweaver, to exercise the `upgradesTo`/`trial` fields; nothing reads them yet.
+- `en_us.json`: job names, rarity names, `projectzero.job.none`, `projectzero.job.tooltip`.
+- `DESIGN-DOCUMENT.md` §5: status tags updated.
+
+**Verification Executed**
+
+- `gradlew build` with `JAVA_HOME` set to the Minecraft launcher's JDK 21 (`.minecraft/runtime/java-runtime-delta`, 21.0.7): **BUILD SUCCESSFUL**.
+- `gradlew runClient` **not run**, so the in-game acceptance test is still to do. Steps:
+  1. New creative world with cheats. Check the log for `Loaded 10 jobs`.
+  2. `/pz xp 20000` (levels 1 to 10 need about 18k XP). Expect "LEVEL UP!" then a "JOB CHANGE" title with the job name in rarity color, and three [System] lines (quest received, quest complete, your job is now X [Rarity]).
+  3. K: JOB shows the name in its rarity color; hover shows rarity and job level 1.
+  4. `/kill`, respawn, K: same job. Save and quit, reload: same job.
+  5. `/pz job set duelist` (tab completion lists all 10), `/pz job reroll` (always a different job), `/pz job clear`, then `/pz xp 1`: quest fires again.
+- Balance: weights are exactly the design doc's table. Jobs carry no stats or skills yet, so they change nothing in combat.
+
+**Remaining Recommendations**
+
+1. Run the in-game steps above and fix anything that breaks.
+2. Basic skills, mana and cooldowns (§4), then job skills on top of them.
+3. Replace placeholder job names when the owner picks final ones (rename the JSON file and the lang key together).
+
+---
+
+### Session Log — 2026-11-26 (Job system review fixes + runClient build fix)
+
+**Context & Direction Check**
+
+- Applied reviewer fixes before pushing the job system commit: `/pz reset` should also clear the job, client caches should reset on logout, and stale "owner still needs to pick reroll unlock condition" lines should be removed now that the owner chose an Awakening Shard (gate boss drop, `DESIGN-DOCUMENT.md` §6).
+- Also fixed a Forge 52.1.0 `runClient` mod-loading crash discovered when launching `gradlew runClient`.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/leveling/LevelingCommands.java`: `/pz reset` now calls `JobService.clear(player)` after `LevelingService.reset(player)`.
+- `src/main/java/com/projectzero/client/ClientEvents.java` (new): `Dist.CLIENT` Forge bus subscriber on `ClientPlayerNetworkEvent.LoggingOut` that resets `ClientStatsCache` to `new PlayerStats()` and `ClientJobCache` to `PlayerJob.NONE`.
+- `build.gradle`: added `mods { projectzero { source sourceSets.main } }` under `runs.configureEach` and merged `sourcesSets/<name>` output directory so Forge 52.1.0 loads `projectzero` cleanly during `runClient`/`runServer`.
+- `DESIGN-DOCUMENT.md` §6: replaced the open unlock options with the owner's decision (each reroll consumes one Awakening Shard, dropped only by gate bosses).
+- `HANDOFF.md`: updated reference sections, removed the stale reroll-cost recommendation lines, and appended this session log.
+
+**Verification Executed**
+
+- `gradlew.bat build` with `JAVA_HOME=C:\Users\Jaime\AppData\Roaming\.minecraft\runtime\java-runtime-delta\windows\java-runtime-delta` (JDK 21.0.7): **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient`: booted cleanly to the Minecraft 1.21.1 title screen with `[System] Project Zero loaded. Welcome, Player.` and zero errors in `run/logs/latest.log`. In-world commands (`/pz xp 20000`, `/pz reset`, K window, death/relog) not yet manually driven.
+
+**Remaining Recommendations**
+
+1. Complete the in-world playtest in `gradlew runClient` (`/pz xp 20000`, K window, `/pz job set|reroll`, `/pz reset`, death and relog).
+2. Build basic skills, mana, and cooldowns (`DESIGN-DOCUMENT.md` §4), then job skills on top of them.
+3. Replace placeholder job names when final names are chosen.
