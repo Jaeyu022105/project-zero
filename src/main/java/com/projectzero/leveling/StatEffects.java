@@ -24,32 +24,36 @@ public final class StatEffects {
 
     public static void apply(ServerPlayer player, PlayerStats stats) {
         set(player, Attributes.ATTACK_DAMAGE, STRENGTH_DAMAGE,
-                stats.bonus(Stat.STRENGTH) * LevelingRules.DAMAGE_PER_STRENGTH);
+                LevelingRules.strengthDamageMultiplier(stats.bonus(Stat.STRENGTH)),
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         set(player, Attributes.MAX_HEALTH, VITALITY_HEALTH,
-                stats.bonus(Stat.VITALITY) * LevelingRules.HEALTH_PER_VITALITY);
+                LevelingRules.vitalityHealthBonus(stats.bonus(Stat.VITALITY)),
+                AttributeModifier.Operation.ADD_VALUE);
         set(player, Attributes.MOVEMENT_SPEED, AGILITY_SPEED,
-                stats.bonus(Stat.AGILITY) * LevelingRules.SPEED_PER_AGILITY);
+                LevelingRules.agilitySpeedMultiplier(stats.bonus(Stat.AGILITY)),
+                AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
         set(player, Attributes.ATTACK_SPEED, AGILITY_ATTACK_SPEED,
-                stats.bonus(Stat.AGILITY) * LevelingRules.ATTACK_SPEED_PER_AGILITY);
+                LevelingRules.agilityAttackSpeedBonus(stats.bonus(Stat.AGILITY)),
+                AttributeModifier.Operation.ADD_VALUE);
 
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
         }
     }
 
-    private static void set(ServerPlayer player, Holder<Attribute> attribute, ResourceLocation id, double amount) {
+    private static void set(ServerPlayer player, Holder<Attribute> attribute, ResourceLocation id,
+                            double amount, AttributeModifier.Operation operation) {
         AttributeInstance instance = player.getAttribute(attribute);
         if (instance == null) return;
         instance.removeModifier(id);
         if (amount != 0) {
-            instance.addTransientModifier(new AttributeModifier(id, amount, AttributeModifier.Operation.ADD_VALUE));
+            instance.addTransientModifier(new AttributeModifier(id, amount, operation));
         }
     }
 
-    /** Sense: chance to fully evade an attack from another entity. */
+    /** Sense: chance to fully evade an attack from another entity (soft-capped below 30%). */
     public static boolean rollEvade(PlayerStats stats, RandomSource random) {
-        double chance = Math.min(LevelingRules.MAX_EVADE_CHANCE,
-                stats.bonus(Stat.SENSE) * LevelingRules.EVADE_CHANCE_PER_SENSE);
+        double chance = LevelingRules.senseEvadeChance(stats.bonus(Stat.SENSE));
         return chance > 0 && random.nextDouble() < chance;
     }
 

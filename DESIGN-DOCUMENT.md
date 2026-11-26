@@ -35,7 +35,7 @@ Where we branch off from Solo Leveling: **Awakening Stones** in custom villages 
 
 ## 3. Stats
 
-All five start at 10. Points are spent in the status window (key **K**). **[Built]** Soft-cap rebalance **[Next]** (Gemini).
+All five start at 10. Points are spent in the status window (key **K**). **[Built]** Soft-cap rebalance **[Built]**.
 
 Balance rule (owner decision 2026-11-26, "rebalance now"): every point helps, but less than the one before (**soft caps**), so all-in builds stay strong without breaking the game at level 100. `p` = points above the base 10. Most curves use `soft(p, k) = p / (1 + p / k)`. All numbers live in `LevelingRules`.
 
@@ -67,7 +67,7 @@ Up to 4 active skill slots on keys, more slots as the player levels. **[Idea]**
 ## 5. Jobs
 
 - **[Built]** At **level 10** the System gives the player a **Job Change Quest**. Clearing it assigns a job. For now the quest completes instantly; the trial dungeon is **[Planned]**. (Solo Leveling uses level 40; 10 keeps the early game short. Tune once we can playtest.)
-- **[Planned] The Library domain (owner idea 2026-11-26).** The job choice is a ceremony, not a chat message. At level 10 the world fades and a "domain" unfolds around the player: a circular library (bookshelf walls rising, floating books, dark starry sky, the player frozen in the middle). Job cards orbit the player; right-clicking one takes it. Cards are **face down**: each card's job is pre-drawn with the rarity weights, so the result is still luck, but it is the player's pick. The chosen card flips to show the job and its rarity (color + glow), the others burn away, and the domain collapses back to the world.
+- **[Built] The Library domain (owner idea 2026-11-26).** The job choice is a ceremony, not a chat message. At level 10 the world fades and a "domain" unfolds around the player: a circular library (bookshelf walls rising, floating books, dark starry sky, the player frozen in the middle). Job cards orbit the player; right-clicking one takes it. Cards are **face down**: each card's job is pre-drawn with the rarity weights, so the result is still luck, but it is the player's pick. The chosen card flips to show the job and its rarity (color + glow), the others burn away, and the domain collapses back to the world.
   - Split: Claude builds the domain visuals (arena, card entities and renderer, effects); Gemini builds the server flow (start/freeze/timeout/assign, multiplayer safety).
 - **[Built]** **The job is random**, weighted by rarity. The player does not choose it. Jobs are JSON data (`data/<ns>/jobs/*.json`); the data files use their own placeholder names (see `HANDOFF.md`). Rarities and draft weights:
 

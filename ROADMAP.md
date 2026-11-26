@@ -9,11 +9,11 @@ Status: ✅ done · 🔨 in progress · ⏳ next · ⬜ later
 - ✅ Random jobs by rarity at level 10
 - ✅ Awakening Stone (2-block shrine), Awakening Shard, reroll
 - ✅ Crystal formations (small / large / colossal), solid core, crystal clusters
-- ✅ Reawakening vision (mirror sea, sea of cards, rarity aura) *(built, not yet committed)*
+- ✅ Reawakening vision (mirror sea, sea of cards, rarity aura)
 
 ## Phase 1: The System core
-1. 🔨 **Library domain job choice.** Claude: grand library, orbiting face-down cards, flip reveal (built, not yet committed). Gemini: commit, freeze/timeout checks, multiplayer safety.
-1b. ⏳ **Shard Vessel (charging shards for rarer rerolls), DESIGN-DOCUMENT.md §6.** Gemini: Vessel item and slot, XP diversion on kill, charge tiers, weighted draw. Claude: Vessel and charged-shard textures, tier glow, golden sea in the vision.
+1. ✅ **Library domain job choice.** Grand library, orbiting face-down cards, flip reveal, freeze/timeout/logout safety.
+1b. 🔨 **Shard Vessel (charging shards for rarer rerolls), DESIGN-DOCUMENT.md §6.** Gemini: Vessel item and slot, XP diversion on kill, charge tiers, weighted draw. Claude: Vessel and charged-shard textures, tier glow, golden sea in the vision.
 2. ⬜ **Skills foundation.** Gemini: mana, cooldowns, slots and keys, JSON skills. Claude: HUD (HP/MP/XP), skill icons.
 3. ⬜ **Basic skills + one signature skill per job.** Gemini: logic. Claude: effects.
 4. ⬜ **Titles and milestones.**

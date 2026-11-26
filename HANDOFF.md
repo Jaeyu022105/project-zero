@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-26** (crystal formations, glassy crystal blocks, JobRegistry/awakeningReroll fixes).
+Last caught up: **2026-11-26** (Task 0: Library domain, Reawakening vision, solid-core crystals/clusters, stat soft-cap rebalance).
 
 ---
 
@@ -69,14 +69,14 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Mod scaffold: Forge 52.1.0 for Minecraft 1.21.1, Java 21, Gradle 8.10.2 wrapper, official Mojang mappings.
 - Leveling: levels 1 to 100, progressively harder XP curve, 5 ability points per level, full heal and "LEVEL UP!" title on level up.
 - XP from kills: every non-player mob gives XP. Vanilla ×0.3, other mods ×1, gate monsters ×3 (`projectzero:gate_monsters` tag, empty for now), bosses ×10.
-- Stats: Strength, Agility, Vitality, Sense, Intelligence, each with an effect (Intelligence only shows max mana for now).
-- Jobs: at level 10 the System gives a Job Change Quest that completes on the spot (trial dungeon comes later) and rolls a random job weighted by rarity (Common 50, Uncommon 28, Rare 15, Epic 6, Legendary 1). Jobs are JSON data in `data/projectzero/jobs/`; 10 placeholder jobs, 2 per rarity. Jobs have no skills or effects yet.
-- Awakening Stones & Crystal Formations: small two-block crystal (`projectzero:awakening_stone`), glassy translucent `projectzero:awakening_crystal` and glowing `projectzero:awakening_core` vein blocks (`AwakeningCrystalBlock`), procedural iceberg-like `CrystalFormation` generator (`small`, `large`, `colossal`), `projectzero:awakening_shard` item, and a Project Zero creative tab. Right-clicking any Awakening Stone or formation block with an Awakening Shard runs `JobService.awakeningReroll`: resets level to `min(currentLevel, firstJobLevel)`, XP to 0, stats to base, unspent points to `(level - 1) * 5`, draws a different random job, keeps up to 3 random old job skills (hook + TODO until skills exist), and consumes the shard in survival only on success. Right-clicking without a shard shows a touch hint with a 40-tick cooldown.
+- Stats: Strength, Agility, Vitality, Sense, Intelligence, rebalanced onto diminishing-return soft-cap curves (`LevelingRules.soft(p, k)`).
+- Jobs & Library Domain: at level 10 the System opens the **Library domain** (`projectzero:library` void dimension) where 7 face-down `JobCardEntity` cards orbit the frozen player; right-clicking one (or waiting out the 90s timeout) flips it, burns the others away, assigns the pre-rolled job, and returns the player home. Jobs are JSON data in `data/projectzero/jobs/` (10 placeholder jobs, 2 per rarity).
+- Awakening Stones, Crystal Formations & Reawakening Vision: small two-block crystal (`awakening_stone`), glassy shell `awakening_crystal`, opaque interior `awakening_crystal_deep`, glowing `awakening_core` veins, surface `awakening_cluster` spikes, procedural `CrystalFormation` (`small`, `large`, `colossal`), and `awakening_shard`. Offering a shard applies `JobService.awakeningRerollQuiet` immediately (logout-safe) and plays the ~14s `ReawakeningVision` (eyelid overlay `VisionOverlayRenderer`, mirror `void_sea` + `void_mote`, 64 drifting cards, rising card with heartbeat, reveal, return home, and rarity-colored particle aura burst).
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), title (always "None"), HP, MP, XP bar, stats with + buttons, available points, hover descriptions.
 - Data saved with the player and kept on death.
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count]`, `/pz crystal small|large|colossal`. (`/pz reset` resets both stats and job; `/pz job clear` clears only the job.)
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count]`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`.
 
-**Builds and boots, in-game playtest pending.** `gradlew build` passes and `gradlew runClient` boots cleanly to the title screen (`[System] Project Zero loaded. Welcome, Player.`); in-world gameplay test is still to do (see Known Gaps).
+**Built and verified in a loaded world (`gradlew runClient`).**
 
 ---
 
@@ -180,7 +180,7 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 
 ### Critical / Blocking
 
-- **Built OK and `runClient` boots cleanly; in-world playtest still pending.** `gradlew build` passed on the owner's PC on 2026-11-26 (commit `52fa9ff` and the jobs pass), using the JDK 21 that ships with the Minecraft launcher. `gradlew runClient` boots cleanly to the title screen after fixing `build.gradle`, but in-world gameplay verification (`/pz xp 20000`, K window, death/relog) has not yet been completed.
+- None currently blocking. (Note for automated testing: Forge 52.1.0 runs vanilla `--quickPlaySingleplayer` before `ClientModLoader.completeModLoading` starts `MinecraftForge.EVENT_BUS`; always open worlds from `TitleScreen` rather than CLI `--quickPlaySingleplayer`.)
 
 ### High Priority
 
@@ -412,3 +412,35 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 
 1. Load a world in `gradlew runClient` and run `/pz crystal colossal`, `/pz xp 20000`, `/pz shard give`, and right-click the crystal formation with a shard (confirm `Loaded 10 jobs`, no crash on world load, glassy crystal visuals, and level reset `min(current, firstJobLevel)`).
 2. Begin the Library domain job-choice ceremony (`DESIGN-DOCUMENT.md` §5) or basic skills/mana/cooldowns (§4).
+
+---
+
+### Session Log — 2026-11-26 (Task 0: Commit domain/vision/crystals + stat soft-cap rebalance)
+
+**Context & Direction Check**
+
+- Started `gemini-12h-backlog.md` backend sprint (Task 0).
+- Committed and pushed Claude's uncommitted work in 4 clean commits (`e15efed` Library domain, `bd44fdd` solid-core crystals & clusters, `16b9baf` Reawakening vision with `VisionOverlayRenderer` preserved untouched, `135831e` docs/roadmap/backlog).
+- Rebalanced all combat/evade stats onto owner-approved soft-cap curves (`DESIGN-DOCUMENT.md` §3).
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/leveling/LevelingRules.java`: replaced flat linear stat constants with soft-cap constants and curve helpers (`soft(p, k)`, Strength `+0.02 * soft(p, 200)` `ADD_MULTIPLIED_TOTAL`, Vitality `+0.5 * soft(p, 300)` `ADD_VALUE`, Agility `+0.40 * p/(p+60)` `ADD_MULTIPLIED_BASE` move speed and `+1.5 * p/(p+60)` `ADD_VALUE` attack speed, Sense `0.30 * p/(p+100)` evade), documented with 45 / 100 / 495-point values.
+- `src/main/java/com/projectzero/leveling/StatEffects.java`: updated attribute modifier operations and Sense evade roll to use `LevelingRules` soft-cap curves.
+- `src/main/resources/assets/projectzero/lang/en_us.json`: updated `stat.projectzero.*.desc` tooltips.
+- `DESIGN-DOCUMENT.md`, `ROADMAP.md`, `HANDOFF.md`: updated status tags and reference sections.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded world from `TitleScreen`):
+  - Confirmed `Loaded 10 jobs` and zero mod `ERROR` or exceptions in `run/logs/latest.log`.
+  - Ran `/pz reset`, `/pz xp 140000` (reached level 20, `LibraryDomain` opened automatically with 7 `JobCardEntity` cards), picked a card (`projectzero:hexblade`), returned home after reveal.
+  - Allocated 45 STR, 20 VIT, 15 AGI, 15 SEN and verified soft-cap attributes (`atk=1.735`, `maxHp=29.38`, `moveSpd=0.1080`, `evade=0.039`).
+  - Ran `/pz reawaken`, verified full 286-tick `ReawakeningVision` + aura burst, returned to level 10 with 45 unspent points and new job (`projectzero:bulwark`).
+  - Ran `/pz crystal colossal` cleanly.
+- Placeholders: none added in Task 0.
+
+**Remaining Recommendations**
+
+1. Task 1: Shard Vessel (`shard_vessel` item, data components, XP diversion, 6 tier weight tables, commands).
