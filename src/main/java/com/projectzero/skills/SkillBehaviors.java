@@ -61,6 +61,8 @@ public final class SkillBehaviors {
         register(ProjectZero.id("shadow_step"), SkillBehaviors::castShadowStep);         // Veilstalker
         register(ProjectZero.id("soul_shackle"), SkillBehaviors::castSoulShackle);       // Gravewarden
         register(ProjectZero.id("solar_cataclysm"), SkillBehaviors::castSolarCataclysm); // Sunbreaker
+        // Milestone skills
+        register(ProjectZero.id("colossus_breaker"), SkillBehaviors::castColossusBreaker);
     }
 
     public static void register(ResourceLocation id, SkillBehavior behavior) {
@@ -415,6 +417,42 @@ public final class SkillBehaviors {
                 30, 0.6, 0.8, 0.6, 0.15);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.0F, 0.8F);
+        return true;
+    }
+
+    /** Giant Killer milestone skill: crushing strike dealing base + % target max HP (capped). */
+    private static boolean castColossusBreaker(ServerPlayer player, Skill skill, JsonObject params) {
+        double range = GsonHelper.getAsDouble(params, "range", 5.5);
+        float baseDamage = GsonHelper.getAsFloat(params, "base_damage", 14.0F);
+        float atkScale = GsonHelper.getAsFloat(params, "attack_scale", 1.1F);
+        float maxHpFraction = GsonHelper.getAsFloat(params, "max_hp_fraction", 0.08F);
+        float maxBonus = GsonHelper.getAsFloat(params, "max_bonus_damage", 40.0F);
+
+        ServerLevel level = player.serverLevel();
+        Vec3 eye = player.getEyePosition();
+        Vec3 look = player.getLookAngle().normalize();
+        Vec3 horiz = new Vec3(look.x, 0, look.z);
+        if (horiz.lengthSqr() > 1.0E-4) horiz = horiz.normalize();
+        LivingEntity primary = raycastTarget(player, eye, look, range);
+        Vec3 center = primary != null ? primary.position() : player.position().add(horiz.scale(2.2));
+
+        float atkPart = baseDamage + (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) * atkScale;
+        List<LivingEntity> targets = hostilesNear(player, center, 3.5);
+        if (primary != null && !targets.contains(primary)) {
+            targets = new ArrayList<>(targets);
+            targets.add(primary);
+        }
+
+        for (LivingEntity target : targets) {
+            float hpBonus = Math.min(maxBonus, target.getMaxHealth() * maxHpFraction);
+            target.hurt(player.damageSources().playerAttack(player), atkPart + hpBonus);
+            target.knockback(0.9, -look.x, -look.z);
+        }
+
+        level.sendParticles(ParticleTypes.SONIC_BOOM, center.x, center.y + 0.8, center.z, 1, 0.0, 0.0, 0.0, 0.0);
+        level.sendParticles(ParticleTypes.ENCHANTED_HIT, center.x, center.y + 0.8, center.z, 24, 0.5, 0.5, 0.5, 0.25);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.7F, 0.75F);
         return true;
     }
 

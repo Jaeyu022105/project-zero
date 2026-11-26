@@ -1,0 +1,16 @@
+{
+  "id": "projectzero:colossus_breaker",
+  "type": "active",
+  "source": "milestone",
+  "mana_cost": 35,
+  "cooldown_ticks": 240,
+  "unlock_level": 1,
+  "behavior": "projectzero:colossus_breaker",
+  "params": {
+    "range": 5.5,
+    "base_damage": 14.0,
+    "attack_scale": 1.1,
+    "max_hp_fraction": 0.08,
+    "max_bonus_damage": 40.0
+  }
+}

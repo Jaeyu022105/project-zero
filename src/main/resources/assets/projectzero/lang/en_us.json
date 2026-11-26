@@ -87,5 +87,20 @@
   "skill.projectzero.soul_shackle": "Soul Shackle",
   "skill.projectzero.soul_shackle.desc": "Bind nearby foes in necrotic chains, dealing magic damage and siphoning health.",
   "skill.projectzero.solar_cataclysm": "Solar Cataclysm",
-  "skill.projectzero.solar_cataclysm.desc": "Detonate a radiant nova that ignites enemies and cleanses debuffs."
+  "skill.projectzero.solar_cataclysm.desc": "Detonate a radiant nova that ignites enemies and cleanses debuffs.",
+  "skill.projectzero.colossus_breaker": "Colossus Breaker",
+  "skill.projectzero.colossus_breaker.desc": "Deliver a titanic blow dealing bonus damage equal to 8% of the target's max health.",
+  "title.projectzero.wolf_slayer": "Wolf Slayer",
+  "title.projectzero.wolf_slayer.desc": "+10% damage against wolves (Slay 100 wolves)",
+  "title.projectzero.hundred_cuts": "Hundred Cuts",
+  "title.projectzero.hundred_cuts.desc": "+2 Strength (Slay 100 creatures)",
+  "title.projectzero.undead_bane": "Undead Bane",
+  "title.projectzero.undead_bane.desc": "+10% damage against undead (Slay 200 undead)",
+  "title.projectzero.survivor": "Survivor",
+  "title.projectzero.survivor.desc": "+5% total max health (Reach level 20 with 0 deaths)",
+  "title.projectzero.giant_killer": "Giant Killer",
+  "title.projectzero.giant_killer.desc": "+5% damage against bosses; unlocks Colossus Breaker (Slay 1 boss)",
+  "title.projectzero.awakened_one": "Awakened One",
+  "title.projectzero.awakened_one.desc": "+5% XP gained (Complete an Awakening Stone reroll)",
+  "projectzero.title.cycle_hint": "Click to cycle titles (%s unlocked)"
 }

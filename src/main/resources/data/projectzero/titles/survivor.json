@@ -1,0 +1,15 @@
+{
+  "condition": {
+    "type": "level_no_deaths",
+    "count": 20
+  },
+  "effect": {
+    "attributes": [
+      {
+        "attribute": "minecraft:generic.max_health",
+        "amount": 0.05,
+        "operation": "add_multiplied_total"
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "condition": {
+    "type": "boss_kills",
+    "count": 1
+  },
+  "effect": {
+    "behavior": "projectzero:damage_vs_tag",
+    "params": {
+      "tag": "forge:bosses",
+      "bonus": 0.05
+    }
+  },
+  "grants_skill": "projectzero:colossus_breaker"
+}

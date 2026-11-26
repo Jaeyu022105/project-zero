@@ -48,11 +48,14 @@ public final class LevelingService {
         PlayerStats stats = get(player);
         if (stats.isMaxLevel()) return;
 
-        int levelsGained = stats.addXp(amount);
+        double xpMult = 1.0 + com.projectzero.titles.TitleService.xpBonusMultiplier(player);
+        long finalAmount = Math.max(1L, Math.round(amount * xpMult));
+
+        int levelsGained = stats.addXp(finalAmount);
         set(player, stats);
 
         player.displayClientMessage(
-                Component.literal("+" + amount + " XP").withStyle(ChatFormatting.AQUA), true);
+                Component.literal("+" + finalAmount + " XP").withStyle(ChatFormatting.AQUA), true);
 
         if (levelsGained > 0) {
             onLevelUp(player, stats, levelsGained);

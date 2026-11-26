@@ -1,0 +1,14 @@
+{
+  "condition": {
+    "type": "tag_kills",
+    "tag": "minecraft:undead",
+    "count": 200
+  },
+  "effect": {
+    "behavior": "projectzero:damage_vs_tag",
+    "params": {
+      "tag": "minecraft:undead",
+      "bonus": 0.10
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "condition": {
+    "type": "rerolls",
+    "count": 1
+  },
+  "effect": {
+    "behavior": "projectzero:xp_bonus",
+    "params": {
+      "bonus": 0.05
+    }
+  }
+}

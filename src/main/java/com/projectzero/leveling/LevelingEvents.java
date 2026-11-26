@@ -66,7 +66,7 @@ public final class LevelingEvents {
         if (event.getSource().getEntity() == null) return;
         if (event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) return;
 
-        if (StatEffects.rollEvade(LevelingService.get(player), player.getRandom())) {
+        if (StatEffects.rollEvade(player, LevelingService.get(player), player.getRandom())) {
             event.setCanceled(true);
             player.displayClientMessage(Component.literal("Evaded!").withStyle(ChatFormatting.GRAY), true);
         }

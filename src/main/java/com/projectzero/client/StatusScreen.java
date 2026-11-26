@@ -6,19 +6,28 @@ import com.projectzero.jobs.PlayerJob;
 import com.projectzero.leveling.PlayerStats;
 import com.projectzero.leveling.Stat;
 import com.projectzero.network.AllocateStatPacket;
+import com.projectzero.network.CycleTitlePacket;
 import com.projectzero.network.ModNetwork;
 import com.projectzero.skills.PlayerSkills;
 import com.projectzero.skills.Skill;
+import com.projectzero.titles.PlayerTitles;
+import com.projectzero.titles.Title;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /** The "System" status window. Opens with K by default. */
 public class StatusScreen extends Screen {
@@ -111,7 +120,7 @@ public class StatusScreen extends Screen {
         field(g, "NAME", name, col1, top + 32);
         field(g, "LEVEL", String.valueOf(s.level()), col2, top + 32);
         boolean jobHovered = jobField(g, col1, top + 46, mouseX, mouseY);
-        field(g, "TITLE", "None", col2, top + 46);
+        boolean titleHovered = titleField(g, col2, top + 46, mouseX, mouseY);
 
         // HP / MP
         if (player != null) {
@@ -181,9 +190,52 @@ public class StatusScreen extends Screen {
                     rarity != null ? rarity.displayName() : Component.literal("?"),
                     ClientJobCache.get().jobLevel());
         }
-        if (hovered != null) {
+        if (titleHovered) {
+            PlayerTitles titles = ClientTitlesCache.get();
+            List<Component> lines = new ArrayList<>();
+            ResourceLocation eq = titles.equipped();
+            if (eq != null) {
+                lines.add(Title.displayName(eq).copy().withStyle(ChatFormatting.GOLD));
+                lines.add(Title.description(eq).copy().withStyle(ChatFormatting.WHITE));
+            }
+            lines.add(Component.translatable("projectzero.title.cycle_hint", titles.unlocked().size())
+                    .withStyle(ChatFormatting.GRAY));
+            g.renderTooltip(font, lines, Optional.empty(), mouseX, mouseY);
+        } else if (hovered != null) {
             g.renderTooltip(font, hovered, mouseX, mouseY);
         }
+    }
+
+    /** TITLE: equipped title name (clickable to cycle). Returns true if hovered. */
+    private boolean titleField(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+        PlayerTitles titles = ClientTitlesCache.get();
+        g.drawString(font, "TITLE: ", x, y, LABEL, false);
+        int valueX = x + font.width("TITLE: ");
+        int maxW = (left + WIDTH - 12) - valueX;
+        ResourceLocation eq = titles.equipped();
+        String text = eq != null ? Title.displayName(eq).getString() : "None";
+        text = font.plainSubstrByWidth(text, Math.max(20, maxW));
+        int color = eq != null ? HIGHLIGHT : (titles.unlocked().isEmpty() ? MUTED : VALUE);
+        g.drawString(font, text, valueX, y, color, false);
+        int hitEnd = Math.max(valueX + font.width(text), x + 76);
+        return mouseX >= x && mouseX < hitEnd && mouseY >= y - 2 && mouseY < y + 10;
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            int col2 = left + WIDTH / 2 + 6;
+            int y = top + 46;
+            if (mouseX >= col2 && mouseX < left + WIDTH - 12 && mouseY >= y - 2 && mouseY < y + 10) {
+                if (!ClientTitlesCache.get().unlocked().isEmpty()) {
+                    Minecraft.getInstance().getSoundManager().play(
+                            SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                    ModNetwork.sendToServer(new CycleTitlePacket());
+                }
+                return true;
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     /** JOB: name in its rarity color. Returns true if the mouse is over the job name. */

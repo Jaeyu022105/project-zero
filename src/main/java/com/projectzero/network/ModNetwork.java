@@ -11,8 +11,9 @@ public final class ModNetwork {
     private ModNetwork() {}
 
     // 2: SyncJobPacket. 3: VisionOverlayPacket. 4: SyncSkillsPacket + CastSkillPacket.
+    // 5: SyncTitlesPacket + CycleTitlePacket.
     // Bump whenever the packet list or a packet's format changes.
-    private static final int PROTOCOL_VERSION = 4;
+    private static final int PROTOCOL_VERSION = 5;
 
     public static final SimpleChannel CHANNEL = ChannelBuilder
             .named(ProjectZero.id("main"))
@@ -54,6 +55,18 @@ public final class ModNetwork {
                 .encoder(CastSkillPacket::encode)
                 .decoder(CastSkillPacket::decode)
                 .consumerMainThread(CastSkillPacket::handle)
+                .add();
+
+        CHANNEL.messageBuilder(SyncTitlesPacket.class, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(SyncTitlesPacket::encode)
+                .decoder(SyncTitlesPacket::decode)
+                .consumerMainThread(SyncTitlesPacket::handle)
+                .add();
+
+        CHANNEL.messageBuilder(CycleTitlePacket.class, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(CycleTitlePacket::encode)
+                .decoder(CycleTitlePacket::decode)
+                .consumerMainThread(CycleTitlePacket::handle)
                 .add();
     }
 

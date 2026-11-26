@@ -1,0 +1,11 @@
+{
+  "condition": {
+    "type": "total_kills",
+    "count": 100
+  },
+  "effect": {
+    "stats": {
+      "strength": 2
+    }
+  }
+}

@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Task 3: 4 basic skills + 10 job signature skills).
+Last caught up: **2026-11-27** (Task 4: Titles and milestones).
 
 ---
 
@@ -27,7 +27,7 @@ Last caught up: **2026-11-27** (Task 3: 4 basic skills + 10 job signature skills
 **What Project Zero is**:
 - A leveling system: levels, XP from kills, five stats, a System-style status window.
 - A job system: Job Change Quest at level 10 (auto-complete for now), weighted random jobs by rarity loaded from JSON.
-- (Planned) Basic skills, job skills, milestone titles and skills, skillbooks.
+- Basic skills, job signature skills, milestone titles and milestone skills, and skillbooks.
 - Awakening Stones & Awakening Shards: two-block crystal block, shard item, and real job reroll backend (custom village worldgen and gate boss loot drops still planned).
 - (Planned) Gates and dungeons by color and size, with Souls-like bosses.
 - (Long term) A Monarch path.
@@ -74,9 +74,10 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Awakening Stones, Crystal Formations & Reawakening Vision: small two-block crystal (`awakening_stone`), glassy shell `awakening_crystal`, opaque interior `awakening_crystal_deep`, glowing `awakening_core` veins, surface `awakening_cluster` spikes, procedural `CrystalFormation` (`small`, `large`, `colossal`), and `awakening_shard`. Offering a shard applies `JobService.awakeningRerollQuiet` immediately (logout-safe) and plays the ~14s `ReawakeningVision` (eyelid overlay `VisionOverlayRenderer`, mirror `void_sea` + `void_mote`, 64 drifting cards, rising card with heartbeat, reveal, return home, and rarity-colored particle aura burst).
 - Shard Vessel (`projectzero:shard_vessel`, stack size 1): right-click with an Awakening Shard in the other hand to insert; sneak + right-click to extract. While holding a non-maxed shard in inventory (first active Vessel only), 50% of kill XP (`VESSEL_DIVERT = 0.5`) diverts into the Vessel (`ShardCharge` data component) across 5 charge tiers (`Dim`, `Glowing`, `Radiant`, `Blazing`, `Resplendent`, thresholds `t * 0.6 * xpToNextLevel(level)`). Extracted shards keep their `shard_charge_tier` (`0..5`) component, stack only with shards of the same tier, shift Awakening Stone rarity weights (`JobRules.weightsForShardTier`), and pass `shardTier` on `JobService.AwakeningResult` for future golden-sea tinting in `ReawakeningVision`.
 - Skills Foundation & Mana (`skills/`): current mana + max mana from Intelligence (`10 * INT`), regenerating `1 + 2% of max` per second. 14 skills in `data/projectzero/skills/*.json` (`SkillRegistry` + `SkillBehaviors` + `SkillEffects`): 4 basic skills auto-learned at levels 3/8/15/25 (`dash`, `second_wind`, `focus`, `bloodlust`) and 10 job signature skills granted on job assignment (`iron_knuckle`, `ricochet_bolt`, `riposte_stance`, `aegis_bastion`, `cursed_edge`, `pack_howl`, `tempest_call`, `shadow_step`, `soul_shackle`, `solar_cataclysm`). Player state (`projectzero:skills`) stores mana, learned skills, 4 active slots (`Z`, `X`, `C`, `V`), and cooldowns; Awakening Stone rerolls retain up to 3 random old-job skills. Includes `projectzero:skillbook` item and plain-text bottom-left `SkillHudOverlay`.
-- Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), title (always "None"), HP, live MP (`current / max`), XP bar, stats with + buttons, learned/slotted `SKILLS` list, available points, hover descriptions.
+- Titles & Milestones (`titles/`): `MilestoneTracker` (`projectzero:milestones` NBT) tracks kills per entity type/tag, total kills, boss kills, deaths, highest level, rerolls, and gates cleared. 6 starter JSON titles in `data/projectzero/titles/*.json` (`wolf_slayer`, `hundred_cuts`, `undead_bane`, `survivor`, `giant_killer` granting milestone skill `colossus_breaker`, `awakened_one`). Equipped title (`projectzero:titles` NBT) applies transient attributes, stat bonuses, damage-vs-entity/tag multipliers, or XP bonuses, and cycles on click in `StatusScreen`.
+- Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), HP, live MP (`current / max`), XP bar, stats with + buttons, learned/slotted `SKILLS` list, available points, hover descriptions.
 - Data saved with the player and kept on death.
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`.
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`.
 
 **Built and verified in a loaded world (`gradlew runClient`).**
 
@@ -543,3 +544,32 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 **Remaining Recommendations**
 
 1. Task 4: Titles and milestones (`titles/` package, `MilestoneTracker`, JSON titles, 6 starter titles, `/pz title` & `/pz milestone` commands, `StatusScreen` clickable `TITLE` field).
+
+---
+
+### Session Log — 2026-11-27 (Task 4: Titles and milestones)
+
+**Context & Direction Check**
+
+- Implemented `DESIGN-DOCUMENT.md` §7 milestone tracking, data-driven JSON titles, 6 starter titles, milestone skill `colossus_breaker`, `/pz title` & `/pz milestone` commands, and clickable `TITLE` cycling in `StatusScreen`.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/titles/`: `MilestoneTracker` (`projectzero:milestones`), `Title`, `TitleRegistry` (`data/<ns>/titles/*.json`), `PlayerTitles` (`projectzero:titles`), `TitleService`, `TitleCommands` (`/pz title list|equip`, `/pz milestone add <stat> <n>`), `TitleEvents`.
+- `src/main/java/com/projectzero/network/` & `client/`: `SyncTitlesPacket`, `CycleTitlePacket`, bumped `ModNetwork.PROTOCOL_VERSION` to `5`, `ClientTitlesCache`, logout reset in `ClientEvents`, clickable `TITLE` field + hover tooltip in `StatusScreen`.
+- `src/main/java/com/projectzero/leveling/` & `jobs/` & `skills/`: `StatEffects.bonusStatPoints` + `effectiveBonus`, `LevelingService.grantXp` XP multiplier hook, `JobService.awakeningRerollQuiet` reroll milestone hook, `/pz reset` title/milestone reset, and `colossus_breaker` behavior in `SkillBehaviors`.
+- `src/main/resources/data/projectzero/titles/*.json`, `skills/colossus_breaker.json`, `lang/en_us.json`: 6 starter titles (`wolf_slayer`, `hundred_cuts`, `undead_bane`, `survivor`, `giant_killer`, `awakened_one`) and milestone skill `colossus_breaker` (`TODO(claude-art)`: ground shockwave VFX).
+- `DESIGN-DOCUMENT.md`, `ROADMAP.md`, `HANDOFF.md`: updated status marks and reference notes.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded world):
+  - Verified `Loaded 6 titles` and `Loaded 15 skills`.
+  - Triggered all 6 starter titles via `/pz milestone add ...`, verified unlock announcements and permanent grant of `colossus_breaker` from `giant_killer`.
+  - Equipped and verified every title effect: `hundred_cuts` (`ATK 1.0 -> 1.0396`), `survivor` (`MaxHP 20.0 -> 21.0`), `wolf_slayer` (`+10%` vs wolves), `undead_bane` (`10 -> 10.824` damage vs zombies), `giant_killer` + `colossus_breaker` (`23.1` damage on Iron Golem), and `awakened_one` (`100 -> 105` XP).
+  - Sent C2S `CycleTitlePacket` and confirmed server/client title sync. Zero errors in `run/logs/latest.log`.
+
+**Remaining Recommendations**
+
+1. Task 5: Equipment and accessories (`equipment/` package, 8 custom slots + `AccessoryMenu`/`AccessoryScreen`, `AccessoryData` component, global loot modifier drops, `StatEffects` + `StatusScreen` `(+X)` integration, `/pz gear roll`).

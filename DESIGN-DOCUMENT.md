@@ -57,7 +57,7 @@ Three sources of skills, all stored the same way (skill id in `projectzero:skill
 
 1. **Basic skills [Built]** unlock at fixed levels for everyone: lvl 3 *Dash* (burst + 6t i-frames), lvl 8 *Second Wind* (30% max HP over 3s), lvl 15 *Focus* (passive +10% damage on first hit against a full-HP foe), lvl 25 *Bloodlust* (+20% damage & +10% speed for 10s).
 2. **Job skills [Built]** (starter signature skill per job, granted on assignment; deeper trees **[Planned]**).
-3. **Milestone skills [Planned]** come from titles and achievements (section 7). They are unique and are never lost on a reroll.
+3. **Milestone skills [Built]** come from titles and achievements (section 7; e.g. *Giant Killer* grants *Colossus Breaker*). They are unique and are never lost on a reroll.
 4. **Skillbooks [Built]** (`projectzero:skillbook` with `projectzero:skill_id` data component; dungeon loot drops **[Planned]**). Using one teaches a skill. A book can teach a skill from any job, so a player can mix builds.
 
 Skill types: **active** (bound to 4 skill keys `Z`, `X`, `C`, `V`, cost mana, have cooldowns) and **passive** (always on). **[Built]** (Skill leveling with use **[Idea]**.)
@@ -115,10 +115,10 @@ Our own mechanic, not in Solo Leveling.
 
 ## 7. Titles and milestones
 
-- **[Planned]** The System tracks milestones: kill counts by mob type, first boss kills, gates cleared by color, damage taken without dying, levels reached, and so on.
-- Reaching one grants a **title**. A title either gives a passive effect (e.g. *Wolf Slayer*: +10% damage to wolves; *One Who Overcame Adversity*: +20% stats at low health) or unlocks a **unique milestone skill**.
-- Only one title can be **equipped** at a time; its effect applies only while equipped. Unique skills from milestones are kept permanently.
-- Titles show on the status window (the TITLE field is already there).
+- **[Built]** The System tracks milestones (`MilestoneTracker` in `projectzero:milestones`): kill counts by mob type/tag, total kills, boss kills, deaths, highest level reached, rerolls, and gates cleared.
+- **[Built]** Reaching a milestone condition in `data/projectzero/titles/*.json` grants a **title** (`[System]` message + on-screen title). A title gives flat stat bonuses, transient attribute modifiers, or combat/XP behaviors (e.g. *Wolf Slayer*: +10% damage to wolves; *Hundred Cuts*: +2 Strength; *Undead Bane*: +10% damage to undead; *Survivor*: +5% max health; *Awakened One*: +5% XP), and can unlock a **unique milestone skill** (*Giant Killer* grants *Colossus Breaker*).
+- **[Built]** Only one title can be **equipped** at a time (`/pz title equip|list` or clicking the `TITLE` field in the status window to cycle); its effect applies only while equipped. Unique skills from milestones are kept permanently.
+- **[Built]** Titles show on the status window (`TITLE` field, clickable with hover tooltip).
 
 ## 8. Monarch path
 

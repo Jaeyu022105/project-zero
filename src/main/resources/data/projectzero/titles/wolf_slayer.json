@@ -1,0 +1,14 @@
+{
+  "condition": {
+    "type": "entity_kills",
+    "entity": "minecraft:wolf",
+    "count": 100
+  },
+  "effect": {
+    "behavior": "projectzero:damage_vs_entity",
+    "params": {
+      "entity": "minecraft:wolf",
+      "bonus": 0.10
+    }
+  }
+}

@@ -149,6 +149,7 @@ public final class JobService {
         PlayerJob updated = get(player).withJob(next.id());
         set(player, updated);
         com.projectzero.skills.SkillService.grantJobSkills(player, next.id(), updated.jobLevel(), true);
+        com.projectzero.titles.MilestoneTracker.recordReroll(player);
         return new AwakeningResult(next, resetLevel, clampedTier);
     }
 

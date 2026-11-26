@@ -30,7 +30,7 @@ public final class SkillService {
     public static final String DATA_KEY = ProjectZero.MOD_ID + ":skills";
 
     public static int maxMana(Player player) {
-        return StatEffects.maxMana(LevelingService.get(player));
+        return StatEffects.maxMana(player, LevelingService.get(player));
     }
 
     public static PlayerSkills get(Player player) {
