@@ -116,11 +116,16 @@ Package layout (`src/main/java/com/projectzero/`):
   - `JobEvents.java`: reload listener registration, level up -> quest, login/clone/respawn/dimension sync, commands.
   - `JobCommands.java`: `/pz job set|reroll|clear` (merged into the `/pz` node).
 - `registry/`
-  - `ModDataComponents.java`: MC 1.21+ data components (`SHARD_CHARGE`, `SHARD_CHARGE_TIER`).
-  - `ModBlocks.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL`, `AWAKENING_CORE`, `AWAKENING_CRYSTAL_DEEP`, `AWAKENING_CLUSTER`, `VOID_SEA`, `VOID_MOTE`.
-  - `ModItems.java`: block items, `AWAKENING_SHARD` (`AwakeningShardItem`), and `SHARD_VESSEL` (`ShardVesselItem`).
+  - `ModDataComponents.java`: MC 1.21+ data components (`SHARD_CHARGE`, `SHARD_CHARGE_TIER`, `SKILL_ID`, `ACCESSORY_DATA`).
+  - `ModBlocks.java` & `ModBlockEntities.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL`, `AWAKENING_CORE`, `AWAKENING_CRYSTAL_DEEP`, `AWAKENING_CLUSTER`, `VOID_SEA`, `VOID_MOTE`, `GATE_PORTAL` (`GateBlockEntity`).
+  - `ModItems.java`: block items, `AWAKENING_SHARD`, `SHARD_VESSEL`, `SKILLBOOK`, and 9 starter `AccessoryItem`s.
   - `ModEntities.java`: `JOB_CARD` (`JobCardEntity`).
+  - `ModMenus.java` & `ModLootModifiers.java`: `ACCESSORIES` (`AccessoryMenu`) and `ACCESSORY_DROPS` (`AccessoryLootModifier`).
   - `ModCreativeTabs.java`: `projectzero` creative tab.
+- `skills/`: `SkillRules`, `SkillType`, `SkillSource`, `Skill`, `SkillBehavior`, `SkillBehaviors`, `SkillEffects`, `SkillRegistry` (`data/<ns>/skills/*.json`), `PlayerSkills` (`projectzero:skills`), `SkillService`, `SkillbookItem`, `SkillCommands`, `SkillEvents`.
+- `titles/`: `MilestoneTracker` (`projectzero:milestones`), `Title`, `TitleRegistry` (`data/<ns>/titles/*.json`), `PlayerTitles` (`projectzero:titles`), `TitleService`, `TitleCommands`, `TitleEvents`.
+- `equipment/`: `AccessorySlotType`, `AccessoryData`, `EquipmentRules`, `AccessoryItem`, `PlayerAccessories` (`projectzero:accessories`), `EquipmentService`, `AccessoryMenu`, `AccessoryLootModifier`, `EquipmentCommands`, `EquipmentEvents`.
+- `gates/`: `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `GateRules` (`projectzero:gateSpawning` gamerule), `MobScaling`, `GateBlock`, `GateBlockEntity`, `DungeonSavedData`, `GateDungeonArena`, `GateService`, `MobCommands`, `GateCommands`, `MobEvents`.
 - `awakening/`
   - `AwakeningRules.java`: `VESSEL_DIVERT = 0.5`, `VESSEL_TIER_FRACTION = 0.6`, `MAX_SHARD_TIER = 5`, tier threshold/name/color helpers.
   - `ShardCharge.java`: `(hasShard, chargeXp, tier)` data component record with Codec + StreamCodec.
@@ -131,16 +136,13 @@ Package layout (`src/main/java/com/projectzero/`):
   - `CrystalCommands.java`: `/pz crystal small|large|colossal`.
   - `AwakeningEvents.java`: registers `AwakeningCommands` and `CrystalCommands`.
 - `network/`
-  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version 2. Bump the version when a packet's format changes.
-  - `SyncStatsPacket.java`: server → client, full stats.
-  - `AllocateStatPacket.java`: client → server, spend one point (server validates).
-  - `SyncJobPacket.java`: server → client, the player's job plus its rarity (the client has no job definitions).
+  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version `6`. Bump the version when a packet's format changes.
+  - `SyncStatsPacket`, `AllocateStatPacket`, `SyncJobPacket`, `VisionOverlayPacket`, `SyncSkillsPacket`, `CastSkillPacket`, `SyncTitlesPacket`, `CycleTitlePacket`, `SyncStatBonusesPacket`, `OpenAccessoriesPacket`.
 - `client/`
-  - `ClientStatsCache.java`: last stats received. Has no client-only imports on purpose, so packet handlers can call it on either side.
-  - `ClientJobCache.java`: last job and rarity received. Same rule.
-  - `ClientEvents.java`: `Dist.CLIENT` Forge bus subscriber; resets `ClientStatsCache` and `ClientJobCache` on `ClientPlayerNetworkEvent.LoggingOut`.
-  - `ModKeyBindings.java`: K opens the status window.
-  - `StatusScreen.java`: the System-style status window.
+  - `ClientStatsCache`, `ClientJobCache`, `ClientSkillsCache`, `ClientTitlesCache`, `ClientBonusCache`: synced local caches with zero client-only imports so packet handlers are server-safe.
+  - `ClientEvents.java` & `ClientModEvents.java`: logout cache reset, `JobCardRenderer`, and `MenuScreens.register` for `AccessoryScreen`.
+  - `ModKeyBindings.java`: `K` opens `StatusScreen`; `Z`, `X`, `C`, `V` cast active skill slots 1–4.
+  - `StatusScreen.java`, `AccessoryScreen.java`, `SkillHudOverlay.java`, `VisionOverlayRenderer.java`.
 
 Resources:
 
@@ -171,7 +173,11 @@ Job data lives next to it under `projectzero:job` (empty compound = no job):
 
 Also copied in `PlayerEvent.Clone`. If a saved job id is missing from the datapack, the player keeps it; the status window shows it in gray.
 
-Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlocked and equipped titles, milestone counters.
+Additional player NBT keys (all copied on `PlayerEvent.Clone`):
+- `projectzero:skills`: current mana, learned skill ids, 4 active slot bindings, active cooldowns.
+- `projectzero:milestones`: kill map by entity type, total kills, boss kills, deaths, highest level, rerolls, gates cleared.
+- `projectzero:titles`: unlocked title ids and single equipped title id.
+- `projectzero:accessories`: 8 active equipped accessory `ItemStack`s (+1 spare locked Relic slot); cleared & dropped on `LivingDropsEvent` when `keepInventory` is `false`.
 
 ---
 
@@ -192,9 +198,9 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 
 ### High Priority
 
-- Basic skills, mana and cooldowns (`DESIGN-DOCUMENT.md` §4).
-- Job content: job skills, job leveling, the real Job Change Quest trial dungeon, job advancement trials (§5). The random job itself is built.
-- Titles and milestone tracking (§7).
+- Visual polish pass by Claude on all `TODO(claude-art)` placeholders (HUD bars/icons, System skills & accessories frames, item icons, worn gauntlet arm model, skill VFX, gate portal shader/model, golden sea shimmer in `ReawakeningVision` for charged shards).
+- Multi-room template dungeon generator (replacing `GateDungeonArena`), dungeon loot chests with `Skillbook` drops, original gate monster models, and Souls-like boss state machines (`DESIGN-DOCUMENT.md` §9–10).
+- Deeper job skill trees, job leveling XP, and job advancement trials (§5).
 
 ### Medium Priority
 
@@ -658,3 +664,51 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 **Remaining Recommendations**
 
 1. Append final sprint summary in `HANDOFF.md` for Claude and the owner.
+
+---
+
+### Session Log — 2026-11-27 (Final 12-Hour Backend Sprint Summary)
+
+**Sprint Task Status & Commits (All Tasks Complete, World-Tested, and Pushed to `main`)**
+
+| Task | Status | Commit(s) | Summary |
+|---|---|---|---|
+| **Task 0:** Commit Claude's work + stat soft-cap rebalance | **done** | `e15efed`, `bd44fdd`, `16b9baf`, `135831e`, `510d4a7` | Committed Library domain, solid-core crystals/clusters, Reawakening vision (`VisionOverlayRenderer` untouched), docs, and rebalanced STR/VIT/AGI/SEN onto soft-cap curves. |
+| **Task 1:** Shard Vessel & charged Awakening Shards | **done** | `b1f7aa7` | `shard_vessel` item, `ShardCharge` & `SHARD_CHARGE_TIER` components, 50% kill XP diversion, 6 tier rarity tables, `AwakeningResult.shardTier`, `/pz shard give` & `/pz vessel charge`. |
+| **Task 2:** Skills foundation, mana, skillbooks & HUD | **done** | `d549e93` | Mana (`10 * INT`, `1 + 2%/s` regen), `SkillRegistry` JSONs, `PlayerSkills` (`Z/X/C/V` + `CastSkillPacket`), `skillbook` item, 3-skill reroll retention, `StatusScreen` skills list, `SkillHudOverlay`. |
+| **Task 3:** 4 Basic skills + 10 Job signature skills | **done** | `3757e42` | Auto-granted basic skills (`dash`, `second_wind`, `focus`, `bloodlust`) + 10 signature job skills (`iron_knuckle`, `ricochet_bolt`, `riposte_stance`, `aegis_bastion`, `cursed_edge`, `pack_howl`, `tempest_call`, `shadow_step`, `soul_shackle`, `solar_cataclysm`). |
+| **Task 4:** Titles and milestones | **done** | `c5e978d` | `MilestoneTracker`, `TitleRegistry` JSONs, 6 starter titles (`wolf_slayer`, `hundred_cuts`, `undead_bane`, `survivor`, `giant_killer` + milestone skill `colossus_breaker`, `awakened_one`), clickable `TITLE` field in `StatusScreen`, `/pz title` & `/pz milestone`. |
+| **Task 5:** Equipment and accessories (own slots) | **done** | `09f9b33` | 8 active custom slots + locked Relic slot (`PlayerAccessories`), `AccessoryData` component, `AccessoryMenu`/`AccessoryScreen`, `AccessoryLootModifier`, 9 starter items, `StatusScreen` `GEAR` button & `(+X)` bonus stats, `keepInventory` death rules, `/pz gear roll`. |
+| **Task 6:** Mob ranks and scaling infrastructure | **done** | `5341e38` | `GateRank` (`E..S`, `×1..×32`), `MobScaling.apply` (`[C · Lv 34] Zombie` nameplates), `XpRewards` rank multiplier + level-gap penalty (`−5%`/lvl past 5, `10%` floor), `/pz mob spawn`. |
+| **Task 7 (Stretch):** Gate backend skeleton | **done** | `0d4e03a` | `GateBlock` + `GateBlockEntity`, `projectzero:dungeon` void dimension, `DungeonSavedData`, `GateDungeonArena` chamber with scaled gate mobs & boss, boss Awakening Shard drop + exit portal + overworld gate closure, `projectzero:gateSpawning` gamerule, `/pz gate spawn|leave`. |
+
+**Complete `TODO(claude-art)` Placeholder Inventory for Claude**
+
+1. **Shard Vessel & Vision (`Task 1`)**:
+   - `assets/projectzero/textures/item/shard_vessel.png`: 16x16 flat placeholder icon (needs Vessel sprite + per-tier glow states).
+   - `JobService.AwakeningResult.shardTier()` (`0..5`): wired and passed to `AwakeningService`; ready for Claude to tint the `ReawakeningVision` sea warmer/gold at higher charge tiers.
+2. **Skills UI & Item (`Task 2`)**:
+   - `assets/projectzero/textures/item/skillbook.png`: 16x16 flat book placeholder icon.
+   - `client/SkillHudOverlay.java`: plain-text bottom-left `HP / MP` + `[Z/X/C/V]` cooldown readout (needs System-styled bars and skill slot frames/icons).
+   - `client/StatusScreen.java`: plain-text `SKILLS` summary row & `GEAR` button (needs dedicated System skills/slot-assignment view & styled tab button).
+3. **Skill VFX & Summon Visuals (`Task 3` & `Task 4`)**:
+   - `skills/SkillBehaviors.java`: all 15 active/passive skills (`dash`, `second_wind`, `bloodlust`, `iron_knuckle`, `ricochet_bolt`, `riposte_stance`, `aegis_bastion`, `cursed_edge`, `pack_howl` Spirit Hound model/sigil, `tempest_call`, `shadow_step`, `soul_shackle`, `solar_cataclysm`, `colossus_breaker`) currently use vanilla particles & sounds.
+4. **Accessories & Gear Screen (`Task 5`)**:
+   - `assets/projectzero/textures/item/{iron_gauntlets,copper_ring,silver_ring,gold_ring,bone_amulet,obsidian_earrings,leather_belt,hunter_charm,mana_charm}.png`: 9 16x16 flat color+outline placeholder icons.
+   - `client/AccessoryScreen.java`: minimal navy/cyan container screen with `GAU/RNG/AML/EAR/BLT/CHM/RLC` text labels (needs System frame + slot silhouette icons).
+   - Worn 3D gauntlet rendering on player arms when equipped in slot 0 (`GAUNTLETS`).
+5. **Gate Portals & Dungeon Generation (`Task 7`)**:
+   - `assets/projectzero/textures/block/gate_portal_{e,d,c,b,a,s,exit}.png` & `models/block/gate_portal_*.json`: flat translucent colored portal blocks (needs swirling rift shader/frame).
+   - `gates/GateDungeonArena.java`: code-built deepslate chamber (to be replaced by Claude's multi-room template dungeon generator + skillbook loot chests).
+
+**Balance Observations**
+
+- **Tier-5 Shard Rarity Spread (`Task 1`)**: Across 20 in-world Tier-5 (`Resplendent`) rerolls, observed `{COMMON=6, UNCOMMON=2, RARE=7, EPIC=5, LEGENDARY=0}` (60% Rare+), which feels rewarding for sacrificing half kill XP without making Legendary trivial.
+- **High-Rank Accessory Scaling (`Task 5` + `Task 0`)**: An `S-Rank Legendary` accessory rolls 3–4 stat lines of ~38–55 points each (`~140–190` total stat points across stats). Because `StatEffects` feeds gear points into `LevelingRules.soft(p, k)` rather than linear scaling, stacking multiple S-rank pieces stays bounded and never breaks movement speed (`< +40%`) or evade (`< 30%`), though end-game S-rank flat stat ranges in `EquipmentRules` (`16..24 × 2.4`) may want tuning once full 8-slot S-rank loadouts are playtested against S-rank bosses (`×32` HP = `640+` HP).
+- **Dungeon Boss Toughness (`Task 6` + `Task 7`)**: `GateRules.BOSS_EXTRA_HEALTH_MULT = 2.5` on top of `GateRank.multiplier()` puts an E-rank Husk boss at `50 HP`, a C-rank Vindicator boss at `240 HP`, and an S-rank Wither Skeleton boss at `1,600 HP`, matching the progression curve well once weapon + Strength soft-caps kick in.
+
+**Open Questions for Owner**
+
+1. **Red Gates (`DESIGN-DOCUMENT.md` §9)**: Currently all gates seal their exit behind iron bars until the dungeon boss dies (with `/pz gate leave` for operators). Should normal `E..A` gates allow retreating back out through an open entrance portal before the boss dies (leaving the gate open in the overworld), reserving the locked-until-boss-dies rule strictly for **Red Gates** (S-rank or a random "Red Gate" anomaly roll on lower ranks)?
+2. **Skill Slot Assignment UI**: Players can currently rebind learned active skills via `/pz skill slot <1-4> <skill>` (and newly learned active skills auto-fill empty slots). Should clicking the `SKILLS` area in `StatusScreen` open a dedicated System Skill Loadout sub-screen next?
+3. **Relic Slot (Slot 9)**: What mechanic should unlock and populate the 9th `RELIC` slot in `PlayerAccessories` (e.g., Monarch trials, hidden-dungeon boss drops, or level 50 advancement)?
