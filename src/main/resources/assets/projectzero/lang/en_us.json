@@ -28,5 +28,8 @@
   "rarity.projectzero.epic": "Epic",
   "rarity.projectzero.legendary": "Legendary",
   "projectzero.job.none": "None",
-  "projectzero.job.tooltip": "%s job, job level %s"
+  "projectzero.job.tooltip": "%s job, job level %s",
+  "block.projectzero.awakening_stone": "Awakening Stone",
+  "item.projectzero.awakening_shard": "Awakening Shard",
+  "itemGroup.projectzero": "Project Zero"
 }
