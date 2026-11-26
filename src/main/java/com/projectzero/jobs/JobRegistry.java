@@ -35,9 +35,11 @@ import java.util.TreeMap;
  * against the file name, which is the real id.
  */
 public final class JobRegistry extends SimpleJsonResourceReloadListener {
-    public static final JobRegistry INSTANCE = new JobRegistry();
-
+    // GSON must be declared before INSTANCE: static fields initialize top to bottom, and the
+    // constructor passes GSON to super(). In the other order it was still null (crash on world load).
     private static final Gson GSON = new Gson();
+
+    public static final JobRegistry INSTANCE = new JobRegistry();
 
     // TreeMap keeps iteration order stable, so command suggestions come out sorted.
     private Map<ResourceLocation, Job> jobs = Map.of();

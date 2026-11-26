@@ -13,5 +13,6 @@ public final class AwakeningEvents {
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         AwakeningCommands.register(event.getDispatcher());
+        CrystalCommands.register(event.getDispatcher());
     }
 }

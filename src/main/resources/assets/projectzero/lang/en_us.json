@@ -31,5 +31,7 @@
   "projectzero.job.tooltip": "%s job, job level %s",
   "block.projectzero.awakening_stone": "Awakening Stone",
   "item.projectzero.awakening_shard": "Awakening Shard",
-  "itemGroup.projectzero": "Project Zero"
+  "itemGroup.projectzero": "Project Zero",
+  "block.projectzero.awakening_crystal": "Awakening Crystal",
+  "block.projectzero.awakening_core": "Awakening Core"
 }

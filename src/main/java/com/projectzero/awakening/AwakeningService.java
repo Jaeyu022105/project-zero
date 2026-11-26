@@ -12,6 +12,10 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * What happens when a player uses an Awakening Stone (DESIGN-DOCUMENT.md §6).
  *
@@ -21,8 +25,17 @@ import net.minecraft.world.item.ItemStack;
 public final class AwakeningService {
     private AwakeningService() {}
 
+    /** Ticks between two "touch" hints, so holding right-click on a formation does not spam chat. */
+    private static final int TOUCH_COOLDOWN_TICKS = 40;
+    private static final Map<UUID, Long> LAST_TOUCH = new HashMap<>();
+
     /** Right-click with an empty hand or another item. */
     public static void touch(ServerPlayer player, BlockPos stonePos) {
+        long now = player.serverLevel().getGameTime();
+        Long last = LAST_TOUCH.get(player.getUUID());
+        if (last != null && now - last < TOUCH_COOLDOWN_TICKS && now >= last) return;
+        LAST_TOUCH.put(player.getUUID(), now);
+
         system(player, Component.literal("An Awakening Stone. Offer an Awakening Shard to reawaken your job.")
                 .withStyle(ChatFormatting.WHITE));
         player.level().playSound(null, stonePos, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 0.8F, 0.7F);

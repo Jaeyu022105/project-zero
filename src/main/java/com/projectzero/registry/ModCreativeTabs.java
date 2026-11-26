@@ -21,6 +21,8 @@ public final class ModCreativeTabs {
                     .displayItems((params, output) -> {
                         output.accept(ModItems.AWAKENING_STONE.get());
                         output.accept(ModItems.AWAKENING_SHARD.get());
+                        output.accept(ModItems.AWAKENING_CRYSTAL.get());
+                        output.accept(ModItems.AWAKENING_CORE.get());
                     })
                     .build());
 }

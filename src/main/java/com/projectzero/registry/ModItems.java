@@ -20,4 +20,10 @@ public final class ModItems {
     /** Consumed by an Awakening Stone to reroll a job. Only gate bosses drop it (DESIGN-DOCUMENT.md §6). */
     public static final RegistryObject<Item> AWAKENING_SHARD = ITEMS.register("awakening_shard",
             () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
+
+    public static final RegistryObject<Item> AWAKENING_CRYSTAL = ITEMS.register("awakening_crystal",
+            () -> new BlockItem(ModBlocks.AWAKENING_CRYSTAL.get(), new Item.Properties().rarity(Rarity.RARE)));
+
+    public static final RegistryObject<Item> AWAKENING_CORE = ITEMS.register("awakening_core",
+            () -> new BlockItem(ModBlocks.AWAKENING_CORE.get(), new Item.Properties().rarity(Rarity.RARE)));
 }

@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-26** (Awakening Stone block, shard item, and real job reroll backend).
+Last caught up: **2026-11-26** (crystal formations, glassy crystal blocks, JobRegistry/awakeningReroll fixes).
 
 ---
 
@@ -71,10 +71,10 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - XP from kills: every non-player mob gives XP. Vanilla ×0.3, other mods ×1, gate monsters ×3 (`projectzero:gate_monsters` tag, empty for now), bosses ×10.
 - Stats: Strength, Agility, Vitality, Sense, Intelligence, each with an effect (Intelligence only shows max mana for now).
 - Jobs: at level 10 the System gives a Job Change Quest that completes on the spot (trial dungeon comes later) and rolls a random job weighted by rarity (Common 50, Uncommon 28, Rare 15, Epic 6, Legendary 1). Jobs are JSON data in `data/projectzero/jobs/`; 10 placeholder jobs, 2 per rarity. Jobs have no skills or effects yet.
-- Awakening Stones & Shards: two-block glowing crystal block (`projectzero:awakening_stone`), `projectzero:awakening_shard` item, and a Project Zero creative tab. Right-clicking an Awakening Stone with an Awakening Shard runs `JobService.awakeningReroll`: resets level to `firstJobLevel`, XP to 0, stats to base, unspent points to `(level - 1) * 5`, draws a different random job, keeps up to 3 random old job skills (hook + TODO until skills exist), and consumes the shard in survival only on success.
+- Awakening Stones & Crystal Formations: small two-block crystal (`projectzero:awakening_stone`), glassy translucent `projectzero:awakening_crystal` and glowing `projectzero:awakening_core` vein blocks (`AwakeningCrystalBlock`), procedural iceberg-like `CrystalFormation` generator (`small`, `large`, `colossal`), `projectzero:awakening_shard` item, and a Project Zero creative tab. Right-clicking any Awakening Stone or formation block with an Awakening Shard runs `JobService.awakeningReroll`: resets level to `min(currentLevel, firstJobLevel)`, XP to 0, stats to base, unspent points to `(level - 1) * 5`, draws a different random job, keeps up to 3 random old job skills (hook + TODO until skills exist), and consumes the shard in survival only on success. Right-clicking without a shard shows a touch hint with a 40-tick cooldown.
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), title (always "None"), HP, MP, XP bar, stats with + buttons, available points, hover descriptions.
 - Data saved with the player and kept on death.
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count]`. (`/pz reset` resets both stats and job; `/pz job clear` clears only the job.)
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count]`, `/pz crystal small|large|colossal`. (`/pz reset` resets both stats and job; `/pz job clear` clears only the job.)
 
 **Builds and boots, in-game playtest pending.** `gradlew build` passes and `gradlew runClient` boots cleanly to the title screen (`[System] Project Zero loaded. Welcome, Player.`); in-world gameplay test is still to do (see Known Gaps).
 
@@ -111,14 +111,17 @@ Package layout (`src/main/java/com/projectzero/`):
   - `JobEvents.java`: reload listener registration, level up -> quest, login/clone/respawn/dimension sync, commands.
   - `JobCommands.java`: `/pz job set|reroll|clear` (merged into the `/pz` node).
 - `registry/`
-  - `ModBlocks.java`: `AWAKENING_STONE` block registration.
-  - `ModItems.java`: `AWAKENING_STONE` block item and `AWAKENING_SHARD` item registrations.
+  - `ModBlocks.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL` (translucent), and `AWAKENING_CORE` (light 15) block registrations.
+  - `ModItems.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL`, `AWAKENING_CORE` block items and `AWAKENING_SHARD` item registrations.
   - `ModCreativeTabs.java`: `projectzero` creative tab.
 - `awakening/`
   - `AwakeningStoneBlock.java`: two-block crystal block with ambient particles/chimes and right-click interaction.
-  - `AwakeningService.java`: handles touching and offering an Awakening Shard to an Awakening Stone (`touch`, `awaken`), calling `JobService.awakeningReroll` and consuming the shard only on success.
+  - `AwakeningCrystalBlock.java`: glassy formation block (culls internal faces like glass; glowing core variant emits sparkles/chimes); right-clicking any formation block triggers touch/awaken.
+  - `CrystalFormation.java`: procedural iceberg-like crystal formation generator (`SMALL`, `LARGE`, `COLOSSAL`) with branching spikes and glowing core veins.
+  - `AwakeningService.java`: handles touching (40-tick anti-spam cooldown) and offering an Awakening Shard (`touch`, `awaken`), calling `JobService.awakeningReroll` and consuming the shard only on success.
   - `AwakeningCommands.java`: `/pz shard give [count]` operator command (temporary until gate boss loot drops shards).
-  - `AwakeningEvents.java`: registers `AwakeningCommands` on `RegisterCommandsEvent`.
+  - `CrystalCommands.java`: `/pz crystal small|large|colossal` operator command for spawning formations in front of the player.
+  - `AwakeningEvents.java`: registers `AwakeningCommands` and `CrystalCommands` on `RegisterCommandsEvent`.
 - `network/`
   - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version 2. Bump the version when a packet's format changes.
   - `SyncStatsPacket.java`: server → client, full stats.
@@ -135,7 +138,7 @@ Resources:
 
 - `META-INF/mods.toml`, `pack.mcmeta` (pack format 34): filled from `gradle.properties` at build time.
 - `assets/projectzero/lang/en_us.json`: all user-facing text that goes through translation keys.
-- `assets/projectzero/blockstates/`, `models/`, `textures/`: Awakening Stone two-block crystal model/texture and Awakening Shard item model/texture.
+- `assets/projectzero/blockstates/`, `models/`, `textures/`: Awakening Stone two-block crystal model, glassy animated `awakening_crystal` (`.png` + `.png.mcmeta`) and `awakening_core` block/item models/textures, and Awakening Shard item model/texture.
 - `data/projectzero/tags/entity_type/gate_monsters.json`: gate monster tag (empty).
 - `data/projectzero/jobs/*.json`: job definitions. Format: `{"id": "projectzero:duelist", "rarity": "uncommon", "upgradesTo": "projectzero:veilstalker", "trial": "projectzero:trial/veilstalker"}`; `upgradesTo` and `trial` are optional, `id` is only checked against the file name. Placeholder jobs: Brawler, Slinger (common); Duelist (upgrades to Veilstalker), Bulwark (uncommon); Hexblade (upgrades to Stormweaver), Beastcaller (rare); Stormweaver, Veilstalker (epic); Gravewarden, Sunbreaker (legendary).
 
@@ -376,3 +379,36 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 1. Run the in-world Awakening Stone + job system playtest in `gradlew runClient`.
 2. Build basic skills, mana, and cooldowns (`DESIGN-DOCUMENT.md` §4), then wire `JobService.retainRandomJobSkillsOnReroll` when job skills exist.
 3. Add Awakening Shard drops to gate boss loot tables and custom village generation for Awakening Stones once gates/villages are built.
+
+---
+
+### Session Log — 2026-11-26 (Crystal formations, glassy crystal, reroll fixes)
+
+**Context & Direction Check**
+
+- Committed Claude's crystal formation visuals/blocks (`CrystalFormation`, `AwakeningCrystalBlock`, `awakening_crystal` glassy translucent animated texture + `awakening_core` glowing veins, `/pz crystal small|large|colossal`, touch cooldown in `AwakeningService`, Library domain & formations design notes in `DESIGN-DOCUMENT.md` §5–6) without modifying visuals.
+- Applied/verified two backend fixes:
+  1. `JobRegistry`: keep `GSON` declared before `INSTANCE` so `SimpleJsonResourceReloadListener` does not receive a null `Gson` on world load (crash fix).
+  2. `JobService.awakeningReroll`: reset level to `Math.min(LevelingService.get(player).level(), current.firstJobLevel())` so an Awakening Stone reroll can never raise a player's level.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/awakening/AwakeningCrystalBlock.java`, `CrystalFormation.java`, `CrystalCommands.java` (new): crystal formation blocks, procedural `small`/`large`/`colossal` formations with branching spikes and glowing core veins, and `/pz crystal small|large|colossal`.
+- `src/main/java/com/projectzero/awakening/AwakeningEvents.java`, `AwakeningService.java`: registered `CrystalCommands`; added 40-tick touch hint cooldown.
+- `src/main/java/com/projectzero/registry/ModBlocks.java`, `ModItems.java`, `ModCreativeTabs.java`: registered `awakening_crystal` and `awakening_core` blocks/items and added them to the Project Zero creative tab.
+- `src/main/resources/assets/projectzero/`: glassy animated `awakening_crystal.png` + `.mcmeta`, `awakening_core.png`, blockstates, block/item models, updated `awakening_stone.json` and `en_us.json`.
+- `src/main/java/com/projectzero/jobs/JobRegistry.java`: `GSON` declared before `INSTANCE` (fixes world-load NPE).
+- `src/main/java/com/projectzero/jobs/JobService.java`: `awakeningReroll` resets to `Math.min(currentLevel, firstJobLevel)`.
+- `DESIGN-DOCUMENT.md` §5–6: added Library domain job-choice ceremony plan and crystal formations spec.
+- `HANDOFF.md`: updated Current App State, Architecture Notes, and appended this session log.
+
+**Verification Executed**
+
+- `gradlew.bat build` with `JAVA_HOME=C:\Users\Jaime\AppData\Roaming\.minecraft\runtime\java-runtime-delta\windows\java-runtime-delta` (JDK 21.0.7): **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient`: booted cleanly to the title screen (`[System] Project Zero loaded. Welcome, Player.`) with zero model/texture/registry errors.
+- In-world test (`/pz crystal colossal`, `/pz xp 20000`, right-click crystal with shard) was **not executed** before committing & pushing per owner's instruction to commit & push right away.
+
+**Remaining Recommendations**
+
+1. Load a world in `gradlew runClient` and run `/pz crystal colossal`, `/pz xp 20000`, `/pz shard give`, and right-click the crystal formation with a shard (confirm `Loaded 10 jobs`, no crash on world load, glassy crystal visuals, and level reset `min(current, firstJobLevel)`).
+2. Begin the Library domain job-choice ceremony (`DESIGN-DOCUMENT.md` §5) or basic skills/mana/cooldowns (§4).

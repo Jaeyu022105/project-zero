@@ -99,8 +99,8 @@ public final class JobService {
     /**
      * Real Awakening Stone reroll (DESIGN-DOCUMENT.md §6): draws a new job different from the
      * current one, retains up to {@link JobRules#REROLL_KEPT_JOB_SKILLS} random skills from the
-     * old job, resets the player's level to {@link PlayerJob#firstJobLevel()} (0 XP, base stats,
-     * refunded ability points), and announces the new job.
+     * old job, resets the player's level to {@code min(current level, firstJobLevel)} (0 XP, base
+     * stats, refunded ability points — never raising the player's level), and announces the new job.
      *
      * @return the new job, or {@code null} if the player has no job or no alternative job can be drawn
      */
@@ -115,7 +115,7 @@ public final class JobService {
             return null;
         }
 
-        int resetLevel = current.firstJobLevel();
+        int resetLevel = Math.min(LevelingService.get(player).level(), current.firstJobLevel());
         retainRandomJobSkillsOnReroll(player, current.jobId());
         LevelingService.resetToLevel(player, resetLevel);
         assign(player, next);

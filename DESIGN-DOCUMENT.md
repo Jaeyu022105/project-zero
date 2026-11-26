@@ -63,6 +63,8 @@ Up to 4 active skill slots on keys, more slots as the player levels. **[Idea]**
 ## 5. Jobs
 
 - **[Built]** At **level 10** the System gives the player a **Job Change Quest**. Clearing it assigns a job. For now the quest completes instantly; the trial dungeon is **[Planned]**. (Solo Leveling uses level 40; 10 keeps the early game short. Tune once we can playtest.)
+- **[Planned] The Library domain (owner idea 2026-11-26).** The job choice is a ceremony, not a chat message. At level 10 the world fades and a "domain" unfolds around the player: a circular library (bookshelf walls rising, floating books, dark starry sky, the player frozen in the middle). Job cards orbit the player; right-clicking one takes it. Cards are **face down**: each card's job is pre-drawn with the rarity weights, so the result is still luck, but it is the player's pick. The chosen card flips to show the job and its rarity (color + glow), the others burn away, and the domain collapses back to the world.
+  - Split: Claude builds the domain visuals (arena, card entities and renderer, effects); Gemini builds the server flow (start/freeze/timeout/assign, multiplayer safety).
 - **[Built]** **The job is random**, weighted by rarity. The player does not choose it. Jobs are JSON data (`data/<ns>/jobs/*.json`); the data files use their own placeholder names (see `HANDOFF.md`). Rarities and draft weights:
 
 | Rarity | Weight | Example jobs (placeholders) |
@@ -81,7 +83,9 @@ Up to 4 active skill slots on keys, more slots as the player levels. **[Idea]**
 
 Our own mechanic, not in Solo Leveling.
 
-- **[Built]** Huge spiky blue crystal clusters (`AwakeningStoneBlock`, two blocks tall). Generation in **custom villages** (not vanilla villages) and a System confirmation window are **[Planned]**; right-clicking with an Awakening Shard rerolls directly for now.
+- **[Built]** Small Awakening Stone: `AwakeningStoneBlock`, two blocks tall, can be placed anywhere.
+- **[Built] Formations (owner idea 2026-11-26):** village stones are huge iceberg-like crystal formations built from `awakening_crystal` blocks with glowing `awakening_core` veins (`CrystalFormation`). Three sizes: **small** (~6-8 tall), **large** (~14-18), **colossal** (~26-32, with broken shards around it). Bigger villages get bigger stones. Right-clicking any part of a formation works. Test with `/pz crystal small|large|colossal`.
+- Earlier note: Generation in **custom villages** (not vanilla villages) and a System confirmation window are **[Planned]**; right-clicking with an Awakening Shard rerolls directly for now.
 - **Rerolling**:
   - **[Built]** Draws a new random job (different from the current one) with the same rarity weights.
   - **[Built]** Resets the player's level back to the level they first got a job (level 10 by default). XP resets to 0, stats reset to base, and stat points are refunded to `(level - 1) × 5`.
