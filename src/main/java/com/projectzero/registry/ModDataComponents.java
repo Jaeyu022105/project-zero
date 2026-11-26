@@ -3,6 +3,7 @@ package com.projectzero.registry;
 import com.mojang.serialization.Codec;
 import com.projectzero.ProjectZero;
 import com.projectzero.awakening.ShardCharge;
+import com.projectzero.equipment.AccessoryData;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -36,5 +37,12 @@ public final class ModDataComponents {
             DATA_COMPONENTS.register("skill_id", () -> DataComponentType.<ResourceLocation>builder()
                     .persistent(ResourceLocation.CODEC)
                     .networkSynchronized(ResourceLocation.STREAM_CODEC)
+                    .build());
+
+    /** Stored on rolled {@code AccessoryItem} stacks: rarity, gate rank, flat stats, and special affix. */
+    public static final RegistryObject<DataComponentType<AccessoryData>> ACCESSORY_DATA =
+            DATA_COMPONENTS.register("accessory_data", () -> DataComponentType.<AccessoryData>builder()
+                    .persistent(AccessoryData.CODEC)
+                    .networkSynchronized(AccessoryData.STREAM_CODEC)
                     .build());
 }

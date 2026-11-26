@@ -3,6 +3,8 @@ package com.projectzero.registry;
 import com.projectzero.ProjectZero;
 import com.projectzero.awakening.AwakeningShardItem;
 import com.projectzero.awakening.ShardVesselItem;
+import com.projectzero.equipment.AccessoryItem;
+import com.projectzero.equipment.AccessorySlotType;
 import com.projectzero.skills.SkillbookItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -43,4 +45,24 @@ public final class ModItems {
 
     public static final RegistryObject<Item> AWAKENING_CLUSTER = ITEMS.register("awakening_cluster",
             () -> new BlockItem(ModBlocks.AWAKENING_CLUSTER.get(), new Item.Properties().rarity(Rarity.RARE)));
+
+    // ---- Starter Accessories (TODO(claude-art): placeholder 16x16 icons & worn gauntlet model) ----
+    public static final RegistryObject<Item> IRON_GAUNTLETS = ITEMS.register("iron_gauntlets",
+            () -> new AccessoryItem(AccessorySlotType.GAUNTLETS, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> COPPER_RING = ITEMS.register("copper_ring",
+            () -> new AccessoryItem(AccessorySlotType.RING, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> SILVER_RING = ITEMS.register("silver_ring",
+            () -> new AccessoryItem(AccessorySlotType.RING, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> GOLD_RING = ITEMS.register("gold_ring",
+            () -> new AccessoryItem(AccessorySlotType.RING, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> BONE_AMULET = ITEMS.register("bone_amulet",
+            () -> new AccessoryItem(AccessorySlotType.AMULET, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> OBSIDIAN_EARRINGS = ITEMS.register("obsidian_earrings",
+            () -> new AccessoryItem(AccessorySlotType.EARRINGS, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> LEATHER_BELT = ITEMS.register("leather_belt",
+            () -> new AccessoryItem(AccessorySlotType.BELT, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> HUNTER_CHARM = ITEMS.register("hunter_charm",
+            () -> new AccessoryItem(AccessorySlotType.CHARM, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> MANA_CHARM = ITEMS.register("mana_charm",
+            () -> new AccessoryItem(AccessorySlotType.CHARM, new Item.Properties().stacksTo(1)));
 }

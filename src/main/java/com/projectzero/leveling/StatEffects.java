@@ -1,6 +1,9 @@
 package com.projectzero.leveling;
 
 import com.projectzero.ProjectZero;
+import com.projectzero.equipment.EquipmentService;
+import com.projectzero.network.ModNetwork;
+import com.projectzero.network.SyncStatBonusesPacket;
 import com.projectzero.titles.TitleService;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -11,6 +14,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+
+import java.util.EnumMap;
 
 /**
  * Turns stat values into gameplay. Uses transient attribute modifiers, so they are
@@ -24,9 +29,9 @@ public final class StatEffects {
     private static final ResourceLocation AGILITY_SPEED = ProjectZero.id("agility_speed");
     private static final ResourceLocation AGILITY_ATTACK_SPEED = ProjectZero.id("agility_attack_speed");
 
-    /** Extra stat points from equipped Title (and accessories when present). */
+    /** Extra stat points from equipped Title and Accessories. */
     public static int bonusStatPoints(Player player, Stat stat) {
-        return TitleService.statBonus(player, stat);
+        return TitleService.statBonus(player, stat) + EquipmentService.statBonus(player, stat);
     }
 
     public static int effectiveBonus(Player player, PlayerStats stats, Stat stat) {
@@ -50,6 +55,13 @@ public final class StatEffects {
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
         }
+
+        EnumMap<Stat, Integer> bonuses = new EnumMap<>(Stat.class);
+        for (Stat st : Stat.values()) {
+            int b = bonusStatPoints(player, st);
+            if (b != 0) bonuses.put(st, b);
+        }
+        ModNetwork.sendToPlayer(player, new SyncStatBonusesPacket(bonuses));
     }
 
     private static void set(ServerPlayer player, Holder<Attribute> attribute, ResourceLocation id,

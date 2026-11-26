@@ -6,6 +6,8 @@ import com.projectzero.registry.ModCreativeTabs;
 import com.projectzero.registry.ModDataComponents;
 import com.projectzero.registry.ModEntities;
 import com.projectzero.registry.ModItems;
+import com.projectzero.registry.ModLootModifiers;
+import com.projectzero.registry.ModMenus;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -37,6 +39,8 @@ public final class ProjectZero {
         ModItems.ITEMS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
         ModEntities.ENTITIES.register(modBus);
+        ModMenus.MENUS.register(modBus);
+        ModLootModifiers.LOOT_MODIFIERS.register(modBus);
 
         ModNetwork.register();
         LOGGER.info("[System] Project Zero loaded. Welcome, Player.");

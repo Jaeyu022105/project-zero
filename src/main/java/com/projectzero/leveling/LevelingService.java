@@ -48,7 +48,9 @@ public final class LevelingService {
         PlayerStats stats = get(player);
         if (stats.isMaxLevel()) return;
 
-        double xpMult = 1.0 + com.projectzero.titles.TitleService.xpBonusMultiplier(player);
+        double xpMult = 1.0
+                + com.projectzero.titles.TitleService.xpBonusMultiplier(player)
+                + com.projectzero.equipment.EquipmentService.xpBonusMultiplier(player);
         long finalAmount = Math.max(1L, Math.round(amount * xpMult));
 
         int levelsGained = stats.addXp(finalAmount);

@@ -27,6 +27,15 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.AWAKENING_CORE.get());
                         output.accept(ModItems.AWAKENING_CRYSTAL_DEEP.get());
                         output.accept(ModItems.AWAKENING_CLUSTER.get());
+                        output.accept(ModItems.IRON_GAUNTLETS.get());
+                        output.accept(ModItems.COPPER_RING.get());
+                        output.accept(ModItems.SILVER_RING.get());
+                        output.accept(ModItems.GOLD_RING.get());
+                        output.accept(ModItems.BONE_AMULET.get());
+                        output.accept(ModItems.OBSIDIAN_EARRINGS.get());
+                        output.accept(ModItems.LEATHER_BELT.get());
+                        output.accept(ModItems.HUNTER_CHARM.get());
+                        output.accept(ModItems.MANA_CHARM.get());
                     })
                     .build());
 }

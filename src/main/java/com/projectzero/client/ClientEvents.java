@@ -19,6 +19,7 @@ public final class ClientEvents {
         ClientJobCache.set(PlayerJob.NONE, null);
         ClientSkillsCache.reset();
         ClientTitlesCache.reset();
+        ClientBonusCache.reset();
         VisionOverlayState.reset();
     }
 }

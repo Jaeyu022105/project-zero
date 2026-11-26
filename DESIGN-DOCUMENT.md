@@ -162,13 +162,12 @@ Our own mechanic, not in Solo Leveling.
 
 ## 12. Equipment and accessories
 
-- **[Planned]** (owner idea 2026-11-26) Besides armor, mobs can drop **gauntlets, rings and accessories** (amulets, earrings, belts, charms). They have **stats**.
-- **Slots:** gauntlets ×1, rings ×2, amulet ×1, earrings ×1, belt ×1, charm ×1. Our own slot system, saved with the player (Curios was approved, but it has no Forge build for 1.21.1).
-- **Stats:** each piece gives flat points to the five stats (Strength, Agility, Vitality, Sense, Intelligence) plus at most one special line (crit chance, mana regen, lifesteal, XP bonus, damage vs. a mob type...). Rolled when dropped, so two rings of the same name can differ.
-- **Rarity:** the same five rarities and colors as jobs (Common → Legendary). Rarer pieces roll more lines and bigger numbers.
-- **Rank:** gate gear has the gate's rank (E → S) in its name and sets the number range. Higher-rank gates drop higher-rank gear.
-- **Drops:** vanilla mobs rarely (low rank, Common/Uncommon), gate monsters more often, bosses always drop one piece. A few named **set pieces** from bosses give a bonus when worn together.
-- Stats from gear add to the status window as a separate "+X" so players see base vs. gear.
+- **[Built]** (owner idea 2026-11-26; item art & worn gauntlet model **[Planned]** for Claude) Besides armor, mobs can drop **gauntlets, rings and accessories** (amulets, earrings, belts, charms). They have **stats**.
+- **[Built] Slots:** gauntlets ×1, rings ×2, amulet ×1, earrings ×1, belt ×1, charms ×2 (8 active slots) + 1 spare locked Relic slot (`PlayerAccessories` in `projectzero:accessories`, opened via the `GEAR` button on the status window; dropped on death only when `keepInventory` is off).
+- **[Built] Stats:** each piece stores rolled `AccessoryData` (data component): rarity, gate rank (`E → S`), flat points to the five stats, and at most one special line (`crit_chance`, `mana_regen`, `lifesteal`, `xp_bonus`, `damage_vs_undead`). Rolled when dropped, so two rings of the same name differ.
+- **[Built] Rarity & Rank:** colored by rarity (`Common → Legendary`) and tagged with gate rank (`[C-Rank] Silver Ring`).
+- **[Built] Drops:** via `AccessoryLootModifier` (`EquipmentRules`): vanilla hostile mobs 1.5% (Common/Uncommon, rank E), other mods' mobs 3%, gate monsters 8%, bosses 100%. Named boss **set pieces** are **[Planned]**.
+- **[Built]** Stats from gear (and equipped Title) add to the status window as a separate `(+X)` (`SyncStatBonusesPacket`) so players see base vs. bonus.
 - Gear later ties into item 15 (materials and crafting): materials can reforge or upgrade pieces.
 
 ## 13. Summons and pets

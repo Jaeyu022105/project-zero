@@ -47,7 +47,8 @@ public final class LevelingCommands {
                             JobService.clear(player);
                             com.projectzero.skills.SkillService.reset(player);
                             com.projectzero.titles.TitleService.reset(player);
-                            ctx.getSource().sendSuccess(() -> Component.literal("Stats, job, skills, and titles reset."), false);
+                            com.projectzero.equipment.EquipmentService.clearAll(player);
+                            ctx.getSource().sendSuccess(() -> Component.literal("Stats, job, skills, titles, and gear reset."), false);
                             return 1;
                         })));
     }

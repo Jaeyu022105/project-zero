@@ -176,7 +176,9 @@ public final class SkillService {
             int max = maxMana(player);
             int beforeInt = data.currentMana();
             if (data.rawMana() < max) {
-                data.setMana(data.rawMana() + SkillRules.manaRegenPerSecond(max), max);
+                double regen = SkillRules.manaRegenPerSecond(max)
+                        + com.projectzero.equipment.EquipmentService.manaRegenBonus(player);
+                data.setMana(data.rawMana() + regen, max);
                 changed = true;
                 if (data.currentMana() != beforeInt) syncNow = true;
             }

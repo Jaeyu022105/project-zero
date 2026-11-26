@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Task 4: Titles and milestones).
+Last caught up: **2026-11-27** (Task 5: Equipment and accessories).
 
 ---
 
@@ -75,9 +75,10 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Shard Vessel (`projectzero:shard_vessel`, stack size 1): right-click with an Awakening Shard in the other hand to insert; sneak + right-click to extract. While holding a non-maxed shard in inventory (first active Vessel only), 50% of kill XP (`VESSEL_DIVERT = 0.5`) diverts into the Vessel (`ShardCharge` data component) across 5 charge tiers (`Dim`, `Glowing`, `Radiant`, `Blazing`, `Resplendent`, thresholds `t * 0.6 * xpToNextLevel(level)`). Extracted shards keep their `shard_charge_tier` (`0..5`) component, stack only with shards of the same tier, shift Awakening Stone rarity weights (`JobRules.weightsForShardTier`), and pass `shardTier` on `JobService.AwakeningResult` for future golden-sea tinting in `ReawakeningVision`.
 - Skills Foundation & Mana (`skills/`): current mana + max mana from Intelligence (`10 * INT`), regenerating `1 + 2% of max` per second. 14 skills in `data/projectzero/skills/*.json` (`SkillRegistry` + `SkillBehaviors` + `SkillEffects`): 4 basic skills auto-learned at levels 3/8/15/25 (`dash`, `second_wind`, `focus`, `bloodlust`) and 10 job signature skills granted on job assignment (`iron_knuckle`, `ricochet_bolt`, `riposte_stance`, `aegis_bastion`, `cursed_edge`, `pack_howl`, `tempest_call`, `shadow_step`, `soul_shackle`, `solar_cataclysm`). Player state (`projectzero:skills`) stores mana, learned skills, 4 active slots (`Z`, `X`, `C`, `V`), and cooldowns; Awakening Stone rerolls retain up to 3 random old-job skills. Includes `projectzero:skillbook` item and plain-text bottom-left `SkillHudOverlay`.
 - Titles & Milestones (`titles/`): `MilestoneTracker` (`projectzero:milestones` NBT) tracks kills per entity type/tag, total kills, boss kills, deaths, highest level, rerolls, and gates cleared. 6 starter JSON titles in `data/projectzero/titles/*.json` (`wolf_slayer`, `hundred_cuts`, `undead_bane`, `survivor`, `giant_killer` granting milestone skill `colossus_breaker`, `awakened_one`). Equipped title (`projectzero:titles` NBT) applies transient attributes, stat bonuses, damage-vs-entity/tag multipliers, or XP bonuses, and cycles on click in `StatusScreen`.
-- Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), HP, live MP (`current / max`), XP bar, stats with + buttons, learned/slotted `SKILLS` list, available points, hover descriptions.
-- Data saved with the player and kept on death.
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`.
+- Equipment & Accessories (`equipment/`): 8 active custom slots (`gauntlets`, `ring` ×2, `amulet`, `earrings`, `belt`, `charm` ×2) + 1 spare locked `relic` slot (`PlayerAccessories` in `projectzero:accessories` NBT; copied on clone, dropped on death only when `keepInventory` is false). 9 starter `AccessoryItem`s (`iron_gauntlets`, `copper_ring`, `silver_ring`, `gold_ring`, `bone_amulet`, `obsidian_earrings`, `leather_belt`, `hunter_charm`, `mana_charm`) with rolled `AccessoryData` component (rarity, `GateRank` E..S, flat stats, optional `crit_chance`/`mana_regen`/`lifesteal`/`xp_bonus`/`damage_vs_undead` affix), `AccessoryMenu` + `AccessoryScreen`, and `AccessoryLootModifier` (1.5% vanilla hostile, 3% modded, 8% gate monster, 100% boss).
+- Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
+- Data saved with the player and kept on death (accessories follow `keepInventory`).
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`.
 
 **Built and verified in a loaded world (`gradlew runClient`).**
 
@@ -573,3 +574,33 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 **Remaining Recommendations**
 
 1. Task 5: Equipment and accessories (`equipment/` package, 8 custom slots + `AccessoryMenu`/`AccessoryScreen`, `AccessoryData` component, global loot modifier drops, `StatEffects` + `StatusScreen` `(+X)` integration, `/pz gear roll`).
+
+---
+
+### Session Log — 2026-11-27 (Task 5: Equipment and accessories)
+
+**Context & Direction Check**
+
+- Implemented `DESIGN-DOCUMENT.md` §12 custom 8-slot accessory system (+1 spare locked Relic slot) since Curios has no Forge 1.21.1 build, rolled `AccessoryData` data component, `AccessoryMenu`/`AccessoryScreen`, `AccessoryLootModifier` drops, `StatusScreen` `GEAR` button + `(+X)` bonus stat display, and `/pz gear roll`.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/gates/GateRank.java` (new): shared `E..S` rank ladder (`×1..×32` multipliers, level ranges, colors, codecs).
+- `src/main/java/com/projectzero/equipment/` (new): `AccessorySlotType`, `AccessoryData` (`ModDataComponents.ACCESSORY_DATA`), `EquipmentRules` (1.5% / 3% / 8% / 100% drop rates + stat/affix rolling), `AccessoryItem` (rarity/rank name & tooltip + quick-equip right-click), `PlayerAccessories` (`projectzero:accessories` NBT), `EquipmentService`, `AccessoryMenu`, `AccessoryLootModifier`, `EquipmentCommands` (`/pz gear roll <slot> <rarity> <rank>`), `EquipmentEvents` (`keepInventory`-aware death drops + `crit_chance`, `lifesteal`, `damage_vs_undead` combat hooks).
+- `src/main/java/com/projectzero/registry/`: `ModMenus`, `ModLootModifiers`, 9 starter items in `ModItems` & `ModCreativeTabs`.
+- `src/main/java/com/projectzero/network/` & `client/`: `SyncStatBonusesPacket`, `OpenAccessoriesPacket`, bumped `ModNetwork.PROTOCOL_VERSION` to `6`, `ClientBonusCache`, `AccessoryScreen` (`TODO(claude-art)`: styled System container frame & slot silhouettes), `StatusScreen` `GEAR` button + `STR 25 (+3)` bonus rendering.
+- `src/main/resources/`: global loot modifier JSONs (`data/forge/loot_modifiers/global_loot_modifiers.json`, `data/projectzero/loot_modifiers/accessory_drops.json`), 9 `TODO(claude-art)` 16x16 placeholder PNGs + item models (`iron_gauntlets`, `copper_ring`, `silver_ring`, `gold_ring`, `bone_amulet`, `obsidian_earrings`, `leather_belt`, `hunter_charm`, `mana_charm`), `en_us.json`.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded world + death tests + full relog cycle):
+  - Rolled `S-Rank Legendary Iron Gauntlets` (`+187` total stat points + `+9% XP Gain`), verified `AccessoryMenu` accepts Gauntlets in slot 0 and rejects items in locked Relic slot 8.
+  - Verified `AccessoryLootModifier` dropped a rolled accessory on a `gate_boss` kill (`drops found: 1`).
+  - Verified death with `keepInventory=true` kept slot 0 equipped (`kept=true`), while death with `keepInventory=false` dropped equipped & inventory accessories and cleared `PlayerAccessories` (`slot0Cleared=true`).
+  - Verified full disconnect + reopen relog preserved equipped accessory and synced `ClientBonusCache` (`144 -> 144`). Zero errors in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): 9 16x16 flat accessory item PNGs (`textures/item/{iron_gauntlets,copper_ring,silver_ring,gold_ring,bone_amulet,obsidian_earrings,leather_belt,hunter_charm,mana_charm}.png`), `client/AccessoryScreen.java` container frame/slot silhouettes, `StatusScreen` `GEAR` button, and worn gauntlet arm rendering.
+
+**Remaining Recommendations**
+
+1. Task 6: Mob ranks and scaling infrastructure (`MobScaling`, `XpRewards` rank & level-gap formula, `/pz mob spawn <entity> <rank> [level]`).

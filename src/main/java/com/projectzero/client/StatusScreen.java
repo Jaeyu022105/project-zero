@@ -8,6 +8,7 @@ import com.projectzero.leveling.Stat;
 import com.projectzero.network.AllocateStatPacket;
 import com.projectzero.network.CycleTitlePacket;
 import com.projectzero.network.ModNetwork;
+import com.projectzero.network.OpenAccessoriesPacket;
 import com.projectzero.skills.PlayerSkills;
 import com.projectzero.skills.Skill;
 import com.projectzero.titles.PlayerTitles;
@@ -70,6 +71,11 @@ public class StatusScreen extends Screen {
                     .build();
             plusButtons.put(stat, addRenderableWidget(button));
         }
+        // GEAR button opening the 8-slot Accessory container menu (TODO(claude-art): System icon tab)
+        addRenderableWidget(Button.builder(Component.translatable("screen.projectzero.gear_button"),
+                        b -> ModNetwork.sendToServer(new OpenAccessoriesPacket()))
+                .bounds(left + WIDTH - 50, top + 6, 40, 14)
+                .build());
         updateButtons();
     }
 
@@ -145,7 +151,14 @@ public class StatusScreen extends Screen {
         for (Stat stat : Stat.values()) {
             int y = top + STAT_TOP + stat.ordinal() * STAT_ROW;
             g.drawString(font, stat.displayName().getString().toUpperCase(), col1, y, LABEL, false);
-            g.drawString(font, String.valueOf(s.get(stat)), left + WIDTH - 70, y, VALUE, false);
+            String baseStr = String.valueOf(s.get(stat));
+            int valX = left + WIDTH - 86;
+            g.drawString(font, baseStr, valX, y, VALUE, false);
+            int bonus = ClientBonusCache.get(stat);
+            if (bonus != 0) {
+                String bonusStr = " (" + (bonus > 0 ? "+" : "") + bonus + ")";
+                g.drawString(font, bonusStr, valX + font.width(baseStr), y, bonus > 0 ? 0xFF55E075 : 0xFFFF6666, false);
+            }
             if (mouseX >= col1 && mouseX < left + WIDTH - 40 && mouseY >= y - 3 && mouseY < y + STAT_ROW - 3) {
                 hovered = stat.description();
             }

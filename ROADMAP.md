@@ -17,7 +17,7 @@ Status: ✅ done · 🔨 in progress · ⏳ next · ⬜ later
 2. ✅ **Skills foundation.** Mana & regen, cooldowns, 4 slots & Z/X/C/V keys, JSON skills, Skillbook item, job-reroll 3-skill retention, placeholder HUD (Claude HUD/icons later).
 3. ✅ **Basic skills + one signature skill per job.** 4 basic skills (Dash, Second Wind, Focus, Bloodlust) + 10 job signature skills built & verified (Claude custom VFX later).
 4. ✅ **Titles and milestones.** `MilestoneTracker`, JSON titles (`data/projectzero/titles/*.json`), 6 starter titles + `colossus_breaker` milestone skill, `/pz title` & `/pz milestone` commands, clickable `TITLE` field in `StatusScreen`.
-4b. 🔨 **Equipment and accessories** (gauntlets, rings, amulets, earrings, belts, charms with rolled stats, dropped by mobs), DESIGN-DOCUMENT.md §12. Gemini: slots, stat rolls, drop tables. Claude: item art, worn models (gauntlets on the arms). Uses **our own accessory slots** (Curios has no Forge build for 1.21.1).
+4b. ✅ **Equipment and accessories** (gauntlets, rings, amulets, earrings, belts, charms with rolled stats, dropped by mobs), DESIGN-DOCUMENT.md §12. 8 active slots + locked Relic slot, `AccessoryData` component, `AccessoryMenu`/`AccessoryScreen`, `AccessoryLootModifier`, 9 starter items, `StatusScreen` `GEAR` button & `(+X)` bonus stats, `/pz gear roll` built & verified (Claude item art & worn arm models later).
 
 ## Phase 2: The world
 5. ⬜ **New terrain:** medieval to comic-fantasy biomes (e.g. banner-dotted highlands, giant-mushroom woods, floating-rock fields, crystal tundra). Claude. *Needs the owner's OK on a biome library (TerraBlender), see Open decisions.*
