@@ -1,0 +1,175 @@
+package com.projectzero.client;
+
+import com.projectzero.leveling.PlayerStats;
+import com.projectzero.leveling.Stat;
+import com.projectzero.leveling.StatEffects;
+import com.projectzero.network.AllocateStatPacket;
+import com.projectzero.network.ModNetwork;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+
+import java.util.EnumMap;
+import java.util.Map;
+
+/** The "System" status window. Opens with K by default. */
+public class StatusScreen extends Screen {
+    private static final int WIDTH = 260;
+    private static final int HEIGHT = 230;
+
+    private static final int PANEL = 0xE00A1220;
+    private static final int BORDER = 0xFF3FD0FF;
+    private static final int GLOW = 0x553FD0FF;
+    private static final int DIVIDER = 0x803FD0FF;
+    private static final int LABEL = 0xFF7FE8FF;
+    private static final int VALUE = 0xFFFFFFFF;
+    private static final int MUTED = 0xFF8090A0;
+    private static final int HIGHLIGHT = 0xFFFFD34D;
+    private static final int XP_BG = 0xFF1A2A3A;
+    private static final int XP_FILL = 0xFF3FD0FF;
+
+    private static final int STAT_TOP = 128;
+    private static final int STAT_ROW = 16;
+
+    private final Map<Stat, Button> plusButtons = new EnumMap<>(Stat.class);
+    private int left;
+    private int top;
+
+    public StatusScreen() {
+        super(Component.translatable("screen.projectzero.status"));
+    }
+
+    @Override
+    protected void init() {
+        left = (width - WIDTH) / 2;
+        top = (height - HEIGHT) / 2;
+        plusButtons.clear();
+
+        for (Stat stat : Stat.values()) {
+            int y = top + STAT_TOP + stat.ordinal() * STAT_ROW - 3;
+            Button button = Button.builder(Component.literal("+"),
+                            b -> ModNetwork.sendToServer(new AllocateStatPacket(stat)))
+                    .bounds(left + WIDTH - 34, y, 14, 14)
+                    .build();
+            plusButtons.put(stat, addRenderableWidget(button));
+        }
+        updateButtons();
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        updateButtons();
+    }
+
+    private void updateButtons() {
+        boolean hasPoints = ClientStatsCache.get().unspentPoints() > 0;
+        for (Button button : plusButtons.values()) {
+            button.active = hasPoints;
+        }
+    }
+
+    @Override
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        // super.render draws the background (including our panel, see renderBackground) and the buttons.
+        super.render(g, mouseX, mouseY, partialTick);
+        renderContents(g, mouseX, mouseY);
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(g, mouseX, mouseY, partialTick);
+        renderPanel(g);
+    }
+
+    private void renderPanel(GuiGraphics g) {
+        g.fill(left - 2, top - 2, left + WIDTH + 2, top + HEIGHT + 2, GLOW);
+        g.fill(left, top, left + WIDTH, top + HEIGHT, PANEL);
+        g.renderOutline(left, top, WIDTH, HEIGHT, BORDER);
+    }
+
+    private void renderContents(GuiGraphics g, int mouseX, int mouseY) {
+        PlayerStats s = ClientStatsCache.get();
+        Player player = Minecraft.getInstance().player;
+        String name = player != null ? player.getGameProfile().getName() : "?";
+
+        // Header
+        g.drawCenteredString(font, Component.literal("STATUS"), left + WIDTH / 2, top + 10, LABEL);
+        divider(g, top + 24);
+
+        // Identity
+        int col1 = left + 14;
+        int col2 = left + WIDTH / 2 + 6;
+        field(g, "NAME", name, col1, top + 32);
+        field(g, "LEVEL", String.valueOf(s.level()), col2, top + 32);
+        field(g, "JOB", "None", col1, top + 46);
+        field(g, "TITLE", "None", col2, top + 46);
+
+        // HP / MP
+        if (player != null) {
+            field(g, "HP", Math.round(player.getHealth()) + " / " + Math.round(player.getMaxHealth()), col1, top + 62);
+        }
+        int mana = StatEffects.maxMana(s);
+        field(g, "MP", mana + " / " + mana, col2, top + 62);
+
+        // XP bar
+        int barX = left + 14;
+        int barY = top + 82;
+        int barW = WIDTH - 28;
+        g.fill(barX, barY, barX + barW, barY + 6, XP_BG);
+        float progress = s.isMaxLevel() ? 1.0F : (float) s.xp() / s.xpToNext();
+        g.fill(barX, barY, barX + Math.round(barW * Math.min(1.0F, progress)), barY + 6, XP_FILL);
+        String xpText = s.isMaxLevel() ? "MAX LEVEL" : "XP " + s.xp() + " / " + s.xpToNext();
+        g.drawCenteredString(font, xpText, left + WIDTH / 2, barY + 10, MUTED);
+
+        divider(g, top + 116);
+
+        // Stats
+        Component hovered = null;
+        for (Stat stat : Stat.values()) {
+            int y = top + STAT_TOP + stat.ordinal() * STAT_ROW;
+            g.drawString(font, stat.displayName().getString().toUpperCase(), col1, y, LABEL, false);
+            g.drawString(font, String.valueOf(s.get(stat)), left + WIDTH - 70, y, VALUE, false);
+            if (mouseX >= col1 && mouseX < left + WIDTH - 40 && mouseY >= y - 3 && mouseY < y + STAT_ROW - 3) {
+                hovered = stat.description();
+            }
+        }
+
+        // Points
+        int pointsY = top + HEIGHT - 16;
+        int pointColor = s.unspentPoints() > 0 ? HIGHLIGHT : MUTED;
+        g.drawString(font, "Available Ability Points: ", col1, pointsY, LABEL, false);
+        g.drawString(font, String.valueOf(s.unspentPoints()),
+                col1 + font.width("Available Ability Points: "), pointsY, pointColor, false);
+
+        if (hovered != null) {
+            g.renderTooltip(font, hovered, mouseX, mouseY);
+        }
+    }
+
+    private void field(GuiGraphics g, String label, String value, int x, int y) {
+        g.drawString(font, label + ": ", x, y, LABEL, false);
+        g.drawString(font, value, x + font.width(label + ": "), y, VALUE, false);
+    }
+
+    private void divider(GuiGraphics g, int y) {
+        g.fill(left + 10, y, left + WIDTH - 10, y + 1, DIVIDER);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (ModKeyBindings.OPEN_STATUS.matches(keyCode, scanCode)) {
+            onClose();
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
+}

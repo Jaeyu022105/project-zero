@@ -1,0 +1,15 @@
+{
+  "key.categories.projectzero": "Project Zero",
+  "key.projectzero.status": "Open Status Window",
+  "screen.projectzero.status": "Status",
+  "stat.projectzero.strength": "Strength",
+  "stat.projectzero.agility": "Agility",
+  "stat.projectzero.vitality": "Vitality",
+  "stat.projectzero.sense": "Sense",
+  "stat.projectzero.intelligence": "Intelligence",
+  "stat.projectzero.strength.desc": "+0.5 attack damage per point",
+  "stat.projectzero.agility.desc": "Faster movement and attack speed",
+  "stat.projectzero.vitality.desc": "+1 max health per point",
+  "stat.projectzero.sense.desc": "Chance to evade incoming attacks",
+  "stat.projectzero.intelligence.desc": "Raises max mana (used by future skills)"
+}
