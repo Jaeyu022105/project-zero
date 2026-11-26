@@ -1,6 +1,7 @@
 package com.projectzero.awakening;
 
-import com.projectzero.jobs.Job;
+import com.projectzero.domain.LibraryDomain;
+import com.projectzero.domain.ReawakeningVision;
 import com.projectzero.jobs.JobService;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -49,8 +50,10 @@ public final class AwakeningService {
             return;
         }
 
-        Job job = JobService.awakeningReroll(player);
-        if (job == null) {
+        if (ReawakeningVision.isInVision(player) || LibraryDomain.isInDomain(player)) return;
+
+        JobService.AwakeningResult result = JobService.awakeningRerollQuiet(player);
+        if (result == null) {
             system(player, Component.literal("The stone does not answer. No other job could be drawn.")
                     .withStyle(ChatFormatting.WHITE));
             return;
@@ -67,7 +70,12 @@ public final class AwakeningService {
         level.sendParticles(ParticleTypes.END_ROD, x, y, z, 80, 0.6, 1.0, 0.6, 0.08);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, x, y + 0.8, z, 30, 0.4, 0.4, 0.4, 0.2);
         level.playSound(null, stonePos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 1.0F, 1.4F);
-        level.playSound(null, stonePos, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 1.0F, 0.5F);
+
+        // The reroll is already saved; the vision only shows it. Without it, announce at once.
+        if (!ReawakeningVision.begin(player, result)) {
+            JobService.announceAwakening(player, result);
+            ReawakeningVision.auraBurst(player, result.job().rarity());
+        }
     }
 
     private static void system(ServerPlayer player, Component message) {

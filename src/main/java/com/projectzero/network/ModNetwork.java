@@ -10,8 +10,9 @@ import net.minecraftforge.network.SimpleChannel;
 public final class ModNetwork {
     private ModNetwork() {}
 
-    // 2: added SyncJobPacket. Bump whenever the packet list or a packet's format changes.
-    private static final int PROTOCOL_VERSION = 2;
+    // 2: added SyncJobPacket. 3: added VisionOverlayPacket.
+    // Bump whenever the packet list or a packet's format changes.
+    private static final int PROTOCOL_VERSION = 3;
 
     public static final SimpleChannel CHANNEL = ChannelBuilder
             .named(ProjectZero.id("main"))
@@ -35,6 +36,12 @@ public final class ModNetwork {
                 .encoder(SyncJobPacket::encode)
                 .decoder(SyncJobPacket::decode)
                 .consumerMainThread(SyncJobPacket::handle)
+                .add();
+
+        CHANNEL.messageBuilder(VisionOverlayPacket.class, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(VisionOverlayPacket::encode)
+                .decoder(VisionOverlayPacket::decode)
+                .consumerMainThread(VisionOverlayPacket::handle)
                 .add();
     }
 

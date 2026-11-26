@@ -33,5 +33,10 @@
   "item.projectzero.awakening_shard": "Awakening Shard",
   "itemGroup.projectzero": "Project Zero",
   "block.projectzero.awakening_crystal": "Awakening Crystal",
-  "block.projectzero.awakening_core": "Awakening Core"
+  "block.projectzero.awakening_core": "Awakening Core",
+  "entity.projectzero.job_card": "Job Card",
+  "block.projectzero.awakening_crystal_deep": "Deep Awakening Crystal",
+  "block.projectzero.awakening_cluster": "Awakening Cluster",
+  "block.projectzero.void_sea": "Void Sea",
+  "block.projectzero.void_mote": "Void Mote"
 }

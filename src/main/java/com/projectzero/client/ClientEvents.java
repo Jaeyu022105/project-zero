@@ -17,5 +17,6 @@ public final class ClientEvents {
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientStatsCache.set(new PlayerStats());
         ClientJobCache.set(PlayerJob.NONE, null);
+        VisionOverlayState.reset();
     }
 }
