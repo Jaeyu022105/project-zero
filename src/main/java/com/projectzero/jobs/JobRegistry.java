@@ -114,8 +114,19 @@ public final class JobRegistry extends SimpleJsonResourceReloadListener {
      * @param exclude a job not to draw (the current one on a reroll); ignored if it is the only job
      */
     public static @Nullable Job random(RandomSource random, @Nullable ResourceLocation exclude) {
+        return random(random, exclude, JobRules.weightsForShardTier(0));
+    }
+
+    /**
+     * Draws a job weighted by {@code weights}: first a rarity by weight (only rarities that have
+     * candidate jobs and positive weight take part), then a job of that rarity uniformly.
+     */
+    public static @Nullable Job random(RandomSource random, @Nullable ResourceLocation exclude,
+                                       Map<JobRarity, Integer> weights) {
         Map<JobRarity, List<Job>> pool = new EnumMap<>(JobRarity.class);
         for (Map.Entry<JobRarity, List<Job>> e : INSTANCE.byRarity.entrySet()) {
+            int w = weights.getOrDefault(e.getKey(), e.getKey().weight());
+            if (w <= 0) continue;
             List<Job> candidates = e.getValue().stream().filter(j -> !j.id().equals(exclude)).toList();
             if (!candidates.isEmpty()) pool.put(e.getKey(), candidates);
         }
@@ -123,10 +134,10 @@ public final class JobRegistry extends SimpleJsonResourceReloadListener {
             return exclude == null ? null : get(exclude);
         }
 
-        int total = pool.keySet().stream().mapToInt(JobRarity::weight).sum();
+        int total = pool.keySet().stream().mapToInt(r -> weights.getOrDefault(r, r.weight())).sum();
         int roll = random.nextInt(total);
         for (Map.Entry<JobRarity, List<Job>> e : pool.entrySet()) {
-            roll -= e.getKey().weight();
+            roll -= weights.getOrDefault(e.getKey(), e.getKey().weight());
             if (roll < 0) {
                 List<Job> list = e.getValue();
                 return list.get(random.nextInt(list.size()));

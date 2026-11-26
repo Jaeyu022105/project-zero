@@ -101,39 +101,40 @@ public final class JobService {
         return job;
     }
 
-    /** What an Awakening Stone reroll did: the new job and the level the player was reset to. */
-    public record AwakeningResult(Job job, int resetLevel) {}
-
     /**
-     * Real Awakening Stone reroll (DESIGN-DOCUMENT.md §6), announced right away. Used when the
-     * Reawakening vision cannot open; the vision itself uses {@link #awakeningRerollQuiet} and
-     * {@link #announceAwakening} so the reveal happens inside the vision.
-     *
-     * @return the new job, or {@code null} if the player has no job or no alternative job can be drawn
+     * What an Awakening Stone reroll did: the new job, the level the player was reset to, and
+     * the Awakening Shard charge tier (0..5) used for the roll (passed to the vision).
      */
+    public record AwakeningResult(Job job, int resetLevel, int shardTier) {}
+
     public static @Nullable Job awakeningReroll(ServerPlayer player) {
-        AwakeningResult result = awakeningRerollQuiet(player);
+        return awakeningReroll(player, 0);
+    }
+
+    public static @Nullable Job awakeningReroll(ServerPlayer player, int shardTier) {
+        AwakeningResult result = awakeningRerollQuiet(player, shardTier);
         if (result == null) return null;
         announceAwakening(player, result);
         return result.job();
     }
 
+    public static @Nullable AwakeningResult awakeningRerollQuiet(ServerPlayer player) {
+        return awakeningRerollQuiet(player, 0);
+    }
+
     /**
      * Applies the reroll without telling the player yet: draws a new job different from the
-     * current one, retains up to {@link JobRules#REROLL_KEPT_JOB_SKILLS} random skills from the
-     * old job, and resets the player's level to {@code min(current level, firstJobLevel)} (0 XP,
-     * base stats, refunded ability points; never raising the player's level).
-     *
-     * Applied at once (not when the vision ends) so a logout or crash mid-vision cannot lose the
-     * shard without the reroll.
-     *
-     * @return what happened, or {@code null} if the player has no job or no alternative job can be drawn
+     * current one using {@code shardTier}'s rarity weights, retains up to
+     * {@link JobRules#REROLL_KEPT_JOB_SKILLS} random skills from the old job, and resets the
+     * player's level to {@code min(current level, firstJobLevel)}.
      */
-    public static @Nullable AwakeningResult awakeningRerollQuiet(ServerPlayer player) {
+    public static @Nullable AwakeningResult awakeningRerollQuiet(ServerPlayer player, int shardTier) {
         PlayerJob current = get(player);
         if (!current.hasJob()) return null;
 
-        Job next = JobRegistry.random(player.getRandom(), current.jobId());
+        int clampedTier = Math.max(0, Math.min(5, shardTier));
+        Job next = JobRegistry.random(player.getRandom(), current.jobId(),
+                JobRules.weightsForShardTier(clampedTier));
         if (next == null || next.id().equals(current.jobId())) {
             ProjectZero.LOGGER.warn("Cannot awakening-reroll {}: no alternative job loaded",
                     player.getGameProfile().getName());
@@ -144,7 +145,7 @@ public final class JobService {
         retainRandomJobSkillsOnReroll(player, current.jobId());
         LevelingService.resetToLevel(player, resetLevel);
         set(player, get(player).withJob(next.id()));
-        return new AwakeningResult(next, resetLevel);
+        return new AwakeningResult(next, resetLevel, clampedTier);
     }
 
     /** The title, chat line and sound for a finished reroll. */

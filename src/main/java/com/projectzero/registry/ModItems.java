@@ -1,6 +1,8 @@
 package com.projectzero.registry;
 
 import com.projectzero.ProjectZero;
+import com.projectzero.awakening.AwakeningShardItem;
+import com.projectzero.awakening.ShardVesselItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -19,7 +21,11 @@ public final class ModItems {
 
     /** Consumed by an Awakening Stone to reroll a job. Only gate bosses drop it (DESIGN-DOCUMENT.md §6). */
     public static final RegistryObject<Item> AWAKENING_SHARD = ITEMS.register("awakening_shard",
-            () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
+            () -> new AwakeningShardItem(new Item.Properties().rarity(Rarity.EPIC)));
+
+    /** Holds one Awakening Shard and diverts half of kill XP into charging it. TODO(claude-art): placeholder icon. */
+    public static final RegistryObject<Item> SHARD_VESSEL = ITEMS.register("shard_vessel",
+            () -> new ShardVesselItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
 
     public static final RegistryObject<Item> AWAKENING_CRYSTAL = ITEMS.register("awakening_crystal",
             () -> new BlockItem(ModBlocks.AWAKENING_CRYSTAL.get(), new Item.Properties().rarity(Rarity.RARE)));

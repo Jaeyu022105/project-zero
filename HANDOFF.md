@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-26** (Task 0: Library domain, Reawakening vision, solid-core crystals/clusters, stat soft-cap rebalance).
+Last caught up: **2026-11-26** (Task 1: Shard Vessel, charged Awakening Shards, XP diversion, 6-tier rarity weights).
 
 ---
 
@@ -72,9 +72,10 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Stats: Strength, Agility, Vitality, Sense, Intelligence, rebalanced onto diminishing-return soft-cap curves (`LevelingRules.soft(p, k)`).
 - Jobs & Library Domain: at level 10 the System opens the **Library domain** (`projectzero:library` void dimension) where 7 face-down `JobCardEntity` cards orbit the frozen player; right-clicking one (or waiting out the 90s timeout) flips it, burns the others away, assigns the pre-rolled job, and returns the player home. Jobs are JSON data in `data/projectzero/jobs/` (10 placeholder jobs, 2 per rarity).
 - Awakening Stones, Crystal Formations & Reawakening Vision: small two-block crystal (`awakening_stone`), glassy shell `awakening_crystal`, opaque interior `awakening_crystal_deep`, glowing `awakening_core` veins, surface `awakening_cluster` spikes, procedural `CrystalFormation` (`small`, `large`, `colossal`), and `awakening_shard`. Offering a shard applies `JobService.awakeningRerollQuiet` immediately (logout-safe) and plays the ~14s `ReawakeningVision` (eyelid overlay `VisionOverlayRenderer`, mirror `void_sea` + `void_mote`, 64 drifting cards, rising card with heartbeat, reveal, return home, and rarity-colored particle aura burst).
+- Shard Vessel (`projectzero:shard_vessel`, stack size 1): right-click with an Awakening Shard in the other hand to insert; sneak + right-click to extract. While holding a non-maxed shard in inventory (first active Vessel only), 50% of kill XP (`VESSEL_DIVERT = 0.5`) diverts into the Vessel (`ShardCharge` data component) across 5 charge tiers (`Dim`, `Glowing`, `Radiant`, `Blazing`, `Resplendent`, thresholds `t * 0.6 * xpToNextLevel(level)`). Extracted shards keep their `shard_charge_tier` (`0..5`) component, stack only with shards of the same tier, shift Awakening Stone rarity weights (`JobRules.weightsForShardTier`), and pass `shardTier` on `JobService.AwakeningResult` for future golden-sea tinting in `ReawakeningVision`.
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), title (always "None"), HP, MP, XP bar, stats with + buttons, available points, hover descriptions.
 - Data saved with the player and kept on death.
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count]`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`.
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`.
 
 **Built and verified in a loaded world (`gradlew runClient`).**
 
@@ -111,17 +112,20 @@ Package layout (`src/main/java/com/projectzero/`):
   - `JobEvents.java`: reload listener registration, level up -> quest, login/clone/respawn/dimension sync, commands.
   - `JobCommands.java`: `/pz job set|reroll|clear` (merged into the `/pz` node).
 - `registry/`
-  - `ModBlocks.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL` (translucent), and `AWAKENING_CORE` (light 15) block registrations.
-  - `ModItems.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL`, `AWAKENING_CORE` block items and `AWAKENING_SHARD` item registrations.
+  - `ModDataComponents.java`: MC 1.21+ data components (`SHARD_CHARGE`, `SHARD_CHARGE_TIER`).
+  - `ModBlocks.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL`, `AWAKENING_CORE`, `AWAKENING_CRYSTAL_DEEP`, `AWAKENING_CLUSTER`, `VOID_SEA`, `VOID_MOTE`.
+  - `ModItems.java`: block items, `AWAKENING_SHARD` (`AwakeningShardItem`), and `SHARD_VESSEL` (`ShardVesselItem`).
+  - `ModEntities.java`: `JOB_CARD` (`JobCardEntity`).
   - `ModCreativeTabs.java`: `projectzero` creative tab.
 - `awakening/`
-  - `AwakeningStoneBlock.java`: two-block crystal block with ambient particles/chimes and right-click interaction.
-  - `AwakeningCrystalBlock.java`: glassy formation block (culls internal faces like glass; glowing core variant emits sparkles/chimes); right-clicking any formation block triggers touch/awaken.
-  - `CrystalFormation.java`: procedural iceberg-like crystal formation generator (`SMALL`, `LARGE`, `COLOSSAL`) with branching spikes and glowing core veins.
-  - `AwakeningService.java`: handles touching (40-tick anti-spam cooldown) and offering an Awakening Shard (`touch`, `awaken`), calling `JobService.awakeningReroll` and consuming the shard only on success.
-  - `AwakeningCommands.java`: `/pz shard give [count]` operator command (temporary until gate boss loot drops shards).
-  - `CrystalCommands.java`: `/pz crystal small|large|colossal` operator command for spawning formations in front of the player.
-  - `AwakeningEvents.java`: registers `AwakeningCommands` and `CrystalCommands` on `RegisterCommandsEvent`.
+  - `AwakeningRules.java`: `VESSEL_DIVERT = 0.5`, `VESSEL_TIER_FRACTION = 0.6`, `MAX_SHARD_TIER = 5`, tier threshold/name/color helpers.
+  - `ShardCharge.java`: `(hasShard, chargeXp, tier)` data component record with Codec + StreamCodec.
+  - `ShardVesselItem.java`, `AwakeningShardItem.java`, `ShardVesselService.java`: right-click insert / sneak+right-click extract, single-Vessel kill XP diversion, tier-up `[System]` messages, tooltips, and same-tier shard stacking.
+  - `AwakeningStoneBlock.java`, `AwakeningCrystalBlock.java`, `AwakeningClusterBlock.java`, `CrystalFormation.java`: stone shrines and procedural crystal formations.
+  - `AwakeningService.java`: handles touching and offering an Awakening Shard (`touch`, `awaken`), reading the shard's charge tier into `JobService.awakeningRerollQuiet(player, shardTier)` and launching `ReawakeningVision`.
+  - `AwakeningCommands.java`: `/pz shard give [count] [tier]` and `/pz vessel charge <xp>`.
+  - `CrystalCommands.java`: `/pz crystal small|large|colossal`.
+  - `AwakeningEvents.java`: registers `AwakeningCommands` and `CrystalCommands`.
 - `network/`
   - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version 2. Bump the version when a packet's format changes.
   - `SyncStatsPacket.java`: server → client, full stats.
@@ -444,3 +448,32 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 **Remaining Recommendations**
 
 1. Task 1: Shard Vessel (`shard_vessel` item, data components, XP diversion, 6 tier weight tables, commands).
+
+---
+
+### Session Log — 2026-11-26 (Task 1: Shard Vessel & charged Awakening Shards)
+
+**Context & Direction Check**
+
+- Implemented `DESIGN-DOCUMENT.md` §6 Shard Vessel and charged Awakening Shards using MC 1.21 data components (`ModDataComponents`), keeping `ReawakeningVision` untouched while adding `int shardTier` to `JobService.AwakeningResult` for Claude's future golden-sea tinting.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/registry/ModDataComponents.java` (new): registered `projectzero:shard_charge` (`ShardCharge`) and `projectzero:shard_charge_tier` (`Integer`; omitted at tier 0 so all uncharged shards stack together, present for tiers 1..5 so shards stack only within the same tier).
+- `src/main/java/com/projectzero/awakening/ShardCharge.java`, `AwakeningRules.java`, `ShardVesselService.java`, `ShardVesselItem.java`, `AwakeningShardItem.java` (new): stack-size-1 `shard_vessel` item (right-click with shard in other hand to insert, sneak + right-click to extract keeping tier, item charge bar + progress tooltip), 50% kill XP diversion (`VESSEL_DIVERT = 0.5`) to the first non-maxed active Vessel in inventory, level-scaled thresholds (`t * 0.6 * xpToNextLevel(level)`), and `[System]` tier-up notifications.
+- `src/main/java/com/projectzero/jobs/JobRules.java`, `JobRegistry.java`, `JobService.java`: added the 6 tier rarity weight tables (`50/28/15/6/1` up to `20/28/29/18/5`), `JobRegistry.random(..., weights)` overload, `JobService.AwakeningResult(job, resetLevel, shardTier)`, and `awakeningRerollQuiet(player, shardTier)`.
+- `src/main/java/com/projectzero/awakening/AwakeningService.java`, `AwakeningCommands.java`, `leveling/LevelingEvents.java`: wired shard tier into `AwakeningService.awaken`, XP diversion into `LevelingEvents.onKill`, and added `/pz shard give [count] [tier]` + `/pz vessel charge <xp>`.
+- `src/main/resources/assets/projectzero/textures/item/shard_vessel.png`, `models/item/shard_vessel.json`, `lang/en_us.json`: `TODO(claude-art)` 16x16 placeholder icon for `shard_vessel` and tier/tooltip translations.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded world):
+  - Baseline zombie kill XP = `12`; after inserting shard into Vessel 1 (with a second Vessel also in inventory), zombie kill gave `playerXp = 6`, `vessel1Xp = 6`, `vessel2Xp = 0`.
+  - `/pz vessel charge` advanced Vessel to Tier 5 (`Resplendent`), verified tooltip (`Shard: Resplendent (Tier 5/5)`, `Charge: MAX (556 XP)`), sneak + right-click extracted Tier-5 shard and cleared Vessel; verified component stacking (`isSameItemSameComponents` true only for matching tiers).
+  - Ran 20 Tier-5 (`Resplendent`) rerolls from `brawler` (including survival Awakening Stone right-click into `ReawakeningVision`, consuming 1 shard): observed rarity spread **`{COMMON=6, UNCOMMON=2, RARE=7, EPIC=5, LEGENDARY=0}`** (60% Rare+!). Zero errors or warnings in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): `textures/item/shard_vessel.png` (flat 16x16 navy/gold/cyan icon; per-tier Vessel/shard glow and golden sea shimmer in `ReawakeningVision` left for Claude using `AwakeningResult.shardTier()`).
+
+**Remaining Recommendations**
+
+1. Task 2: Skills foundation (`skills/` package, mana & regen, JSON skills reload listener, `PlayerSkills`, Z/X/C/V keys + `CastSkillPacket`, `skillbook` item, status window & placeholder HUD).

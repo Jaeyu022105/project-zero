@@ -38,5 +38,19 @@
   "block.projectzero.awakening_crystal_deep": "Deep Awakening Crystal",
   "block.projectzero.awakening_cluster": "Awakening Cluster",
   "block.projectzero.void_sea": "Void Sea",
-  "block.projectzero.void_mote": "Void Mote"
+  "block.projectzero.void_mote": "Void Mote",
+  "item.projectzero.shard_vessel": "Shard Vessel",
+  "shard_tier.projectzero.0": "Uncharged",
+  "shard_tier.projectzero.1": "Dim",
+  "shard_tier.projectzero.2": "Glowing",
+  "shard_tier.projectzero.3": "Radiant",
+  "shard_tier.projectzero.4": "Blazing",
+  "shard_tier.projectzero.5": "Resplendent",
+  "tooltip.projectzero.shard.tier": "Charge: %s (Tier %s/%s)",
+  "tooltip.projectzero.shard.charged_hint": "Shifts Awakening Stone rolls toward rarer jobs",
+  "tooltip.projectzero.vessel.empty": "Empty (hold a Shard in other hand + right-click)",
+  "tooltip.projectzero.vessel.tier": "Shard: %s (Tier %s/%s)",
+  "tooltip.projectzero.vessel.progress": "Charge: %s / %s XP (diverts 50% kill XP)",
+  "tooltip.projectzero.vessel.max": "Charge: MAX (%s XP)",
+  "tooltip.projectzero.vessel.extract_hint": "Sneak + right-click to extract shard"
 }

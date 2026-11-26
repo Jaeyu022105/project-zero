@@ -52,7 +52,8 @@ public final class AwakeningService {
 
         if (ReawakeningVision.isInVision(player) || LibraryDomain.isInDomain(player)) return;
 
-        JobService.AwakeningResult result = JobService.awakeningRerollQuiet(player);
+        int shardTier = ShardVesselService.getShardTier(shard);
+        JobService.AwakeningResult result = JobService.awakeningRerollQuiet(player, shardTier);
         if (result == null) {
             system(player, Component.literal("The stone does not answer. No other job could be drawn.")
                     .withStyle(ChatFormatting.WHITE));

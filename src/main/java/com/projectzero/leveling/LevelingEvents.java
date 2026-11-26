@@ -1,6 +1,7 @@
 package com.projectzero.leveling;
 
 import com.projectzero.ProjectZero;
+import com.projectzero.awakening.ShardVesselService;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -53,7 +54,9 @@ public final class LevelingEvents {
     public static void onKill(LivingDeathEvent event) {
         if (event.getEntity().level().isClientSide()) return;
         if (event.getSource().getEntity() instanceof ServerPlayer player) {
-            LevelingService.grantXp(player, XpRewards.forKill(event.getEntity()));
+            long rawXp = XpRewards.forKill(event.getEntity());
+            long playerXp = ShardVesselService.divertKillXp(player, rawXp);
+            LevelingService.grantXp(player, playerXp);
         }
     }
 

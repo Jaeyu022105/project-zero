@@ -13,8 +13,8 @@ Status: ✅ done · 🔨 in progress · ⏳ next · ⬜ later
 
 ## Phase 1: The System core
 1. ✅ **Library domain job choice.** Grand library, orbiting face-down cards, flip reveal, freeze/timeout/logout safety.
-1b. 🔨 **Shard Vessel (charging shards for rarer rerolls), DESIGN-DOCUMENT.md §6.** Gemini: Vessel item and slot, XP diversion on kill, charge tiers, weighted draw. Claude: Vessel and charged-shard textures, tier glow, golden sea in the vision.
-2. ⬜ **Skills foundation.** Gemini: mana, cooldowns, slots and keys, JSON skills. Claude: HUD (HP/MP/XP), skill icons.
+1b. ✅ **Shard Vessel (charging shards for rarer rerolls), DESIGN-DOCUMENT.md §6.** Vessel item, data components, XP diversion on kill, 6 charge tier tables, weighted draw, tooltips, commands (Claude art/golden vision sea later).
+2. 🔨 **Skills foundation.** Gemini: mana, cooldowns, slots and keys, JSON skills. Claude: HUD (HP/MP/XP), skill icons.
 3. ⬜ **Basic skills + one signature skill per job.** Gemini: logic. Claude: effects.
 4. ⬜ **Titles and milestones.**
 4b. ⬜ **Equipment and accessories** (gauntlets, rings, amulets, earrings, belts, charms with rolled stats, dropped by mobs), DESIGN-DOCUMENT.md §12. Gemini: slots, stat rolls, drop tables. Claude: item art, worn models (gauntlets on the arms). Uses **our own accessory slots** (Curios has no Forge build for 1.21.1).

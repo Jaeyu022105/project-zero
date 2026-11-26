@@ -3,6 +3,7 @@ package com.projectzero;
 import com.projectzero.network.ModNetwork;
 import com.projectzero.registry.ModBlocks;
 import com.projectzero.registry.ModCreativeTabs;
+import com.projectzero.registry.ModDataComponents;
 import com.projectzero.registry.ModEntities;
 import com.projectzero.registry.ModItems;
 import com.mojang.logging.LogUtils;
@@ -31,6 +32,7 @@ public final class ProjectZero {
 
     public ProjectZero(FMLJavaModLoadingContext context) {
         IEventBus modBus = context.getModEventBus();
+        ModDataComponents.DATA_COMPONENTS.register(modBus);
         ModBlocks.BLOCKS.register(modBus);
         ModItems.ITEMS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
