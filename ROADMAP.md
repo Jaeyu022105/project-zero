@@ -8,13 +8,16 @@ Status: ✅ done · 🔨 in progress · ⏳ next · ⬜ later
 - ✅ Leveling, stats, status window (K)
 - ✅ Random jobs by rarity at level 10
 - ✅ Awakening Stone (2-block shrine), Awakening Shard, reroll
-- 🔨 Crystal formations (small / large / colossal), glassy crystal
+- ✅ Crystal formations (small / large / colossal), solid core, crystal clusters
+- ✅ Reawakening vision (mirror sea, sea of cards, rarity aura) *(built, not yet committed)*
 
 ## Phase 1: The System core
-1. ⏳ **Library domain job choice.** Claude: arena, orbiting face-down cards, flip reveal. Gemini: freeze, timeout, assign, multiplayer safety.
+1. 🔨 **Library domain job choice.** Claude: grand library, orbiting face-down cards, flip reveal (built, not yet committed). Gemini: commit, freeze/timeout checks, multiplayer safety.
+1b. ⏳ **Shard Vessel (charging shards for rarer rerolls), DESIGN-DOCUMENT.md §6.** Gemini: Vessel item and slot, XP diversion on kill, charge tiers, weighted draw. Claude: Vessel and charged-shard textures, tier glow, golden sea in the vision.
 2. ⬜ **Skills foundation.** Gemini: mana, cooldowns, slots and keys, JSON skills. Claude: HUD (HP/MP/XP), skill icons.
 3. ⬜ **Basic skills + one signature skill per job.** Gemini: logic. Claude: effects.
 4. ⬜ **Titles and milestones.**
+4b. ⬜ **Equipment and accessories** (gauntlets, rings, amulets, earrings, belts, charms with rolled stats, dropped by mobs), DESIGN-DOCUMENT.md §12. Gemini: slots, stat rolls, drop tables. Claude: item art, worn models (gauntlets on the arms). Uses **our own accessory slots** (Curios has no Forge build for 1.21.1).
 
 ## Phase 2: The world
 5. ⬜ **New terrain:** medieval to comic-fantasy biomes (e.g. banner-dotted highlands, giant-mushroom woods, floating-rock fields, crystal tundra). Claude. *Needs the owner's OK on a biome library (TerraBlender), see Open decisions.*
@@ -33,9 +36,11 @@ Status: ✅ done · 🔨 in progress · ⏳ next · ⬜ later
 14. ⬜ **Red gates:** entering one locks the exit and takes you to a whole *other world* (its own dimension with its own terrain, sky, mobs and rules) until its boss dies.
 15. ⬜ **New materials and weapon crafting:** ores and monster parts from gates and red-gate worlds (e.g. mana-steel, beast fangs, essence stones) feeding new weapons and armor with their own recipes and stations. Gemini: items, recipes, stats. Claude: textures, models, stations.
 16. ⬜ **Weapon-themed mobs:** monsters whose drops are the parts for specific weapons.
+17. ⬜ **Summons and pets**, DESIGN-DOCUMENT.md §13. Pets can start with the first gate monsters (Phase 2); job summons after the skills foundation and first mobs. Gemini: roster, AI, leveling, saving. Claude: creature models, summon sigil effects.
 
 ## Later
 - Job trials and job upgrades, gate breaks (monsters spill out), more jobs, bosses and biomes, the Monarch path.
 
 ## Open decisions (owner)
-- **Biome library:** custom overworld biomes on Forge 1.21.1 practically need **TerraBlender** (a widely used free library). Without it we can only add structures and features to vanilla biomes. Recommendation: use TerraBlender.
+- ✅ **Accessory slots:** owner approved Curios 2026-11-26, but Curios for 1.21.1 is NeoForge-only, so we build our own 8 slots (saved with the player). Revisit if we ever move to NeoForge.
+- ✅ **Biome library:** TerraBlender, approved by the owner 2026-11-26.
