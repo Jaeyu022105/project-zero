@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-26** (Task 1: Shard Vessel, charged Awakening Shards, XP diversion, 6-tier rarity weights).
+Last caught up: **2026-11-26** (Task 2: Skills foundation, mana & regen, Z/X/C/V casting, skillbooks, placeholder HUD).
 
 ---
 
@@ -73,9 +73,10 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Jobs & Library Domain: at level 10 the System opens the **Library domain** (`projectzero:library` void dimension) where 7 face-down `JobCardEntity` cards orbit the frozen player; right-clicking one (or waiting out the 90s timeout) flips it, burns the others away, assigns the pre-rolled job, and returns the player home. Jobs are JSON data in `data/projectzero/jobs/` (10 placeholder jobs, 2 per rarity).
 - Awakening Stones, Crystal Formations & Reawakening Vision: small two-block crystal (`awakening_stone`), glassy shell `awakening_crystal`, opaque interior `awakening_crystal_deep`, glowing `awakening_core` veins, surface `awakening_cluster` spikes, procedural `CrystalFormation` (`small`, `large`, `colossal`), and `awakening_shard`. Offering a shard applies `JobService.awakeningRerollQuiet` immediately (logout-safe) and plays the ~14s `ReawakeningVision` (eyelid overlay `VisionOverlayRenderer`, mirror `void_sea` + `void_mote`, 64 drifting cards, rising card with heartbeat, reveal, return home, and rarity-colored particle aura burst).
 - Shard Vessel (`projectzero:shard_vessel`, stack size 1): right-click with an Awakening Shard in the other hand to insert; sneak + right-click to extract. While holding a non-maxed shard in inventory (first active Vessel only), 50% of kill XP (`VESSEL_DIVERT = 0.5`) diverts into the Vessel (`ShardCharge` data component) across 5 charge tiers (`Dim`, `Glowing`, `Radiant`, `Blazing`, `Resplendent`, thresholds `t * 0.6 * xpToNextLevel(level)`). Extracted shards keep their `shard_charge_tier` (`0..5`) component, stack only with shards of the same tier, shift Awakening Stone rarity weights (`JobRules.weightsForShardTier`), and pass `shardTier` on `JobService.AwakeningResult` for future golden-sea tinting in `ReawakeningVision`.
-- Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), title (always "None"), HP, MP, XP bar, stats with + buttons, available points, hover descriptions.
+- Skills Foundation & Mana (`skills/`): current mana + max mana from Intelligence (`10 * INT`), regenerating `1 + 2% of max` per second. Skills load from `data/projectzero/skills/*.json` (`SkillRegistry`) and reference Java `SkillBehavior` entries (`SkillBehaviors`). Player state (`projectzero:skills`) stores mana, learned skills, 4 active slots (`Z`, `X`, `C`, `V` -> `CastSkillPacket`), and remaining cooldown ticks; Awakening Stone rerolls retain up to 3 random old-job skills (`SkillService.retainRandomJobSkillsOnReroll`). Includes `projectzero:skillbook` item (`projectzero:skill_id` component) and plain-text bottom-left `SkillHudOverlay` (`HP x/y  MP x/y` + slot cooldowns).
+- Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), title (always "None"), HP, live MP (`current / max`), XP bar, stats with + buttons, learned/slotted `SKILLS` list, available points, hover descriptions.
 - Data saved with the player and kept on death.
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`.
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`.
 
 **Built and verified in a loaded world (`gradlew runClient`).**
 
@@ -477,3 +478,33 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 **Remaining Recommendations**
 
 1. Task 2: Skills foundation (`skills/` package, mana & regen, JSON skills reload listener, `PlayerSkills`, Z/X/C/V keys + `CastSkillPacket`, `skillbook` item, status window & placeholder HUD).
+
+---
+
+### Session Log — 2026-11-26 (Task 2: Skills foundation, mana, skillbooks, placeholder HUD)
+
+**Context & Direction Check**
+
+- Implemented `DESIGN-DOCUMENT.md` §4 skills foundation, mana + regen, 4 active keybind slots (`Z`, `X`, `C`, `V`), `SkillbookItem` (`projectzero:skill_id` data component), job-reroll 3-skill retention, `StatusScreen` skills list, and bottom-left placeholder HUD.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/skills/`: `SkillRules`, `SkillType`, `SkillSource`, `Skill`, `SkillBehavior`, `SkillBehaviors` (starter `dash` + `noop`), `SkillRegistry` (`data/<ns>/skills/*.json`), `PlayerSkills` (`projectzero:skills` NBT + network), `SkillService` (mana, `1 + 2%/s` regen, `castSlot` validation, `retainRandomJobSkillsOnReroll`), `SkillbookItem`, `SkillCommands` (`/pz skill learn|forget|list|slot|mana|book`), `SkillEvents`.
+- `src/main/java/com/projectzero/network/`: `SyncSkillsPacket`, `CastSkillPacket`; bumped `ModNetwork.PROTOCOL_VERSION` to `4`.
+- `src/main/java/com/projectzero/client/`: `ClientSkillsCache`, `SkillHudOverlay` (`TODO(claude-art)`), `ModKeyBindings` (`Z`, `X`, `C`, `V`), `ClientEvents` logout reset, `StatusScreen` live MP + `SKILLS` list.
+- `src/main/java/com/projectzero/registry/`: `ModDataComponents.SKILL_ID`, `ModItems.SKILLBOOK`, `ModCreativeTabs`.
+- `src/main/java/com/projectzero/jobs/JobService.java` & `leveling/`: wired `SkillService.retainRandomJobSkillsOnReroll`, `/pz reset`, and Intelligence/level-up mana sync.
+- `src/main/resources/`: `data/projectzero/skills/dash.json`, `models/item/skillbook.json`, `textures/item/skillbook.png` (`TODO(claude-art)`), `lang/en_us.json`.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded world + full relog cycle):
+  - Confirmed `Loaded 1 skills` (`dash`), `/pz skill learn dash`, `/pz skill forget dash`, survival `SkillbookItem` right-click consumption + learn, `/pz skill slot 1 dash`.
+  - Sent `CastSkillPacket(0)` (same packet as `Z`): mana dropped `100 -> 85`, cooldown started (`53` ticks remaining), `clientMana = 85`, recast while on cooldown blocked, `StatusScreen` and `SkillHudOverlay` rendered cleanly, mana regenerated `85 -> 88` after ~1.3s.
+  - Disconnected to `TitleScreen` and re-opened the world: verified `serverLearned = true`, `serverSlot0 = true`, `clientSynced = true`. Zero errors in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): `textures/item/skillbook.png` (16x16 flat book icon), `client/SkillHudOverlay.java` (plain-text bottom-left HUD), `client/StatusScreen.java` plain `SKILLS` row.
+
+**Remaining Recommendations**
+
+1. Task 3: Basic skills (`dash`, `second_wind`, `focus`, `bloodlust` auto-granted by level) + 10 signature job skills (granted on `JobService.assign`).

@@ -45,22 +45,22 @@ Balance rule (owner decision 2026-11-26, "rebalance now"): every point helps, bu
 | Vitality | +`0.5 × soft(p, 300)` max health (a quarter heart per point at first) | +20 HP (10 hearts) | +38 HP | +93 HP | Stamina pool, poison and bleed resistance |
 | Agility | Speed +`40% × p / (p + 60)` (never reaches +40%); attack speed +`1.5 × p / (p + 60)` | +17% speed | +25% | +36% | Dodge roll i-frames, stamina recovery |
 | Sense | Evade chance `30% × p / (p + 100)` (never reaches 30%) | 9% | 15% | 25% | Crit chance, seeing hidden gate traps and boss tells |
-| Intelligence | Max mana (10 per point), shown only | | | | Mana for skills, skill power |
+| Intelligence | Max mana (10 per point), current MP + regen (`1 + 2%/s`) **[Built]** | | | | Skill power |
 
 Before this rule (until 2026-11-26): Strength +0.5 flat damage per point, Vitality +1 HP, Agility +1.5% speed per point with no cap, Sense 0.4% per point capped at 30% (reached at level ~16).
 
-**[Next]** Mana and stamina bars on the HUD once skills exist. Stamina should drive Souls-style combat (dodging, blocking, heavy attacks).
+**[Built]** Plain-text HP/MP + active skill cooldown HUD (`SkillHudOverlay`, placeholder for Claude's styled bars). Stamina should drive Souls-style combat later (dodging, blocking, heavy attacks).
 
 ## 4. Skills
 
-Three sources of skills, all stored the same way (a skill id plus a skill level):
+Three sources of skills, all stored the same way (skill id in `projectzero:skills`):
 
-1. **Basic skills [Next]** unlock at fixed levels for everyone, before a job: e.g. level 5 *Sprint* (stamina dash), level 10 *Dagger Rush*-style lunge, level 15 *Bloodlust*-style fear aura. Placeholder names; final list is the owner's call.
-2. **Job skills [Planned]** unlock as the player levels inside their job (section 5).
+1. **Basic skills [Next]** unlock at fixed levels for everyone, before a job.
+2. **Job skills [Next]** unlock as the player levels inside their job (section 5).
 3. **Milestone skills [Planned]** come from titles and achievements (section 7). They are unique and are never lost on a reroll.
-4. **Skillbooks [Planned]** drop in dungeons. Using one teaches a skill. Rarer gates drop rarer books. A book can teach a skill from any job, so a player can mix builds.
+4. **Skillbooks [Built]** (`projectzero:skillbook` with `projectzero:skill_id` data component; dungeon loot drops **[Planned]**). Using one teaches a skill. A book can teach a skill from any job, so a player can mix builds.
 
-Skill types: **active** (bound to skill keys, cost mana, have cooldowns) and **passive** (always on, usually attribute modifiers). Skills level up with use, up to a max level per skill.
+Skill types: **active** (bound to 4 skill keys `Z`, `X`, `C`, `V`, cost mana, have cooldowns) and **passive** (always on). **[Built]** (Skill leveling with use **[Idea]**.)
 
 Up to 4 active skill slots on keys, more slots as the player levels. **[Idea]**
 
@@ -93,7 +93,7 @@ Our own mechanic, not in Solo Leveling.
 - **Rerolling**:
   - **[Built]** Draws a new random job (different from the current one) with the same rarity weights.
   - **[Built]** Resets the player's level back to the level they first got a job (level 10 by default). XP resets to 0, stats reset to base, and stat points are refunded to `(level - 1) × 5`.
-  - **[Planned]** Keeps **3 random skills** from the previous job (hook in `JobService` ready for skills). The rest are lost. Basic skills, milestone skills and skillbook skills are always kept.
+  - **[Built]** Keeps **3 random skills** from the previous job (`SkillService.retainRandomJobSkillsOnReroll`). The rest are lost. Basic skills, milestone skills and skillbook skills are always kept.
 - **[Built] Reawakening vision (owner idea 2026-11-26):** offering the shard plays a short vision instead of an instant reroll (`ReawakeningVision`, about 14 s). The player's eyes close (eyelid overlay), they stand on a dark mirror sea in a starry void with a sea of face-down cards drifting over the water, one card glides up to them, trembles (heartbeat), then flips to show the new job while the rest burn away. Eyes close again, open back home, and a split-second aura bursts around the player in the job's rarity color (bigger for rarer jobs, visible to everyone nearby). The reroll is saved before the vision starts, so a logout cannot lose the shard. Test with `/pz reawaken`.
 - **Cost [Built]** (owner decision 2026-11-26): each reroll consumes one **Awakening Shard** on success. Shards will only drop from gate bosses (**[Planned]**; `/pz shard give` for testing).
 - **Shard Vessel: charging a shard [Built]** (owner idea 2026-11-26; Vessel art & golden vision sea **[Planned]** for Claude). A carried item that charges an Awakening Shard for a better reroll, paid for with your own XP:

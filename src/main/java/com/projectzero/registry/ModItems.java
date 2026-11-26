@@ -3,6 +3,7 @@ package com.projectzero.registry;
 import com.projectzero.ProjectZero;
 import com.projectzero.awakening.AwakeningShardItem;
 import com.projectzero.awakening.ShardVesselItem;
+import com.projectzero.skills.SkillbookItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -26,6 +27,10 @@ public final class ModItems {
     /** Holds one Awakening Shard and diverts half of kill XP into charging it. TODO(claude-art): placeholder icon. */
     public static final RegistryObject<Item> SHARD_VESSEL = ITEMS.register("shard_vessel",
             () -> new ShardVesselItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+
+    /** Teaches the skill stored in {@code projectzero:skill_id} when used. TODO(claude-art): placeholder icon. */
+    public static final RegistryObject<Item> SKILLBOOK = ITEMS.register("skillbook",
+            () -> new SkillbookItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
 
     public static final RegistryObject<Item> AWAKENING_CRYSTAL = ITEMS.register("awakening_crystal",
             () -> new BlockItem(ModBlocks.AWAKENING_CRYSTAL.get(), new Item.Properties().rarity(Rarity.RARE)));

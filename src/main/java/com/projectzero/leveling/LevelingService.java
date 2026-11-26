@@ -65,6 +65,9 @@ public final class LevelingService {
         PlayerStats stats = get(player);
         if (!stats.allocate(stat)) return false;
         set(player, stats);
+        if (stat == Stat.INTELLIGENCE) {
+            com.projectzero.skills.SkillService.sync(player);
+        }
         return true;
     }
 
@@ -86,6 +89,7 @@ public final class LevelingService {
         // Leveling up fully restores the player.
         player.setHealth(player.getMaxHealth());
         player.getFoodData().setFoodLevel(20);
+        com.projectzero.skills.SkillService.setMana(player, com.projectzero.skills.SkillService.maxMana(player));
 
         player.connection.send(new ClientboundSetTitleTextPacket(
                 Component.literal("LEVEL UP!").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD)));

@@ -1,0 +1,14 @@
+{
+  "id": "projectzero:dash",
+  "type": "active",
+  "source": "basic",
+  "mana_cost": 15,
+  "cooldown_ticks": 60,
+  "unlock_level": 3,
+  "behavior": "projectzero:dash",
+  "params": {
+    "speed": 1.35,
+    "lift": 0.2,
+    "iframes_ticks": 6
+  }
+}

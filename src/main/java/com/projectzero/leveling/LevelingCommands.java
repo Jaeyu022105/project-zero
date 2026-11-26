@@ -45,7 +45,8 @@ public final class LevelingCommands {
                             ServerPlayer player = ctx.getSource().getPlayerOrException();
                             LevelingService.reset(player);
                             JobService.clear(player);
-                            ctx.getSource().sendSuccess(() -> Component.literal("Stats and job reset."), false);
+                            com.projectzero.skills.SkillService.reset(player);
+                            ctx.getSource().sendSuccess(() -> Component.literal("Stats, job, and skills reset."), false);
                             return 1;
                         })));
     }

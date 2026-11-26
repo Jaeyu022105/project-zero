@@ -6,6 +6,7 @@ import com.projectzero.awakening.ShardCharge;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -28,5 +29,12 @@ public final class ModDataComponents {
             DATA_COMPONENTS.register("shard_charge_tier", () -> DataComponentType.<Integer>builder()
                     .persistent(Codec.INT)
                     .networkSynchronized(ByteBufCodecs.VAR_INT)
+                    .build());
+
+    /** Stored on {@code skillbook} stacks: id of the skill taught when consumed. */
+    public static final RegistryObject<DataComponentType<ResourceLocation>> SKILL_ID =
+            DATA_COMPONENTS.register("skill_id", () -> DataComponentType.<ResourceLocation>builder()
+                    .persistent(ResourceLocation.CODEC)
+                    .networkSynchronized(ResourceLocation.STREAM_CODEC)
                     .build());
 }
