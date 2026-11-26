@@ -1,0 +1,16 @@
+{
+  "id": "projectzero:solar_cataclysm",
+  "type": "active",
+  "source": "job",
+  "job": "projectzero:sunbreaker",
+  "mana_cost": 60,
+  "cooldown_ticks": 300,
+  "unlock_level": 1,
+  "behavior": "projectzero:solar_cataclysm",
+  "params": {
+    "radius": 8.0,
+    "damage": 18.0,
+    "burn_seconds": 6,
+    "fire_res_ticks": 200
+  }
+}

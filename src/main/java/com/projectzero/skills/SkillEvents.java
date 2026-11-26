@@ -1,6 +1,10 @@
 package com.projectzero.skills;
 
 import com.projectzero.ProjectZero;
+import com.projectzero.jobs.JobService;
+import com.projectzero.jobs.PlayerJob;
+import com.projectzero.leveling.LevelingService;
+import com.projectzero.leveling.PlayerLevelUpEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -32,8 +36,18 @@ public final class SkillEvents {
     }
 
     @SubscribeEvent
+    public static void onLevelUp(PlayerLevelUpEvent event) {
+        SkillService.grantBasicSkillsForLevel(event.getPlayer(), event.getNewLevel(), true);
+    }
+
+    @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
+            SkillService.grantBasicSkillsForLevel(sp, LevelingService.get(sp).level(), false);
+            PlayerJob job = JobService.get(sp);
+            if (job.hasJob()) {
+                SkillService.grantJobSkills(sp, job.jobId(), job.jobLevel(), false);
+            }
             SkillService.sync(sp);
         }
     }

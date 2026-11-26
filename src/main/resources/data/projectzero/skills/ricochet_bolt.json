@@ -1,0 +1,17 @@
+{
+  "id": "projectzero:ricochet_bolt",
+  "type": "active",
+  "source": "job",
+  "job": "projectzero:slinger",
+  "mana_cost": 18,
+  "cooldown_ticks": 70,
+  "unlock_level": 1,
+  "behavior": "projectzero:ricochet_bolt",
+  "params": {
+    "range": 24.0,
+    "damage": 9.0,
+    "bounces": 2,
+    "bounce_radius": 6.5,
+    "bounce_retention": 0.75
+  }
+}

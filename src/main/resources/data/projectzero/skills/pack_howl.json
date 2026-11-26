@@ -1,0 +1,14 @@
+{
+  "id": "projectzero:pack_howl",
+  "type": "active",
+  "source": "job",
+  "job": "projectzero:beastcaller",
+  "mana_cost": 45,
+  "cooldown_ticks": 360,
+  "unlock_level": 1,
+  "behavior": "projectzero:pack_howl",
+  "params": {
+    "count": 2,
+    "duration_ticks": 240
+  }
+}

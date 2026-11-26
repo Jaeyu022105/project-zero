@@ -15,8 +15,8 @@ Status: ✅ done · 🔨 in progress · ⏳ next · ⬜ later
 1. ✅ **Library domain job choice.** Grand library, orbiting face-down cards, flip reveal, freeze/timeout/logout safety.
 1b. ✅ **Shard Vessel (charging shards for rarer rerolls), DESIGN-DOCUMENT.md §6.** Vessel item, data components, XP diversion on kill, 6 charge tier tables, weighted draw, tooltips, commands (Claude art/golden vision sea later).
 2. ✅ **Skills foundation.** Mana & regen, cooldowns, 4 slots & Z/X/C/V keys, JSON skills, Skillbook item, job-reroll 3-skill retention, placeholder HUD (Claude HUD/icons later).
-3. 🔨 **Basic skills + one signature skill per job.** Gemini: logic. Claude: effects.
-4. ⬜ **Titles and milestones.**
+3. ✅ **Basic skills + one signature skill per job.** 4 basic skills (Dash, Second Wind, Focus, Bloodlust) + 10 job signature skills built & verified (Claude custom VFX later).
+4. 🔨 **Titles and milestones.**
 4b. ⬜ **Equipment and accessories** (gauntlets, rings, amulets, earrings, belts, charms with rolled stats, dropped by mobs), DESIGN-DOCUMENT.md §12. Gemini: slots, stat rolls, drop tables. Claude: item art, worn models (gauntlets on the arms). Uses **our own accessory slots** (Curios has no Forge build for 1.21.1).
 
 ## Phase 2: The world

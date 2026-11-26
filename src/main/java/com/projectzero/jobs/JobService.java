@@ -82,9 +82,11 @@ public final class JobService {
         return true;
     }
 
-    /** Sets the player's job, keeps their first-job level, and announces it. */
+    /** Sets the player's job, keeps their first-job level, grants its starter skills, and announces it. */
     public static void assign(ServerPlayer player, Job job) {
-        set(player, get(player).withJob(job.id()));
+        PlayerJob updated = get(player).withJob(job.id());
+        set(player, updated);
+        com.projectzero.skills.SkillService.grantJobSkills(player, job.id(), updated.jobLevel(), true);
         announce(player, job);
     }
 
@@ -144,7 +146,9 @@ public final class JobService {
         int resetLevel = Math.min(LevelingService.get(player).level(), current.firstJobLevel());
         retainRandomJobSkillsOnReroll(player, current.jobId());
         LevelingService.resetToLevel(player, resetLevel);
-        set(player, get(player).withJob(next.id()));
+        PlayerJob updated = get(player).withJob(next.id());
+        set(player, updated);
+        com.projectzero.skills.SkillService.grantJobSkills(player, next.id(), updated.jobLevel(), true);
         return new AwakeningResult(next, resetLevel, clampedTier);
     }
 

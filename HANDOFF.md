@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-26** (Task 2: Skills foundation, mana & regen, Z/X/C/V casting, skillbooks, placeholder HUD).
+Last caught up: **2026-11-27** (Task 3: 4 basic skills + 10 job signature skills).
 
 ---
 
@@ -73,7 +73,7 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Jobs & Library Domain: at level 10 the System opens the **Library domain** (`projectzero:library` void dimension) where 7 face-down `JobCardEntity` cards orbit the frozen player; right-clicking one (or waiting out the 90s timeout) flips it, burns the others away, assigns the pre-rolled job, and returns the player home. Jobs are JSON data in `data/projectzero/jobs/` (10 placeholder jobs, 2 per rarity).
 - Awakening Stones, Crystal Formations & Reawakening Vision: small two-block crystal (`awakening_stone`), glassy shell `awakening_crystal`, opaque interior `awakening_crystal_deep`, glowing `awakening_core` veins, surface `awakening_cluster` spikes, procedural `CrystalFormation` (`small`, `large`, `colossal`), and `awakening_shard`. Offering a shard applies `JobService.awakeningRerollQuiet` immediately (logout-safe) and plays the ~14s `ReawakeningVision` (eyelid overlay `VisionOverlayRenderer`, mirror `void_sea` + `void_mote`, 64 drifting cards, rising card with heartbeat, reveal, return home, and rarity-colored particle aura burst).
 - Shard Vessel (`projectzero:shard_vessel`, stack size 1): right-click with an Awakening Shard in the other hand to insert; sneak + right-click to extract. While holding a non-maxed shard in inventory (first active Vessel only), 50% of kill XP (`VESSEL_DIVERT = 0.5`) diverts into the Vessel (`ShardCharge` data component) across 5 charge tiers (`Dim`, `Glowing`, `Radiant`, `Blazing`, `Resplendent`, thresholds `t * 0.6 * xpToNextLevel(level)`). Extracted shards keep their `shard_charge_tier` (`0..5`) component, stack only with shards of the same tier, shift Awakening Stone rarity weights (`JobRules.weightsForShardTier`), and pass `shardTier` on `JobService.AwakeningResult` for future golden-sea tinting in `ReawakeningVision`.
-- Skills Foundation & Mana (`skills/`): current mana + max mana from Intelligence (`10 * INT`), regenerating `1 + 2% of max` per second. Skills load from `data/projectzero/skills/*.json` (`SkillRegistry`) and reference Java `SkillBehavior` entries (`SkillBehaviors`). Player state (`projectzero:skills`) stores mana, learned skills, 4 active slots (`Z`, `X`, `C`, `V` -> `CastSkillPacket`), and remaining cooldown ticks; Awakening Stone rerolls retain up to 3 random old-job skills (`SkillService.retainRandomJobSkillsOnReroll`). Includes `projectzero:skillbook` item (`projectzero:skill_id` component) and plain-text bottom-left `SkillHudOverlay` (`HP x/y  MP x/y` + slot cooldowns).
+- Skills Foundation & Mana (`skills/`): current mana + max mana from Intelligence (`10 * INT`), regenerating `1 + 2% of max` per second. 14 skills in `data/projectzero/skills/*.json` (`SkillRegistry` + `SkillBehaviors` + `SkillEffects`): 4 basic skills auto-learned at levels 3/8/15/25 (`dash`, `second_wind`, `focus`, `bloodlust`) and 10 job signature skills granted on job assignment (`iron_knuckle`, `ricochet_bolt`, `riposte_stance`, `aegis_bastion`, `cursed_edge`, `pack_howl`, `tempest_call`, `shadow_step`, `soul_shackle`, `solar_cataclysm`). Player state (`projectzero:skills`) stores mana, learned skills, 4 active slots (`Z`, `X`, `C`, `V`), and cooldowns; Awakening Stone rerolls retain up to 3 random old-job skills. Includes `projectzero:skillbook` item and plain-text bottom-left `SkillHudOverlay`.
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), title (always "None"), HP, live MP (`current / max`), XP bar, stats with + buttons, learned/slotted `SKILLS` list, available points, hover descriptions.
 - Data saved with the player and kept on death.
 - Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`.
@@ -508,3 +508,38 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 **Remaining Recommendations**
 
 1. Task 3: Basic skills (`dash`, `second_wind`, `focus`, `bloodlust` auto-granted by level) + 10 signature job skills (granted on `JobService.assign`).
+
+---
+
+### Session Log — 2026-11-27 (Task 3: Basic skills + 10 signature job skills)
+
+**Context & Direction Check**
+
+- Implemented all 4 level-granted basic skills and 10 original signature job skills (one per job in `data/projectzero/jobs/*.json`), keeping behaviors in Java (`SkillBehaviors`, `SkillEffects`) and balance numbers in JSON `params`, with vanilla particles/sounds as placeholders for Claude's custom VFX.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/skills/SkillEffects.java` (new): timed server-side state and combat hooks (`Second Wind` HoT pulses, `Bloodlust` transient attribute modifiers, `Riposte Stance` parry/counter on `LivingAttackEvent`, `Focus` +10% full-HP first-hit passive & `Shadow Step` backstab on `LivingHurtEvent`, and `Pack Howl` Spirit Hound timed despawn + zero loot/XP).
+- `src/main/java/com/projectzero/skills/SkillBehaviors.java`, `SkillService.java`, `SkillEvents.java`, `jobs/JobService.java`, `leveling/XpRewards.java`: registered all 14 skill behaviors; hooked `PlayerLevelUpEvent`, `JobService.assign`, `JobService.awakeningRerollQuiet`, and login catch-up.
+- `src/main/resources/data/projectzero/skills/*.json` & `lang/en_us.json`: 14 skill JSON definitions and translations:
+  - **Basic**: `dash` (lvl 3, forward burst + 6t i-frames; `TODO(claude-art)`: wind trail), `second_wind` (lvl 8, 30% max HP over 3s; `TODO(claude-art)`: green/cyan healing aura), `focus` (lvl 15 passive, +10% first-hit on full-HP foes), `bloodlust` (lvl 25, +20% total atk & +10% speed 10s; `TODO(claude-art)`: red pressure aura).
+  - **Job signatures**:
+    1. Brawler — `iron_knuckle`: shockwave cone punch + heavy knockback (`TODO(claude-art)`: fist shockwave ring).
+    2. Slinger — `ricochet_bolt`: ranged bolt chaining to 2 nearby enemies (`TODO(claude-art)`: glowing tracer beam).
+    3. Duelist — `riposte_stance`: 1.75s parry window negating + countering next attack (`TODO(claude-art)`: blade flash).
+    4. Bulwark — `aegis_bastion`: 6 absorption hearts + Resistance + AoE taunt (`TODO(claude-art)`: translucent hex shield).
+    5. Hexblade — `cursed_edge`: 10-block dark slash wave applying Wither II + 2 HP drain/hit (`TODO(claude-art)`: crescent dark wave).
+    6. Beastcaller — `pack_howl`: summons 2 temporary tamed Spirit Hounds for 12s (`TODO(claude-art)`: ground summon sigil + spectral wolf texture).
+    7. Stormweaver — `tempest_call`: fire-safe lightning storm on up to 5 foes (`TODO(claude-art)`: custom arc VFX).
+    8. Veilstalker — `shadow_step`: blink behind target + brief invisibility + +50% next hit (`TODO(claude-art)`: shadow mist).
+    9. Gravewarden — `soul_shackle`: AoE necrotic root + magic damage + 25% life siphon (`TODO(claude-art)`: rising spectral chains).
+    10. Sunbreaker — `solar_cataclysm`: radiant fire nova + debuff cleanse + Fire Resistance (`TODO(claude-art)`: solar pillar).
+
+**Verification Executed**
+
+- `gradlew.bat runClient --no-daemon` (loaded world):
+  - Verified `Loaded 14 skills`, auto-unlock of `dash`, `second_wind`, `focus`, `bloodlust` by level 26, `Focus` full-HP bonus damage (`10.824` > `10.5`), `Second Wind` pulse heal (`10.0 -> 12.0` HP), `Bloodlust` attribute buff, and assigning + casting all 10 job signature skills (`castOk=true` for all 10). Zero errors in `run/logs/latest.log`.
+
+**Remaining Recommendations**
+
+1. Task 4: Titles and milestones (`titles/` package, `MilestoneTracker`, JSON titles, 6 starter titles, `/pz title` & `/pz milestone` commands, `StatusScreen` clickable `TITLE` field).

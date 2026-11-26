@@ -1,0 +1,14 @@
+{
+  "id": "projectzero:bloodlust",
+  "type": "active",
+  "source": "basic",
+  "mana_cost": 40,
+  "cooldown_ticks": 400,
+  "unlock_level": 25,
+  "behavior": "projectzero:bloodlust",
+  "params": {
+    "duration_ticks": 200,
+    "damage_bonus": 0.20,
+    "speed_bonus": 0.10
+  }
+}

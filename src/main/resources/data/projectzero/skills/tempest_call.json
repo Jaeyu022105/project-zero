@@ -1,0 +1,15 @@
+{
+  "id": "projectzero:tempest_call",
+  "type": "active",
+  "source": "job",
+  "job": "projectzero:stormweaver",
+  "mana_cost": 50,
+  "cooldown_ticks": 220,
+  "unlock_level": 1,
+  "behavior": "projectzero:tempest_call",
+  "params": {
+    "radius": 9.0,
+    "max_targets": 5,
+    "damage": 14.0
+  }
+}

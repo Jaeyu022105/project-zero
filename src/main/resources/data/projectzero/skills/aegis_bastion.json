@@ -1,0 +1,15 @@
+{
+  "id": "projectzero:aegis_bastion",
+  "type": "active",
+  "source": "job",
+  "job": "projectzero:bulwark",
+  "mana_cost": 30,
+  "cooldown_ticks": 240,
+  "unlock_level": 1,
+  "behavior": "projectzero:aegis_bastion",
+  "params": {
+    "absorption_amount": 12.0,
+    "duration_ticks": 160,
+    "taunt_radius": 8.0
+  }
+}

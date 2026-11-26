@@ -1,0 +1,12 @@
+{
+  "id": "projectzero:focus",
+  "type": "passive",
+  "source": "basic",
+  "mana_cost": 0,
+  "cooldown_ticks": 0,
+  "unlock_level": 15,
+  "behavior": "projectzero:focus",
+  "params": {
+    "bonus_multiplier": 0.10
+  }
+}

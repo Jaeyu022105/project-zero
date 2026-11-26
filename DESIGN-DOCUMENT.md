@@ -55,8 +55,8 @@ Before this rule (until 2026-11-26): Strength +0.5 flat damage per point, Vitali
 
 Three sources of skills, all stored the same way (skill id in `projectzero:skills`):
 
-1. **Basic skills [Next]** unlock at fixed levels for everyone, before a job.
-2. **Job skills [Next]** unlock as the player levels inside their job (section 5).
+1. **Basic skills [Built]** unlock at fixed levels for everyone: lvl 3 *Dash* (burst + 6t i-frames), lvl 8 *Second Wind* (30% max HP over 3s), lvl 15 *Focus* (passive +10% damage on first hit against a full-HP foe), lvl 25 *Bloodlust* (+20% damage & +10% speed for 10s).
+2. **Job skills [Built]** (starter signature skill per job, granted on assignment; deeper trees **[Planned]**).
 3. **Milestone skills [Planned]** come from titles and achievements (section 7). They are unique and are never lost on a reroll.
 4. **Skillbooks [Built]** (`projectzero:skillbook` with `projectzero:skill_id` data component; dungeon loot drops **[Planned]**). Using one teaches a skill. A book can teach a skill from any job, so a player can mix builds.
 

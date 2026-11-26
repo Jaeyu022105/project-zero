@@ -1,0 +1,16 @@
+{
+  "id": "projectzero:soul_shackle",
+  "type": "active",
+  "source": "job",
+  "job": "projectzero:gravewarden",
+  "mana_cost": 55,
+  "cooldown_ticks": 260,
+  "unlock_level": 1,
+  "behavior": "projectzero:soul_shackle",
+  "params": {
+    "radius": 7.0,
+    "damage": 15.0,
+    "root_ticks": 70,
+    "siphon_fraction": 0.25
+  }
+}

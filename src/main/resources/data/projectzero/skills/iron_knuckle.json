@@ -1,0 +1,16 @@
+{
+  "id": "projectzero:iron_knuckle",
+  "type": "active",
+  "source": "job",
+  "job": "projectzero:brawler",
+  "mana_cost": 20,
+  "cooldown_ticks": 100,
+  "unlock_level": 1,
+  "behavior": "projectzero:iron_knuckle",
+  "params": {
+    "range": 4.0,
+    "base_damage": 8.0,
+    "attack_scale": 0.8,
+    "knockback": 1.4
+  }
+}

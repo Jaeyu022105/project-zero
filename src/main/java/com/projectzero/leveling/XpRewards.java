@@ -34,6 +34,7 @@ public final class XpRewards {
 
     public static long forKill(LivingEntity killed) {
         if (killed instanceof Player) return 0;
+        if (killed.getPersistentData().getBoolean(com.projectzero.skills.SkillEffects.SUMMON_TAG)) return 0;
 
         Long fixed = FIXED.get(killed.getType());
         if (fixed != null) return fixed;

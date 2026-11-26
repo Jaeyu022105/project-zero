@@ -1,0 +1,15 @@
+{
+  "id": "projectzero:riposte_stance",
+  "type": "active",
+  "source": "job",
+  "job": "projectzero:duelist",
+  "mana_cost": 25,
+  "cooldown_ticks": 160,
+  "unlock_level": 1,
+  "behavior": "projectzero:riposte_stance",
+  "params": {
+    "window_ticks": 35,
+    "counter_damage": 12.0,
+    "attack_scale": 1.0
+  }
+}

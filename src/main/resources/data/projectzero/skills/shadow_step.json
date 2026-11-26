@@ -1,0 +1,15 @@
+{
+  "id": "projectzero:shadow_step",
+  "type": "active",
+  "source": "job",
+  "job": "projectzero:veilstalker",
+  "mana_cost": 30,
+  "cooldown_ticks": 120,
+  "unlock_level": 1,
+  "behavior": "projectzero:shadow_step",
+  "params": {
+    "range": 14.0,
+    "invisibility_ticks": 40,
+    "backstab_multiplier": 0.50
+  }
+}

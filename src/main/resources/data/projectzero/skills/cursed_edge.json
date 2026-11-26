@@ -1,0 +1,16 @@
+{
+  "id": "projectzero:cursed_edge",
+  "type": "active",
+  "source": "job",
+  "job": "projectzero:hexblade",
+  "mana_cost": 28,
+  "cooldown_ticks": 120,
+  "unlock_level": 1,
+  "behavior": "projectzero:cursed_edge",
+  "params": {
+    "range": 10.0,
+    "damage": 10.0,
+    "wither_ticks": 80,
+    "heal_per_hit": 2.0
+  }
+}

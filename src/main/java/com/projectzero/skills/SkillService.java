@@ -81,6 +81,20 @@ public final class SkillService {
         return true;
     }
 
+    /** Auto-grants any basic skills unlocked up to {@code playerLevel}. */
+    public static void grantBasicSkillsForLevel(ServerPlayer player, int playerLevel, boolean notify) {
+        for (Skill skill : SkillRegistry.basicSkillsForLevel(playerLevel)) {
+            learn(player, skill, notify);
+        }
+    }
+
+    /** Auto-grants any job skills unlocked for {@code jobId} up to {@code jobLevel}. */
+    public static void grantJobSkills(ServerPlayer player, ResourceLocation jobId, int jobLevel, boolean notify) {
+        for (Skill skill : SkillRegistry.jobSkillsFor(jobId, jobLevel)) {
+            learn(player, skill, notify);
+        }
+    }
+
     public static boolean forget(ServerPlayer player, ResourceLocation skillId) {
         PlayerSkills data = get(player);
         if (!data.removeSkill(skillId)) return false;
