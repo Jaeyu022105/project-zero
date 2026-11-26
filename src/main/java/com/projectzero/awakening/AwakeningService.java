@@ -15,9 +15,8 @@ import net.minecraft.world.item.ItemStack;
 /**
  * What happens when a player uses an Awakening Stone (DESIGN-DOCUMENT.md §6).
  *
- * The presentation (messages, sound, particles) is done. The reroll itself is still the
- * test version from {@link JobService#reroll}: the real rules (reset level to the first-job
- * level, keep 3 random job skills) belong in JobService and are not built yet.
+ * Delegates the reroll rules to {@link JobService#awakeningReroll(ServerPlayer)} and only
+ * consumes the Awakening Shard (in survival) and plays the effects on success.
  */
 public final class AwakeningService {
     private AwakeningService() {}
@@ -37,9 +36,12 @@ public final class AwakeningService {
             return;
         }
 
-        // TODO(gemini): replace with the real reroll: reset level to firstJobLevel, keep 3 random job skills.
-        Job job = JobService.reroll(player);
-        if (job == null) return;
+        Job job = JobService.awakeningReroll(player);
+        if (job == null) {
+            system(player, Component.literal("The stone does not answer. No other job could be drawn.")
+                    .withStyle(ChatFormatting.WHITE));
+            return;
+        }
 
         if (!player.getAbilities().instabuild) {
             shard.shrink(1);

@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-26** (job system: random job by rarity at level 10).
+Last caught up: **2026-11-26** (Awakening Stone block, shard item, and real job reroll backend).
 
 ---
 
@@ -28,7 +28,7 @@ Last caught up: **2026-11-26** (job system: random job by rarity at level 10).
 - A leveling system: levels, XP from kills, five stats, a System-style status window.
 - A job system: Job Change Quest at level 10 (auto-complete for now), weighted random jobs by rarity loaded from JSON.
 - (Planned) Basic skills, job skills, milestone titles and skills, skillbooks.
-- (Planned) Awakening Stones in custom villages for job rerolls (each reroll consumes one Awakening Shard, dropped only by gate bosses).
+- Awakening Stones & Awakening Shards: two-block crystal block, shard item, and real job reroll backend (custom village worldgen and gate boss loot drops still planned).
 - (Planned) Gates and dungeons by color and size, with Souls-like bosses.
 - (Long term) A Monarch path.
 
@@ -71,9 +71,10 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - XP from kills: every non-player mob gives XP. Vanilla ×0.3, other mods ×1, gate monsters ×3 (`projectzero:gate_monsters` tag, empty for now), bosses ×10.
 - Stats: Strength, Agility, Vitality, Sense, Intelligence, each with an effect (Intelligence only shows max mana for now).
 - Jobs: at level 10 the System gives a Job Change Quest that completes on the spot (trial dungeon comes later) and rolls a random job weighted by rarity (Common 50, Uncommon 28, Rare 15, Epic 6, Legendary 1). Jobs are JSON data in `data/projectzero/jobs/`; 10 placeholder jobs, 2 per rarity. Jobs have no skills or effects yet.
+- Awakening Stones & Shards: two-block glowing crystal block (`projectzero:awakening_stone`), `projectzero:awakening_shard` item, and a Project Zero creative tab. Right-clicking an Awakening Stone with an Awakening Shard runs `JobService.awakeningReroll`: resets level to `firstJobLevel`, XP to 0, stats to base, unspent points to `(level - 1) * 5`, draws a different random job, keeps up to 3 random old job skills (hook + TODO until skills exist), and consumes the shard in survival only on success.
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), title (always "None"), HP, MP, XP bar, stats with + buttons, available points, hover descriptions.
 - Data saved with the player and kept on death.
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`. (`/pz reset` resets both stats and job; `/pz job clear` clears only the job.)
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count]`. (`/pz reset` resets both stats and job; `/pz job clear` clears only the job.)
 
 **Builds and boots, in-game playtest pending.** `gradlew build` passes and `gradlew runClient` boots cleanly to the title screen (`[System] Project Zero loaded. Welcome, Player.`); in-world gameplay test is still to do (see Known Gaps).
 
@@ -89,11 +90,11 @@ Main stack:
 
 Package layout (`src/main/java/com/projectzero/`):
 
-- `ProjectZero.java`: mod entry point, `MOD_ID = "projectzero"`, `ProjectZero.id(path)` helper for resource locations, registers networking.
+- `ProjectZero.java`: mod entry point, `MOD_ID = "projectzero"`, `ProjectZero.id(path)` helper for resource locations, registers `ModBlocks`, `ModItems`, `ModCreativeTabs`, and `ModNetwork`.
 - `leveling/`
-  - `LevelingService.java`: **the** server API for leveling. Other systems call `grantXp`, `allocate`, `reset`, `get`, `set`, `sync`. Never edit player stats directly.
+  - `LevelingService.java`: **the** server API for leveling. Other systems call `grantXp`, `allocate`, `reset`, `resetToLevel`, `get`, `set`, `sync`. Never edit player stats directly.
   - `LevelingRules.java`: every balance number (XP curve, points per level, stat effect sizes, XP multipliers).
-  - `PlayerStats.java`: plain data (level, xp, points, stats) with NBT save/load and network read/write.
+  - `PlayerStats.java`: plain data (level, xp, points, stats) with `resetToLevel`, NBT save/load and network read/write.
   - `Stat.java`: the five stats, base value 10.
   - `StatEffects.java`: turns stats into transient attribute modifiers; evade roll; max mana.
   - `XpRewards.java`: XP per kill, `GATE_MONSTERS` tag, `register(type, xp)` for fixed values.
@@ -101,14 +102,23 @@ Package layout (`src/main/java/com/projectzero/`):
   - `LevelingCommands.java`: `/pz` operator commands.
   - `PlayerLevelUpEvent.java`: posted on the Forge bus after a level up (once per XP grant). Other systems hook levels through this instead of `LevelingService` calling them.
 - `jobs/`
-  - `JobService.java`: **the** server API for jobs: `get`, `set`, `sync`, `tryJobChangeQuest`, `assign`, `reroll`, `clear`, `copy`.
-  - `JobRules.java`: job change level (10), starting job level.
+  - `JobService.java`: **the** server API for jobs: `get`, `set`, `sync`, `tryJobChangeQuest`, `assign`, `reroll`, `awakeningReroll`, `clear`, `copy`.
+  - `JobRules.java`: job change level (10), starting job level (1), reroll kept job skills (3).
   - `JobRarity.java`: rarities with draw weights and colors (chat + ARGB).
   - `Job.java`: one job definition (id, rarity, optional `upgradesTo`, optional `trial`). Lang key `job.<ns>.<path>`.
   - `JobRegistry.java`: datapack reload listener for `data/<ns>/jobs/*.json` (file name = id), weighted random draw. Server side only.
   - `PlayerJob.java`: plain data (job id, job level, first-job level) with NBT and network methods.
   - `JobEvents.java`: reload listener registration, level up -> quest, login/clone/respawn/dimension sync, commands.
   - `JobCommands.java`: `/pz job set|reroll|clear` (merged into the `/pz` node).
+- `registry/`
+  - `ModBlocks.java`: `AWAKENING_STONE` block registration.
+  - `ModItems.java`: `AWAKENING_STONE` block item and `AWAKENING_SHARD` item registrations.
+  - `ModCreativeTabs.java`: `projectzero` creative tab.
+- `awakening/`
+  - `AwakeningStoneBlock.java`: two-block crystal block with ambient particles/chimes and right-click interaction.
+  - `AwakeningService.java`: handles touching and offering an Awakening Shard to an Awakening Stone (`touch`, `awaken`), calling `JobService.awakeningReroll` and consuming the shard only on success.
+  - `AwakeningCommands.java`: `/pz shard give [count]` operator command (temporary until gate boss loot drops shards).
+  - `AwakeningEvents.java`: registers `AwakeningCommands` on `RegisterCommandsEvent`.
 - `network/`
   - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version 2. Bump the version when a packet's format changes.
   - `SyncStatsPacket.java`: server → client, full stats.
@@ -125,6 +135,7 @@ Resources:
 
 - `META-INF/mods.toml`, `pack.mcmeta` (pack format 34): filled from `gradle.properties` at build time.
 - `assets/projectzero/lang/en_us.json`: all user-facing text that goes through translation keys.
+- `assets/projectzero/blockstates/`, `models/`, `textures/`: Awakening Stone two-block crystal model/texture and Awakening Shard item model/texture.
 - `data/projectzero/tags/entity_type/gate_monsters.json`: gate monster tag (empty).
 - `data/projectzero/jobs/*.json`: job definitions. Format: `{"id": "projectzero:duelist", "rarity": "uncommon", "upgradesTo": "projectzero:veilstalker", "trial": "projectzero:trial/veilstalker"}`; `upgradesTo` and `trial` are optional, `id` is only checked against the file name. Placeholder jobs: Brawler, Slinger (common); Duelist (upgrades to Veilstalker), Bulwark (uncommon); Hexblade (upgrades to Stormweaver), Beastcaller (rare); Stormweaver, Veilstalker (epic); Gravewarden, Sunbreaker (legendary).
 
@@ -329,3 +340,39 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 1. Complete the in-world playtest in `gradlew runClient` (`/pz xp 20000`, K window, `/pz job set|reroll`, `/pz reset`, death and relog).
 2. Build basic skills, mana, and cooldowns (`DESIGN-DOCUMENT.md` §4), then job skills on top of them.
 3. Replace placeholder job names when final names are chosen.
+
+---
+
+### Session Log — 2026-11-26 (Awakening Stone reroll backend)
+
+**Context & Direction Check**
+
+- Committed Claude's Awakening Stone block, Awakening Shard item, creative tab, models, textures, and effects first as-is (`21c87f2`) without changing visuals.
+- Implemented the real Awakening Stone reroll backend (`DESIGN-DOCUMENT.md` §6): `JobService.awakeningReroll` resets level to `PlayerJob.firstJobLevel` (XP 0, base stats, `(level - 1) * 5` unspent points), draws a different random job, includes a hook + TODO to keep up to 3 random old job skills once skills exist, and consumes the Awakening Shard only on success.
+- Added temporary op command `/pz shard give [count]` until gate boss loot drops Awakening Shards.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/leveling/PlayerStats.java`: added `PlayerStats.resetToLevel(int)`.
+- `src/main/java/com/projectzero/leveling/LevelingService.java`: added `LevelingService.resetToLevel(ServerPlayer, int)`.
+- `src/main/java/com/projectzero/jobs/JobRules.java`: added `REROLL_KEPT_JOB_SKILLS = 3`.
+- `src/main/java/com/projectzero/jobs/JobService.java`: added `awakeningReroll(ServerPlayer)` and `retainRandomJobSkillsOnReroll(ServerPlayer, ResourceLocation)` hook with `TODO(skills)`.
+- `src/main/java/com/projectzero/awakening/AwakeningService.java`: replaced `TODO(gemini)` `JobService.reroll` call with `JobService.awakeningReroll`, returning early without consuming the shard if reroll fails. Visuals/particles/sounds untouched.
+- `src/main/java/com/projectzero/awakening/AwakeningCommands.java` & `AwakeningEvents.java` (new): `/pz shard give [count]` op command.
+- `DESIGN-DOCUMENT.md` §6 and `HANDOFF.md`: updated status tags, reference sections, and session log.
+
+**Verification Executed**
+
+- `gradlew.bat build` with `JAVA_HOME=C:\Users\Jaime\AppData\Roaming\.minecraft\runtime\java-runtime-delta\windows\java-runtime-delta` (JDK 21.0.7): **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient`: booted cleanly to the title screen (`[System] Project Zero loaded. Welcome, Player.`) with zero registry, blockstate, model, or texture warnings/errors in `run/logs/latest.log`.
+- Manual in-world interaction test not yet driven; recommended steps:
+  1. Level past 10 (`/pz xp 50000`), spend some ability points in **K**.
+  2. Place an Awakening Stone from the Project Zero tab, run `/pz shard give`, switch to survival (`/gamemode survival`).
+  3. Right-click the Awakening Stone with the Awakening Shard: confirm job changes to a different job, level resets to 10, XP resets to 0, stats reset to 10 with 45 unspent points, and 1 shard is consumed.
+  4. Test `/pz job clear`, then right-click with a shard: confirm stone rejects and shard is NOT consumed.
+
+**Remaining Recommendations**
+
+1. Run the in-world Awakening Stone + job system playtest in `gradlew runClient`.
+2. Build basic skills, mana, and cooldowns (`DESIGN-DOCUMENT.md` §4), then wire `JobService.retainRandomJobSkillsOnReroll` when job skills exist.
+3. Add Awakening Shard drops to gate boss loot tables and custom village generation for Awakening Stones once gates/villages are built.

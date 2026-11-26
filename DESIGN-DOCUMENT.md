@@ -81,12 +81,12 @@ Up to 4 active skill slots on keys, more slots as the player levels. **[Idea]**
 
 Our own mechanic, not in Solo Leveling.
 
-- **[Planned]** Huge spiky blue crystal clusters that generate in a few **custom villages** (not vanilla villages). Interacting opens a System window offering a reroll.
+- **[Built]** Huge spiky blue crystal clusters (`AwakeningStoneBlock`, two blocks tall). Generation in **custom villages** (not vanilla villages) and a System confirmation window are **[Planned]**; right-clicking with an Awakening Shard rerolls directly for now.
 - **Rerolling**:
-  - Draws a new random job with the same rarity weights.
-  - Resets the player's level back to the level they first got a job (level 10 by default). Stat points are refunded to match the new level.
-  - Keeps **3 random skills** from the previous job. The rest are lost. Basic skills, milestone skills and skillbook skills are always kept.
-- **Cost [Planned]** (owner decision 2026-11-26): each reroll consumes one **Awakening Shard**. Shards only drop from gate bosses.
+  - **[Built]** Draws a new random job (different from the current one) with the same rarity weights.
+  - **[Built]** Resets the player's level back to the level they first got a job (level 10 by default). XP resets to 0, stats reset to base, and stat points are refunded to `(level - 1) × 5`.
+  - **[Planned]** Keeps **3 random skills** from the previous job (hook in `JobService` ready for skills). The rest are lost. Basic skills, milestone skills and skillbook skills are always kept.
+- **Cost [Built]** (owner decision 2026-11-26): each reroll consumes one **Awakening Shard** on success. Shards will only drop from gate bosses (**[Planned]**; `/pz shard give` for testing).
 
 ## 7. Titles and milestones
 

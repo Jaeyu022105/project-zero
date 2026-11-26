@@ -85,7 +85,7 @@ public final class JobService {
 
     /**
      * Draws a different random job for the player. Testing only for now; the real reroll
-     * (Awakening Stones, §6) will also reset level and keep 3 job skills.
+     * (Awakening Stones, §6) uses {@link #awakeningReroll(ServerPlayer)}.
      *
      * @return the new job, or null if no jobs are loaded
      */
@@ -94,6 +94,43 @@ public final class JobService {
         Job job = JobRegistry.random(player.getRandom(), current);
         if (job != null) assign(player, job);
         return job;
+    }
+
+    /**
+     * Real Awakening Stone reroll (DESIGN-DOCUMENT.md §6): draws a new job different from the
+     * current one, retains up to {@link JobRules#REROLL_KEPT_JOB_SKILLS} random skills from the
+     * old job, resets the player's level to {@link PlayerJob#firstJobLevel()} (0 XP, base stats,
+     * refunded ability points), and announces the new job.
+     *
+     * @return the new job, or {@code null} if the player has no job or no alternative job can be drawn
+     */
+    public static @Nullable Job awakeningReroll(ServerPlayer player) {
+        PlayerJob current = get(player);
+        if (!current.hasJob()) return null;
+
+        Job next = JobRegistry.random(player.getRandom(), current.jobId());
+        if (next == null || next.id().equals(current.jobId())) {
+            ProjectZero.LOGGER.warn("Cannot awakening-reroll {}: no alternative job loaded",
+                    player.getGameProfile().getName());
+            return null;
+        }
+
+        int resetLevel = current.firstJobLevel();
+        retainRandomJobSkillsOnReroll(player, current.jobId());
+        LevelingService.resetToLevel(player, resetLevel);
+        assign(player, next);
+        system(player, Component.literal("Level reset to " + resetLevel + ". Ability points refunded.")
+                .withStyle(ChatFormatting.WHITE));
+        return next;
+    }
+
+    /**
+     * Keeps up to {@link JobRules#REROLL_KEPT_JOB_SKILLS} random skills from the player's previous
+     * job during an Awakening Stone reroll (basic, milestone, and skillbook skills are always kept).
+     */
+    private static void retainRandomJobSkillsOnReroll(ServerPlayer player, ResourceLocation previousJobId) {
+        // TODO(skills): once the skill system exists, keep up to JobRules.REROLL_KEPT_JOB_SKILLS
+        // random learned skills belonging to previousJobId and remove the remaining skills of that job.
     }
 
     /** Removes the player's job, so the Job Change Quest can trigger again. Testing only. */

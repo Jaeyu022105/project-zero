@@ -13,4 +13,7 @@ public final class JobRules {
 
     /** Job level a fresh job starts at. Job XP does not exist yet. */
     public static final int STARTING_JOB_LEVEL = 1;
+
+    /** Maximum number of random skills kept from the previous job on an Awakening Stone reroll (§6). */
+    public static final int REROLL_KEPT_JOB_SKILLS = 3;
 }

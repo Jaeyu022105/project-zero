@@ -73,6 +73,15 @@ public final class LevelingService {
         player.setHealth(player.getMaxHealth());
     }
 
+    /**
+     * Resets the player to {@code targetLevel} with 0 XP, base stats, and recomputed unspent points
+     * ({@code (level - 1) * STAT_POINTS_PER_LEVEL}). Used by Awakening Stone job rerolls.
+     */
+    public static void resetToLevel(ServerPlayer player, int targetLevel) {
+        set(player, PlayerStats.resetToLevel(targetLevel));
+        player.setHealth(player.getMaxHealth());
+    }
+
     private static void onLevelUp(ServerPlayer player, PlayerStats stats, int levelsGained) {
         // Leveling up fully restores the player.
         player.setHealth(player.getMaxHealth());

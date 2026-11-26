@@ -19,6 +19,16 @@ public final class PlayerStats {
         }
     }
 
+    /** Fresh stats at {@code targetLevel}: 0 XP, all stats at base, and {@code (level - 1) * 5} unspent points. */
+    public static PlayerStats resetToLevel(int targetLevel) {
+        int clamped = Math.max(1, Math.min(LevelingRules.MAX_LEVEL, targetLevel));
+        PlayerStats s = new PlayerStats();
+        s.level = clamped;
+        s.xp = 0;
+        s.unspentPoints = (clamped - 1) * LevelingRules.STAT_POINTS_PER_LEVEL;
+        return s;
+    }
+
     public int level() { return level; }
     public long xp() { return xp; }
     public int unspentPoints() { return unspentPoints; }
