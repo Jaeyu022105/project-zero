@@ -3,6 +3,7 @@ package com.projectzero;
 import com.projectzero.network.ModNetwork;
 import com.projectzero.registry.ModBlocks;
 import com.projectzero.registry.ModCreativeTabs;
+import com.projectzero.registry.ModEntities;
 import com.projectzero.registry.ModItems;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
  *   client/    key bindings, status window, client-side caches
  *   registry/  blocks, items, creative tab
  *   awakening/ Awakening Stones (job rerolls)
+ *   domain/    the Library domain (job choice ceremony)
  */
 @Mod(ProjectZero.MOD_ID)
 public final class ProjectZero {
@@ -32,6 +34,7 @@ public final class ProjectZero {
         ModBlocks.BLOCKS.register(modBus);
         ModItems.ITEMS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
+        ModEntities.ENTITIES.register(modBus);
 
         ModNetwork.register();
         LOGGER.info("[System] Project Zero loaded. Welcome, Player.");

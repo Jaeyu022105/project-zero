@@ -56,10 +56,10 @@ public final class JobService {
 
     /**
      * Gives the Job Change Quest if the player has reached {@link JobRules#JOB_CHANGE_LEVEL}
-     * and has no job yet. For now the quest completes on the spot and rolls a random job;
-     * the trial dungeon comes later.
+     * and has no job yet. Opens the Library domain, where the player picks a face-down card;
+     * falls back to an instant random job if the domain cannot open.
      *
-     * @return true if a job was assigned
+     * @return true if a job was assigned right away (fallback only)
      */
     public static boolean tryJobChangeQuest(ServerPlayer player) {
         if (get(player).hasJob()) return false;
@@ -72,6 +72,11 @@ public final class JobService {
         }
 
         system(player, Component.literal("You have received a Job Change Quest.").withStyle(ChatFormatting.WHITE));
+        // The job is chosen in the Library domain (face-down cards). If it cannot open,
+        // fall back to the instant random job so nobody is left without one.
+        if (com.projectzero.domain.LibraryDomain.isInDomain(player) || com.projectzero.domain.LibraryDomain.open(player)) {
+            return false;
+        }
         system(player, Component.literal("Quest complete.").withStyle(ChatFormatting.WHITE));
         assign(player, job);
         return true;
@@ -96,15 +101,35 @@ public final class JobService {
         return job;
     }
 
+    /** What an Awakening Stone reroll did: the new job and the level the player was reset to. */
+    public record AwakeningResult(Job job, int resetLevel) {}
+
     /**
-     * Real Awakening Stone reroll (DESIGN-DOCUMENT.md §6): draws a new job different from the
-     * current one, retains up to {@link JobRules#REROLL_KEPT_JOB_SKILLS} random skills from the
-     * old job, resets the player's level to {@code min(current level, firstJobLevel)} (0 XP, base
-     * stats, refunded ability points — never raising the player's level), and announces the new job.
+     * Real Awakening Stone reroll (DESIGN-DOCUMENT.md §6), announced right away. Used when the
+     * Reawakening vision cannot open; the vision itself uses {@link #awakeningRerollQuiet} and
+     * {@link #announceAwakening} so the reveal happens inside the vision.
      *
      * @return the new job, or {@code null} if the player has no job or no alternative job can be drawn
      */
     public static @Nullable Job awakeningReroll(ServerPlayer player) {
+        AwakeningResult result = awakeningRerollQuiet(player);
+        if (result == null) return null;
+        announceAwakening(player, result);
+        return result.job();
+    }
+
+    /**
+     * Applies the reroll without telling the player yet: draws a new job different from the
+     * current one, retains up to {@link JobRules#REROLL_KEPT_JOB_SKILLS} random skills from the
+     * old job, and resets the player's level to {@code min(current level, firstJobLevel)} (0 XP,
+     * base stats, refunded ability points; never raising the player's level).
+     *
+     * Applied at once (not when the vision ends) so a logout or crash mid-vision cannot lose the
+     * shard without the reroll.
+     *
+     * @return what happened, or {@code null} if the player has no job or no alternative job can be drawn
+     */
+    public static @Nullable AwakeningResult awakeningRerollQuiet(ServerPlayer player) {
         PlayerJob current = get(player);
         if (!current.hasJob()) return null;
 
@@ -118,10 +143,15 @@ public final class JobService {
         int resetLevel = Math.min(LevelingService.get(player).level(), current.firstJobLevel());
         retainRandomJobSkillsOnReroll(player, current.jobId());
         LevelingService.resetToLevel(player, resetLevel);
-        assign(player, next);
-        system(player, Component.literal("Level reset to " + resetLevel + ". Ability points refunded.")
+        set(player, get(player).withJob(next.id()));
+        return new AwakeningResult(next, resetLevel);
+    }
+
+    /** The title, chat line and sound for a finished reroll. */
+    public static void announceAwakening(ServerPlayer player, AwakeningResult result) {
+        announce(player, result.job(), "REAWAKENED");
+        system(player, Component.literal("Level reset to " + result.resetLevel() + ". Ability points refunded.")
                 .withStyle(ChatFormatting.WHITE));
-        return next;
     }
 
     /**
@@ -152,10 +182,14 @@ public final class JobService {
     }
 
     private static void announce(ServerPlayer player, Job job) {
+        announce(player, job, "JOB CHANGE");
+    }
+
+    private static void announce(ServerPlayer player, Job job, String header) {
         Component rarity = job.rarity().displayName().copy().withStyle(job.rarity().chatColor());
 
         player.connection.send(new ClientboundSetTitleTextPacket(
-                Component.literal("JOB CHANGE").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD)));
+                Component.literal(header).withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD)));
         player.connection.send(new ClientboundSetSubtitleTextPacket(
                 coloredName(job).append(Component.literal(" (").withStyle(ChatFormatting.GRAY))
                         .append(rarity)
