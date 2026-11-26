@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Task 5: Equipment and accessories).
+Last caught up: **2026-11-27** (Task 6: Mob ranks and scaling infrastructure).
 
 ---
 
@@ -68,7 +68,8 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 
 - Mod scaffold: Forge 52.1.0 for Minecraft 1.21.1, Java 21, Gradle 8.10.2 wrapper, official Mojang mappings.
 - Leveling: levels 1 to 100, progressively harder XP curve, 5 ability points per level, full heal and "LEVEL UP!" title on level up.
-- XP from kills: every non-player mob gives XP. Vanilla ×0.3, other mods ×1, gate monsters ×3 (`projectzero:gate_monsters` tag, empty for now), bosses ×10.
+- XP from kills: every non-player mob gives XP. Vanilla ×0.3, other mods ×1, gate monsters ×3 (`projectzero:gate_monsters` tag or `projectzero:gate_monster` NBT), bosses ×10, multiplied by `GateRank` (`×1..×32`) and level-gap penalty (`−5%` per level past a 5-level gap, `10%` floor).
+- Mob Ranks & Scaling (`gates/`): `GateRank` (`E..S`), `MobScaling.apply(entity, rank, level)` (`ADD_MULTIPLIED_BASE` permanent health/damage modifiers, persistent rank/level tags, `[C · Lv 34] Zombie` nameplates), and `/pz mob spawn <entity> <rank> [level]`.
 - Stats: Strength, Agility, Vitality, Sense, Intelligence, rebalanced onto diminishing-return soft-cap curves (`LevelingRules.soft(p, k)`).
 - Jobs & Library Domain: at level 10 the System opens the **Library domain** (`projectzero:library` void dimension) where 7 face-down `JobCardEntity` cards orbit the frozen player; right-clicking one (or waiting out the 90s timeout) flips it, burns the others away, assigns the pre-rolled job, and returns the player home. Jobs are JSON data in `data/projectzero/jobs/` (10 placeholder jobs, 2 per rarity).
 - Awakening Stones, Crystal Formations & Reawakening Vision: small two-block crystal (`awakening_stone`), glassy shell `awakening_crystal`, opaque interior `awakening_crystal_deep`, glowing `awakening_core` veins, surface `awakening_cluster` spikes, procedural `CrystalFormation` (`small`, `large`, `colossal`), and `awakening_shard`. Offering a shard applies `JobService.awakeningRerollQuiet` immediately (logout-safe) and plays the ~14s `ReawakeningVision` (eyelid overlay `VisionOverlayRenderer`, mirror `void_sea` + `void_mote`, 64 drifting cards, rising card with heartbeat, reveal, return home, and rarity-colored particle aura burst).
@@ -78,7 +79,7 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Equipment & Accessories (`equipment/`): 8 active custom slots (`gauntlets`, `ring` ×2, `amulet`, `earrings`, `belt`, `charm` ×2) + 1 spare locked `relic` slot (`PlayerAccessories` in `projectzero:accessories` NBT; copied on clone, dropped on death only when `keepInventory` is false). 9 starter `AccessoryItem`s (`iron_gauntlets`, `copper_ring`, `silver_ring`, `gold_ring`, `bone_amulet`, `obsidian_earrings`, `leather_belt`, `hunter_charm`, `mana_charm`) with rolled `AccessoryData` component (rarity, `GateRank` E..S, flat stats, optional `crit_chance`/`mana_regen`/`lifesteal`/`xp_bonus`/`damage_vs_undead` affix), `AccessoryMenu` + `AccessoryScreen`, and `AccessoryLootModifier` (1.5% vanilla hostile, 3% modded, 8% gate monster, 100% boss).
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
 - Data saved with the player and kept on death (accessories follow `keepInventory`).
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`.
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`.
 
 **Built and verified in a loaded world (`gradlew runClient`).**
 
@@ -604,3 +605,28 @@ Planned additions (see `DESIGN-DOCUMENT.md`): learned skills with levels, unlock
 **Remaining Recommendations**
 
 1. Task 6: Mob ranks and scaling infrastructure (`MobScaling`, `XpRewards` rank & level-gap formula, `/pz mob spawn <entity> <rank> [level]`).
+
+---
+
+### Session Log — 2026-11-27 (Task 6: Mob ranks and scaling infrastructure)
+
+**Context & Direction Check**
+
+- Implemented `DESIGN-DOCUMENT.md` §9 rank-based mob scaling (`GateRank` E..S, `MobScaling.apply`), `XpRewards` rank multiplier + level-gap penalty (`−5%` per level beyond 5-level grace, `10%` floor), and `/pz mob spawn <entity> <rank> [level]`.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/gates/`: `GateRank.randomLevel`, `MobScaling` (idempotent `ADD_MULTIPLIED_BASE` permanent health & attack damage modifiers, `projectzero:mob_rank` / `mob_level` / `mob_scaled` NBT, `[C · Lv 34] Zombie` custom nameplate, `unscaledMaxHealth` helper), `MobCommands` (`/pz mob spawn <entity> <rank> [level]`), `MobEvents`.
+- `src/main/java/com/projectzero/leveling/`: `LevelingRules.levelGapXpMultiplier`, `XpRewards.forKill(killed, killerLevel)` (uses `unscaledMaxHealth` × `rank.multiplier()` × `levelGapXpMultiplier`, plus `projectzero:gate_monster` / `gate_boss` NBT tag support), and `LevelingEvents.onKill`.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded world):
+  - Spawned E-rank Lv 10 Zombie (`[E · Lv 10] Zombie`, `maxHp=20.0`, `atk=3.0`, `xp=12`, `hitsToKill(10dmg)=2`) and S-rank Lv 95 Zombie (`[S · Lv 95] Zombie`, `maxHp=640.0`, `atk=96.0`, `xp=384`, `hitsToKill(10dmg)=64` — exact `32×` scaling across HP, damage, XP, and hits to kill).
+  - Verified level-gap rule on C-rank Lv 30 Gate Zombie: killer Lv 35 = `480 XP` (100%), killer Lv 45 = `240 XP` (50%), killer Lv 90 = `48 XP` (10% floor). Zero errors in `run/logs/latest.log`.
+- Placeholders: none added in Task 6.
+
+**Remaining Recommendations**
+
+1. Task 7 (Stretch): Gate backend skeleton (`GateBlock` + `GateBlockEntity`, `projectzero:dungeon` void dimension, code-built dungeon arena with scaled gate monsters + boss + Awakening Shard drop + exit portal, `projectzero:gateSpawning` gamerule, `/pz gate spawn <rank> <size>`).

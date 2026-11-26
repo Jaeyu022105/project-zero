@@ -23,6 +23,17 @@ public final class LevelingRules {
     public static final double GATE_MONSTER_XP_MULTIPLIER = 3.0;
     public static final double BOSS_XP_MULTIPLIER = 10.0;
 
+    // Level-gap XP penalty (DESIGN-DOCUMENT.md §9): -5% per level beyond a 5-level gap, floor 10%.
+    public static final int LEVEL_GAP_GRACE = 5;
+    public static final double LEVEL_GAP_PENALTY_PER_LEVEL = 0.05;
+    public static final double LEVEL_GAP_MIN_MULTIPLIER = 0.10;
+
+    public static double levelGapXpMultiplier(int playerLevel, int mobLevel) {
+        int extra = (playerLevel - mobLevel) - LEVEL_GAP_GRACE;
+        if (extra <= 0) return 1.0;
+        return Math.max(LEVEL_GAP_MIN_MULTIPLIER, 1.0 - extra * LEVEL_GAP_PENALTY_PER_LEVEL);
+    }
+
     // Stat soft-cap curves (DESIGN-DOCUMENT.md §3). p = points above Stat.BASE_VALUE (10).
     // soft(p, k) = p / (1 + p / k). Values at 45 / 100 / 495 points above base:
     //   Strength: +0.02 * soft(p, 200) total attack damage  -> +73% / +133% / +285%

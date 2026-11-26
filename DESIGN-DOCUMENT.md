@@ -134,7 +134,7 @@ Our own mechanic, not in Solo Leveling.
 - A gate that stays uncleared for too long can **break**: its monsters spill into the overworld. **[Idea]**
 - Gate monsters go in the `projectzero:gate_monsters` entity tag so they give the ×3 XP.
 - Loot: skillbooks, gear, Awakening Shards, mana crystals.
-- **Mob scaling [Planned]** (owner decision 2026-11-26). Vanilla mobs never scale: you outgrow them, like E-rank mobs. Gate monsters scale **by gate rank**; each rank roughly doubles health and damage, and has a target player level:
+- **Mob scaling [Built]** (owner decision 2026-11-26; `GateRank`, `MobScaling`, `XpRewards`). Vanilla mobs never scale: you outgrow them, like E-rank mobs. Gate monsters scale **by gate rank**; each rank doubles health, damage, and XP, and has a target player level:
 
   | Rank | E | D | C | B | A | S |
   |---|---|---|---|---|---|---|

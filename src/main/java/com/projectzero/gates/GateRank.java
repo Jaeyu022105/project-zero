@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -54,6 +55,10 @@ public enum GateRank {
     public int maxLevel() { return maxLevel; }
     public ChatFormatting chatColor() { return chatColor; }
     public int argb() { return argb; }
+
+    public int randomLevel(RandomSource random) {
+        return minLevel + random.nextInt(Math.max(1, maxLevel - minLevel + 1));
+    }
 
     public static @Nullable GateRank byName(String raw) {
         if (raw == null) return null;

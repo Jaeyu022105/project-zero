@@ -1,6 +1,8 @@
 package com.projectzero.leveling;
 
 import com.projectzero.ProjectZero;
+import com.projectzero.gates.GateRank;
+import com.projectzero.gates.MobScaling;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -33,22 +35,42 @@ public final class XpRewards {
     }
 
     public static long forKill(LivingEntity killed) {
+        return forKill(killed, 1);
+    }
+
+    public static long forKill(LivingEntity killed, int killerLevel) {
         if (killed instanceof Player) return 0;
         if (killed.getPersistentData().getBoolean(com.projectzero.skills.SkillEffects.SUMMON_TAG)) return 0;
 
         Long fixed = FIXED.get(killed.getType());
-        if (fixed != null) return fixed;
+        double xp;
+        if (fixed != null) {
+            xp = fixed;
+        } else {
+            xp = MobScaling.unscaledMaxHealth(killed);
+            if (killed instanceof Enemy) xp *= 2.0;
 
-        double xp = killed.getMaxHealth();
-        if (killed instanceof Enemy) xp *= 2.0;
+            ResourceLocation typeId = EntityType.getKey(killed.getType());
+            boolean isGateMonster = killed.getType().is(GATE_MONSTERS)
+                    || killed.getPersistentData().getBoolean(MobScaling.GATE_MONSTER_KEY);
+            if (isGateMonster) {
+                xp *= LevelingRules.GATE_MONSTER_XP_MULTIPLIER;
+            } else if ("minecraft".equals(typeId.getNamespace())) {
+                xp *= LevelingRules.VANILLA_XP_MULTIPLIER;
+            }
 
-        ResourceLocation typeId = EntityType.getKey(killed.getType());
-        if (killed.getType().is(GATE_MONSTERS)) {
-            xp *= LevelingRules.GATE_MONSTER_XP_MULTIPLIER;
-        } else if ("minecraft".equals(typeId.getNamespace())) {
-            xp *= LevelingRules.VANILLA_XP_MULTIPLIER;
+            boolean isBoss = killed.getType().is(Tags.EntityTypes.BOSSES)
+                    || killed.getPersistentData().getBoolean(MobScaling.GATE_BOSS_KEY);
+            if (isBoss) xp *= LevelingRules.BOSS_XP_MULTIPLIER;
+
+            GateRank rank = MobScaling.getRank(killed);
+            if (rank != null) {
+                xp *= rank.multiplier();
+            }
         }
-        if (killed.getType().is(Tags.EntityTypes.BOSSES)) xp *= LevelingRules.BOSS_XP_MULTIPLIER;
+
+        int mobLevel = MobScaling.effectiveLevel(killed);
+        xp *= LevelingRules.levelGapXpMultiplier(killerLevel, mobLevel);
 
         return Math.max(1, Math.round(xp));
     }
