@@ -26,4 +26,10 @@ public final class ModItems {
 
     public static final RegistryObject<Item> AWAKENING_CORE = ITEMS.register("awakening_core",
             () -> new BlockItem(ModBlocks.AWAKENING_CORE.get(), new Item.Properties().rarity(Rarity.RARE)));
+
+    public static final RegistryObject<Item> AWAKENING_CRYSTAL_DEEP = ITEMS.register("awakening_crystal_deep",
+            () -> new BlockItem(ModBlocks.AWAKENING_CRYSTAL_DEEP.get(), new Item.Properties().rarity(Rarity.RARE)));
+
+    public static final RegistryObject<Item> AWAKENING_CLUSTER = ITEMS.register("awakening_cluster",
+            () -> new BlockItem(ModBlocks.AWAKENING_CLUSTER.get(), new Item.Properties().rarity(Rarity.RARE)));
 }

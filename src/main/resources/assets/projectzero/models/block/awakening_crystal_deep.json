@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "projectzero:block/awakening_crystal_deep"
+  }
+}

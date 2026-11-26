@@ -2,13 +2,19 @@ package com.projectzero.awakening;
 
 import com.projectzero.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.AmethystClusterBlock;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Builds an Awakening Stone formation: a huge spiky crystal "iceberg" made of crystal blocks,
@@ -60,6 +66,7 @@ public final class CrystalFormation {
      * the ground). The base sinks 2 blocks into the ground so it looks rooted.
      */
     public static void place(LevelAccessor level, BlockPos ground, Size size, RandomSource random) {
+        PLACED.get().clear();
         BlockPos base = ground.below(2);
         int height = Mth.nextInt(random, size.minHeight, size.maxHeight) + 2;
 
@@ -92,6 +99,8 @@ public final class CrystalFormation {
                 fillSpike(level, start, dir, Mth.nextInt(random, 3, 6), 1.0, size, random);
             }
         }
+
+        finish(level, random);
 
         // Fill under the base so it never floats over a dip.
         int r = (int) Math.ceil(size.mainRadius) + 1;
@@ -159,11 +168,58 @@ public final class CrystalFormation {
                         BlockPos p = BlockPos.containing(center.x + dx, center.y + dy, center.z + dz);
                         if (canReplace(level, p)) {
                             level.setBlock(p, crystal(size, random, progress), 2);
+                            PLACED.get().add(p.immutable());
                         }
                     }
                 }
             }
         }
+    }
+
+    /** Positions placed by the current {@link #place} call (per thread, so worldgen threads don't mix). */
+    private static final ThreadLocal<Set<BlockPos>> PLACED = ThreadLocal.withInitial(HashSet::new);
+
+    private static final double CLUSTER_CHANCE = 0.08;
+
+    /**
+     * Second pass over the finished shape:
+     *   - crystal with no air next to it becomes solid deep crystal, so the formation is
+     *     see-through only one block deep;
+     *   - some exposed faces grow a spiky cluster.
+     */
+    private static void finish(LevelAccessor level, RandomSource random) {
+        Set<BlockPos> placed = PLACED.get();
+        BlockState deep = ModBlocks.AWAKENING_CRYSTAL_DEEP.get().defaultBlockState();
+        List<BlockPos> interior = new ArrayList<>();
+        List<BlockPos> clusterSpots = new ArrayList<>();
+        List<Direction> clusterFaces = new ArrayList<>();
+
+        for (BlockPos p : placed) {
+            if (!level.getBlockState(p).is(ModBlocks.AWAKENING_CRYSTAL.get())) continue;
+            boolean exposed = false;
+            for (Direction dir : Direction.values()) {
+                BlockPos n = p.relative(dir);
+                BlockState ns = level.getBlockState(n);
+                if (ns.isAir() || ns.canBeReplaced()) {
+                    exposed = true;
+                    if (dir != Direction.DOWN && random.nextDouble() < CLUSTER_CHANCE) {
+                        clusterSpots.add(n);
+                        clusterFaces.add(dir);
+                    }
+                }
+            }
+            if (!exposed) interior.add(p);
+        }
+        for (BlockPos p : interior) level.setBlock(p, deep, 2);
+
+        BlockState cluster = ModBlocks.AWAKENING_CLUSTER.get().defaultBlockState();
+        for (int i = 0; i < clusterSpots.size(); i++) {
+            BlockPos p = clusterSpots.get(i);
+            if (level.getBlockState(p).isAir() || level.getBlockState(p).canBeReplaced()) {
+                level.setBlock(p, cluster.setValue(AmethystClusterBlock.FACING, clusterFaces.get(i)), 2);
+            }
+        }
+        placed.clear();
     }
 
     /** Core veins only in the lower half of a spike, where players can reach them. */

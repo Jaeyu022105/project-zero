@@ -23,6 +23,8 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.AWAKENING_SHARD.get());
                         output.accept(ModItems.AWAKENING_CRYSTAL.get());
                         output.accept(ModItems.AWAKENING_CORE.get());
+                        output.accept(ModItems.AWAKENING_CRYSTAL_DEEP.get());
+                        output.accept(ModItems.AWAKENING_CLUSTER.get());
                     })
                     .build());
 }
