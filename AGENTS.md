@@ -45,3 +45,7 @@ Every movement of the player is animated in third **and** first person: walk, ru
 | `game-feel` | Making a skill, attack, boss move or mob animation feel weighty and readable (Souls timing + hit juice, Minecraft-safe) |
 
 Each skill is a folder with a `SKILL.md` (YAML front matter `name` + `description`, then instructions). Claude Code and Gemini CLI both read this format.
+
+## Worldgen rule: features only read nearby chunks
+
+A feature may only read and write the 3x3 chunks around its origin chunk. `level.getBiome(pos)` (or getBlockState) farther out crashes the server ("Requested chunk unavailable during world generation"), which shows up in game as "connection lost". To check biomes farther away, never read biomes through the level; ask the generator's biome source: `ctx.chunkGenerator().getBiomeSource().getNoiseBiome(QuartPos.fromBlock(x), QuartPos.fromBlock(y), QuartPos.fromBlock(z), level.getLevel().getChunkSource().randomState().sampler())`.

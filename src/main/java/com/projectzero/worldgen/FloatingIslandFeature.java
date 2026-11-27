@@ -34,7 +34,10 @@ public class FloatingIslandFeature extends Feature<NoneFeatureConfiguration> {
         for (int i = 0; i < 8; i++) {
             double a = i * Math.PI / 4;
             BlockPos edge = o.offset((int) Math.round(Math.cos(a) * (REACH + 6)), 0, (int) Math.round(Math.sin(a) * (REACH + 6)));
-            if (!level.getBiome(edge).is(ModBiomes.SKYFALL_ISLES)) return false;
+            // Ask the biome source, not the level: these points lie outside the chunks a feature may read.
+            if (!ctx.chunkGenerator().getBiomeSource().getNoiseBiome(net.minecraft.core.QuartPos.fromBlock(edge.getX()),
+                    net.minecraft.core.QuartPos.fromBlock(edge.getY()), net.minecraft.core.QuartPos.fromBlock(edge.getZ()),
+                    level.getLevel().getChunkSource().randomState().sampler()).is(ModBiomes.SKYFALL_ISLES)) return false;
         }
         int lift = 35 + r.nextInt(76);
         BlockPos c = ctx.origin().above(lift);
