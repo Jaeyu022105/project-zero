@@ -20,6 +20,15 @@ public final class ModCreativeTabs {
                     .icon(() -> new ItemStack(ModItems.AWAKENING_SHARD.get()))
                     .displayItems((params, output) -> {
                         output.accept(ModItems.AWAKENING_STONE.get());
+                        output.accept(ModMaterials.BEAST_FANG.get());
+                        output.accept(ModMaterials.BEAST_CLAW.get());
+                        output.accept(ModMaterials.BEAST_PELT.get());
+                        output.accept(ModMaterials.RAW_BEAST_MEAT.get());
+                        output.accept(ModMaterials.COOKED_BEAST_MEAT.get());
+                        output.accept(ModMaterials.CHITIN_PLATE.get());
+                        output.accept(ModMaterials.VENOM_GLAND.get());
+                        output.accept(ModMaterials.BONE_SHARD.get());
+                        output.accept(ModMaterials.ROTTEN_SINEW.get());
                         output.accept(ModNature.GLOWCAP_GILLS.get());
                         output.accept(ModNature.VIOLET_CAP.get());
                         output.accept(ModNature.SKYWOOD_LOG.get());

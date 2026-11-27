@@ -1,4 +1,13 @@
 {
+  "item.projectzero.beast_fang": "Beast Fang",
+  "item.projectzero.beast_claw": "Beast Claw",
+  "item.projectzero.beast_pelt": "Beast Pelt",
+  "item.projectzero.raw_beast_meat": "Raw Beast Meat",
+  "item.projectzero.cooked_beast_meat": "Cooked Beast Meat",
+  "item.projectzero.chitin_plate": "Chitin Plate",
+  "item.projectzero.venom_gland": "Venom Gland",
+  "item.projectzero.bone_shard": "Bone Shard",
+  "item.projectzero.rotten_sinew": "Rotten Sinew",
   "key.categories.projectzero": "Project Zero",
   "key.projectzero.status": "Open Status Window",
   "key.projectzero.skill_1": "Cast Skill Slot 1",
