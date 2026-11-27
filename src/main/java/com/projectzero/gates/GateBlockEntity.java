@@ -28,10 +28,17 @@ public class GateBlockEntity extends BlockEntity {
     private int surges = 0;
     private long lastAgeCheck = 0L;
     private int rankUps = 0;
+    private long pausedAgingTicks = 0L;
+    private long lastAgingTickSeen = -1L;
 
     private boolean breaking = false;
     private int breakWave = 0;
     private long nextWaveTime = 0L;
+    private long pausedBreakTicks = 0L;
+    private long lastBreakTickSeen = -1L;
+    private boolean bossRespawned = false;
+    private long missingBossTicks = 0L;
+    private long lastBossCheckTick = -1L;
 
     public GateBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.GATE_PORTAL.get(), pos, state);
@@ -47,9 +54,12 @@ public class GateBlockEntity extends BlockEntity {
     public int surges() { return surges; }
     public long lastAgeCheck() { return lastAgeCheck; }
     public int rankUps() { return rankUps; }
+    public long pausedAgingTicks() { return pausedAgingTicks; }
     public boolean isBreaking() { return breaking; }
     public int breakWave() { return breakWave; }
     public long nextWaveTime() { return nextWaveTime; }
+    public long pausedBreakTicks() { return pausedBreakTicks; }
+    public boolean bossRespawned() { return bossRespawned; }
 
     public void configure(GateRank rank, GateSize size, long openTime, int dungeonSlot, BlockPos anchorPos) {
         this.rank = rank;
@@ -57,6 +67,7 @@ public class GateBlockEntity extends BlockEntity {
         this.openTime = openTime;
         this.dungeonSlot = dungeonSlot;
         this.anchorPos = anchorPos;
+        this.lastAgingTickSeen = openTime;
         setChanged();
     }
 
@@ -66,12 +77,30 @@ public class GateBlockEntity extends BlockEntity {
         this.surges = surges;
         this.rankUps = rankUps;
         this.lastAgeCheck = lastAgeCheck;
+        this.lastAgingTickSeen = lastAgeCheck;
         setChanged();
     }
 
     public void setLastAgeCheck(long lastAgeCheck) {
         this.lastAgeCheck = lastAgeCheck;
+        this.lastAgingTickSeen = lastAgeCheck;
         setChanged();
+    }
+
+    /** Accumulates paused aging ticks in memory without dirtying the chunk every tick. */
+    public long recordPausedAgingStep(long now) {
+        long dt = (lastAgingTickSeen >= 0L && now >= lastAgingTickSeen) ? (now - lastAgingTickSeen) : 1L;
+        lastAgingTickSeen = now;
+        pausedAgingTicks += dt;
+        return pausedAgingTicks;
+    }
+
+    public void markAgingActiveTick(long now) {
+        this.lastAgingTickSeen = now;
+    }
+
+    public void clearPausedAgingTicks() {
+        this.pausedAgingTicks = 0L;
     }
 
     public void shiftOpenTime(long deltaTicks) {
@@ -83,7 +112,63 @@ public class GateBlockEntity extends BlockEntity {
         this.breaking = breaking;
         this.breakWave = breakWave;
         this.nextWaveTime = nextWaveTime;
+        this.lastBreakTickSeen = nextWaveTime;
+        if (!breaking || breakWave == 0) {
+            this.bossRespawned = false;
+            this.missingBossTicks = 0L;
+            this.lastBossCheckTick = -1L;
+        }
         setChanged();
+    }
+
+    public void setNextWaveTime(long nextWaveTime) {
+        this.nextWaveTime = nextWaveTime;
+        setChanged();
+    }
+
+    /** Accumulates paused break-wave ticks in memory without dirtying the chunk every tick. */
+    public long recordPausedBreakStep(long now) {
+        long dt = (lastBreakTickSeen >= 0L && now >= lastBreakTickSeen) ? (now - lastBreakTickSeen) : 1L;
+        lastBreakTickSeen = now;
+        pausedBreakTicks += dt;
+        return pausedBreakTicks;
+    }
+
+    public void markBreakActiveTick(long now) {
+        this.lastBreakTickSeen = now;
+    }
+
+    public void clearPausedBreakTicks() {
+        this.pausedBreakTicks = 0L;
+    }
+
+    public void setBossRespawned(boolean bossRespawned) {
+        this.bossRespawned = bossRespawned;
+        setChanged();
+    }
+
+    public void resetBossCheckClock(long now) {
+        this.lastBossCheckTick = now;
+    }
+
+    public long consumeBossCheckElapsed(long now, long minStepTicks) {
+        if (lastBossCheckTick < 0L) {
+            lastBossCheckTick = now;
+            return 0L;
+        }
+        long elapsed = now - lastBossCheckTick;
+        if (elapsed < minStepTicks) return 0L;
+        lastBossCheckTick = now;
+        return elapsed;
+    }
+
+    public long addMissingBossTicks(long delta) {
+        this.missingBossTicks += delta;
+        return this.missingBossTicks;
+    }
+
+    public void resetMissingBossTicks() {
+        this.missingBossTicks = 0L;
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, GateBlockEntity be) {
@@ -104,9 +189,13 @@ public class GateBlockEntity extends BlockEntity {
         tag.putInt("Surges", surges);
         tag.putLong("LastAgeCheck", lastAgeCheck);
         tag.putInt("RankUps", rankUps);
+        if (pausedAgingTicks > 0L) tag.putLong("PausedAgingTicks", pausedAgingTicks);
         tag.putBoolean("Breaking", breaking);
         tag.putInt("BreakWave", breakWave);
         tag.putLong("NextWaveTime", nextWaveTime);
+        if (pausedBreakTicks > 0L) tag.putLong("PausedBreakTicks", pausedBreakTicks);
+        if (bossRespawned) tag.putBoolean("BossRespawned", true);
+        if (missingBossTicks > 0L) tag.putLong("MissingBossTicks", missingBossTicks);
     }
 
     @Override
@@ -124,9 +213,13 @@ public class GateBlockEntity extends BlockEntity {
         this.surges = Math.max(0, tag.getInt("Surges"));
         this.lastAgeCheck = tag.getLong("LastAgeCheck");
         this.rankUps = Math.max(0, tag.getInt("RankUps"));
+        this.pausedAgingTicks = Math.max(0L, tag.getLong("PausedAgingTicks"));
         this.breaking = tag.getBoolean("Breaking");
         this.breakWave = Math.max(0, tag.getInt("BreakWave"));
         this.nextWaveTime = tag.getLong("NextWaveTime");
+        this.pausedBreakTicks = Math.max(0L, tag.getLong("PausedBreakTicks"));
+        this.bossRespawned = tag.getBoolean("BossRespawned");
+        this.missingBossTicks = Math.max(0L, tag.getLong("MissingBossTicks"));
     }
 
     @Override

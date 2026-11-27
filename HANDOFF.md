@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Merged `claude/visual-pass`, ancient gates, gate aging, and dungeon breaks).
+Last caught up: **2026-11-27** (Gate review fixes: stripped PNG `caBX` metadata, batched paused-aging shifts, paused empty break waves, and 60s missing break boss respawn).
 
 ---
 
@@ -773,6 +773,39 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 1. Hook `GateBlockEntity#surges` (`0..3`) in `client/GateRiftRenderer` so surging rifts spin faster and emit extra motes visually.
 2. Add gameplay uses for `mana_crystal_shard` (Shard Vessel charging fuel, crafting, or NPC trading) and add `SkillbookItem` rolls to `GateDungeonArena` treasure chests.
 3. Begin Phase 2/3 custom gate monster models and Souls-like boss state machines (`DESIGN-DOCUMENT.md` §10).
+
+---
+
+### Session Log — 2026-11-27 (Review fixes after b00807a: PNG metadata strip & gate tick safeguards)
+
+**Context & Direction Check**
+
+- Executed `gemini-gate-review-fixes.md` after review of `b00807a`:
+  0. Fast-forwarded `main` onto `origin/claude/visual-pass` (`abae742`).
+  1. Stripped `caBX` metadata chunks from PNG textures while keeping pixel data byte-identical.
+  2. Eliminated per-tick `setChanged()` write storm when `projectzero:gateAging` is `false`.
+  3. Paused dungeon-break wave timers when no player is within `BREAK_PLAYER_RADIUS` (`96` blocks).
+  4. Added one-time break boss respawn safety if no living slot boss exists within 64 blocks for 60s after the final wave while a player is nearby.
+  5. Configured commit author email to `Jaeyu022105@users.noreply.github.com`.
+
+**Changes Made**
+
+- `src/main/resources/assets/projectzero/textures/**/*.png` (59 files across `block/`, `entity/`, `gui/skills/`, `gui/slots/`, `item/`): stripped `caBX` chunks (`408,404 → 67,974` bytes, saving `340,430` bytes), keeping only `IHDR`, `PLTE`/`tRNS`, `IDAT`, and `IEND` with verified byte-identical scanlines and RGBA pixels.
+- `src/main/java/com/projectzero/gates/GateRules.java`: added `BREAK_BOSS_CHECK_RADIUS = 64.0` and `BREAK_BOSS_MISSING_TICKS = 1200`.
+- `src/main/java/com/projectzero/gates/GateBlockEntity.java` & `GateService.java`:
+  - Accumulated paused aging ticks in memory (`recordPausedAgingStep`) and flushed `shiftPortalOpenTime` + `setLastAgeCheck` once per `AGING_CHECK_INTERVAL_TICKS` (and on re-enable / `evaluateAging`) so toggling `gateAging` back on never jumps ahead.
+  - Paused `tickDungeonBreak` wave timers by accumulating away ticks and pushing `nextWaveTime` forward when no non-spectator player is within `BREAK_PLAYER_RADIUS`, resuming cleanly when a player returns.
+  - Added `checkMissingBreakBoss`: after `breakWave >= BREAK_WAVES`, checks every 20t while a player is within `BREAK_PLAYER_RADIUS` whether a living entity tagged as that slot's gate boss exists within 64 blocks; after 60s (`1200t`) missing, respawns the boss once (`BossRespawned` persisted on the portal BEs) and logs a warning.
+
+**Verification Executed**
+
+- Pure-stdlib Python PNG chunk & RGBA pixel verification script (`strip_png_meta.py`): decoded and verified all 59 stripped PNGs before and after saving (`0` pixel differences).
+- `gradlew.bat compileJava --no-daemon`: **BUILD SUCCESSFUL**. `runClient` was not required by the review prompt.
+
+**Remaining Recommendations**
+
+1. Implement `[Planned]` dungeon-break corruption spread & receding cleanup (`DESIGN-DOCUMENT.md` §9).
+2. Hook `GateBlockEntity#surges` in `client/GateRiftRenderer` for faster spin and extra motes on surging gates.
 
 ---
 
