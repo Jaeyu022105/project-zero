@@ -95,8 +95,8 @@
       "minecraft:trees_cherry",
       "projectzero:undergrowth",
       "projectzero:fern_carpet",
-      "projectzero:giant_bamboo",
-      "projectzero:bamboo_shoots"
+      "projectzero:bamboo_shoots",
+      "projectzero:giant_bamboo"
     ],
     [
       "minecraft:freeze_top_layer"

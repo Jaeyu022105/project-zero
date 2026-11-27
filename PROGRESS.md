@@ -32,6 +32,7 @@ Last updated: **2026-11-27**
 ## In progress
 
 - **Gemini's reset backlog** (`.agents/prompts/gemini-reset-backlog.md`): Tasks 1 to 5 are done and merged into this branch (System notices bottom right, level ceiling at 100, storming a breaking gate, corruption spread, fireflies). Gemini ran out of tokens there, so Task 6 (companions foundation and screen) is not started, and Task 7 moved to Claude (the bamboo and plateau polish threads).
+- **Spirit Bamboo Sea polish [Built] 2026-11-27:** thick 2x2/3x3 culms with node rings, per-grove lean and height, leaf sprays, noise lanes with stone lanterns, moss floor; biome enlarged by mapping Flower Forest to it.
 - **Claude, polish pass on every existing biome** (DESIGN-DOCUMENT §15), starting with the biomes Gemini's Task 7 doesn't touch. Round 1 written, being built and tested: Bloodmoon Steppe (more common, dead trees, giant skeletons), Baobab Savanna kopjes, Salt Mirror Flats salt cones. The Spirit Bamboo Sea and the Shattered Sky Plateau each have their own polish thread.
 
 ## Next, from the plan

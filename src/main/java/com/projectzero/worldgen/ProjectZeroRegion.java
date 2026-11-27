@@ -57,6 +57,8 @@ public class ProjectZeroRegion extends Region {
             // Wooded Badlands alone made the steppe 10-18k blocks away in test seeds; the hot dry plateaus give it a common slot.
             builder.replaceBiome(Biomes.SAVANNA_PLATEAU, ModBiomes.BLOODMOON_STEPPE);
             builder.replaceBiome(Biomes.CHERRY_GROVE, ModBiomes.SPIRIT_BAMBOO);
+            // Flower Forest too, so the bamboo sea reaches down from the cherry slopes into wide, flat temperate land.
+            builder.replaceBiome(Biomes.FLOWER_FOREST, ModBiomes.SPIRIT_BAMBOO);
             builder.replaceBiome(Biomes.MANGROVE_SWAMP, ModBiomes.SUNKEN_MARSH);
             builder.replaceBiome(Biomes.STONY_PEAKS, ModBiomes.SHATTERED_PLATEAU);
         });
