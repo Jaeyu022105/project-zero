@@ -4,6 +4,8 @@ import com.projectzero.ProjectZero;
 import com.projectzero.leveling.LevelingService;
 import com.projectzero.network.ModNetwork;
 import com.projectzero.network.SyncJobPacket;
+import com.projectzero.ui.NoticeType;
+import com.projectzero.ui.SystemNotices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -38,6 +40,12 @@ public final class JobService {
         return data.hasJob() ? JobRegistry.get(data.jobId()) : null;
     }
 
+    /** True if the player's current job ignores the level 100 ceiling (Monarch-class jobs, §8). */
+    public static boolean hasNoCeiling(Player player) {
+        Job def = currentJob(player);
+        return def != null && def.noCeiling();
+    }
+
     /** Saves the job data and sends it to the player's client. */
     public static void set(ServerPlayer player, PlayerJob job) {
         player.getPersistentData().put(DATA_KEY, job.save());
@@ -51,7 +59,10 @@ public final class JobService {
 
     private static void sync(ServerPlayer player, PlayerJob job) {
         Job def = job.hasJob() ? JobRegistry.get(job.jobId()) : null;
-        ModNetwork.sendToPlayer(player, new SyncJobPacket(job, def != null ? def.rarity().ordinal() : -1));
+        ModNetwork.sendToPlayer(player, new SyncJobPacket(
+                job,
+                def != null ? def.rarity().ordinal() : -1,
+                def != null && def.noCeiling()));
     }
 
     /**
@@ -71,13 +82,15 @@ public final class JobService {
             return false;
         }
 
-        system(player, Component.literal("You have received a Job Change Quest.").withStyle(ChatFormatting.WHITE));
+        SystemNotices.system(player, NoticeType.QUEST,
+                Component.literal("You have received a Job Change Quest.").withStyle(ChatFormatting.WHITE));
         // The job is chosen in the Library domain (face-down cards). If it cannot open,
         // fall back to the instant random job so nobody is left without one.
         if (com.projectzero.domain.LibraryDomain.isInDomain(player) || com.projectzero.domain.LibraryDomain.open(player)) {
             return false;
         }
-        system(player, Component.literal("Quest complete.").withStyle(ChatFormatting.WHITE));
+        SystemNotices.system(player, NoticeType.QUEST,
+                Component.literal("Quest complete.").withStyle(ChatFormatting.WHITE));
         assign(player, job);
         return true;
     }
@@ -156,8 +169,9 @@ public final class JobService {
     /** The title, chat line and sound for a finished reroll. */
     public static void announceAwakening(ServerPlayer player, AwakeningResult result) {
         announce(player, result.job(), "REAWAKENED");
-        system(player, Component.literal("Level reset to " + result.resetLevel() + ". Ability points refunded.")
-                .withStyle(ChatFormatting.WHITE));
+        SystemNotices.system(player, NoticeType.QUEST,
+                Component.literal("Level reset to " + result.resetLevel() + ". Ability points refunded.")
+                        .withStyle(ChatFormatting.WHITE));
     }
 
     /**
@@ -200,17 +214,14 @@ public final class JobService {
                         .append(rarity)
                         .append(Component.literal(")").withStyle(ChatFormatting.GRAY))));
 
-        system(player, Component.literal("Your job is now ").withStyle(ChatFormatting.WHITE)
+        Component chat = Component.literal("Your job is now ").withStyle(ChatFormatting.WHITE)
                 .append(coloredName(job))
                 .append(Component.literal(" [").withStyle(ChatFormatting.GRAY))
                 .append(rarity)
-                .append(Component.literal("]").withStyle(ChatFormatting.GRAY)));
+                .append(Component.literal("]").withStyle(ChatFormatting.GRAY));
+        SystemNotices.system(player, NoticeType.QUEST, Component.literal(header), chat, chat);
 
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1.0F, 1.0F);
-    }
-
-    private static void system(ServerPlayer player, Component message) {
-        player.sendSystemMessage(Component.literal("[System] ").withStyle(ChatFormatting.AQUA).append(message));
     }
 }

@@ -5,6 +5,8 @@ import com.projectzero.jobs.Job;
 import com.projectzero.jobs.JobRegistry;
 import com.projectzero.jobs.JobService;
 import com.projectzero.registry.ModEntities;
+import com.projectzero.ui.NoticeType;
+import com.projectzero.ui.SystemNotices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -133,7 +135,8 @@ public final class LibraryDomain {
 
         title(player, Component.literal("DOMAIN EXPANSION").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD),
                 Component.literal("The Library of Paths").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
-        system(player, Component.literal("Choose your path. Touch a card.").withStyle(ChatFormatting.WHITE));
+        SystemNotices.system(player, NoticeType.QUEST,
+                Component.literal("Choose your path. Touch a card.").withStyle(ChatFormatting.WHITE));
         library.playSound(null, c, SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 0.6F, 1.6F);
         library.playSound(null, c, SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1.0F, 0.8F);
         return true;
@@ -198,7 +201,8 @@ public final class LibraryDomain {
             if (now - session.openedAt > TIMEOUT_TICKS) {
                 List<JobCardEntity> alive = session.cards.stream().filter(c -> c.isAlive()).toList();
                 if (!alive.isEmpty()) {
-                    system(player, Component.literal("You hesitate. The library chooses for you.").withStyle(ChatFormatting.GRAY));
+                    SystemNotices.system(player, NoticeType.WARNING,
+                            Component.literal("You hesitate. The library chooses for you.").withStyle(ChatFormatting.GRAY));
                     pick(player, alive.get(level.random.nextInt(alive.size())));
                 }
             }
@@ -375,9 +379,5 @@ public final class LibraryDomain {
         player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 50, 15));
         player.connection.send(new ClientboundSetTitleTextPacket(title));
         player.connection.send(new ClientboundSetSubtitleTextPacket(subtitle));
-    }
-
-    private static void system(ServerPlayer player, Component message) {
-        player.sendSystemMessage(Component.literal("[System] ").withStyle(ChatFormatting.AQUA).append(message));
     }
 }

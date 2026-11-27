@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Gate review fixes: stripped PNG `caBX` metadata, batched paused-aging shifts, paused empty break waves, and 60s missing break boss respawn).
+Last caught up: **2026-11-27** (Reset backlog Task 5: fireflies — `firefly_bush` block, `FIREFLY` particle, night/dusk client emitter, biome-modifier worldgen).
 
 ---
 
@@ -67,7 +67,7 @@ The durable project context lives in:
 Version **0.1.0** plus the job system (no new version number yet). Implemented:
 
 - Mod scaffold: Forge 52.1.0 for Minecraft 1.21.1, Java 21, Gradle 8.10.2 wrapper, official Mojang mappings.
-- Leveling: levels 1 to 100, progressively harder XP curve, 5 ability points per level, full heal and "LEVEL UP!" title on level up.
+- Leveling: levels 1 to 200 (`MAX_LEVEL = 200`, pending owner's final cap) with a **level ceiling at 100** (`CEILING_LEVEL = 100`, `PlayerStats.ceilingBroken`, `LevelingService.breakCeiling`, `"no_ceiling"` Monarch job flag), progressively harder XP curve, 5 ability points per level, full heal and "LEVEL UP!" title + notice on level up.
 - XP from kills: every non-player mob gives XP. Vanilla Ã—0.3, other mods Ã—1, gate monsters Ã—3 (`projectzero:gate_monsters` tag or `projectzero:gate_monster` NBT), bosses Ã—10, multiplied by `GateRank` (`Ã—1..Ã—32`) and level-gap penalty (`âˆ’5%` per level past a 5-level gap, `10%` floor).
 - Mob Ranks, Gates, Ancient/Sea Variants, Aging & Dungeon Breaks (`gates/`): `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `MobScaling.apply(entity, rank, level)` (`[C · Lv 34] Zombie` nameplates), free-floating rifts (`GateBlock` + `GateBlockEntity` + `GateRiftRenderer`), sea gates (`GateBlock.SEA`), carved circular stone-ring ancient gates (`AncientGate`, `AncientGateStoneBlock`, `AncientGateFeature` worldgen, `AncientGate.ruin` on clear), `projectzero:dungeon` void dimension (`DungeonSavedData` + multi-chamber remnant-world `GateDungeonArena` with 8 themes, `mana_crystal` clusters dropping `mana_crystal_shard`, scattered chests, return rift on E..A), boss kill loop (drops `Awakening Shard` + 100% rolled accessory, increments `gatesCleared`, opens exit rift, closes overworld gate), gate aging (`projectzero:gateAging` default `true`: surges every 7 days up to 3 for +3 mob levels & +5% chest loot, rank-up at 28 days updating `GateBlock.RANK`, `AncientGate.setRank`, and rescaling built dungeons +25% mobs), dungeon breaks (`projectzero:dungeonBreaks` default `true`: breaks at 2nd rank-up or S-rank's next rank-up within 96 blocks, `BROKEN=true`, clears interior mobs, spawns 5 outdoor waves every 60s + boss on wave 5), `/pz mob spawn <entity> <rank> [level]`, and `/pz gate spawn <rank> <size> [sea|ancient] | leave | age <days> | break`.
 - Stats: Strength, Agility, Vitality, Sense, Intelligence, rebalanced onto diminishing-return soft-cap curves (`LevelingRules.soft(p, k)`).
@@ -127,7 +127,7 @@ Package layout (`src/main/java/com/projectzero/`):
 - `titles/`: `MilestoneTracker` (`projectzero:milestones`), `Title`, `TitleRegistry` (`data/<ns>/titles/*.json`), `PlayerTitles` (`projectzero:titles`), `TitleService`, `TitleCommands`, `TitleEvents`.
 - `equipment/`: `AccessorySlotType`, `AccessoryData`, `EquipmentRules`, `AccessoryItem`, `PlayerAccessories` (`projectzero:accessories`), `EquipmentService`, `AccessoryMenu`, `AccessoryLootModifier`, `EquipmentCommands`, `EquipmentEvents`.
 - `combat/`: `BossAffinity` (boss elemental weaknesses/resistances), hit feedback, player movement/action poses (`PlayerPoses`).
-- `gates/`: `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `GateRules` (`projectzero:gateSpawning`, `projectzero:gateAging`, `projectzero:dungeonBreaks` gamerules + aging/break constants), `MobScaling`, `GateBlock`, `GateBlockEntity`, `RiftShape`, `AncientGate`, `AncientGateStoneBlock`, `AncientStonePiece`, `AncientGateFeature`, `ManaCrystalBlock`, `DungeonSavedData`, `GateDungeonArena`, `GateService`, `MobCommands`, `GateCommands`, `MobEvents`.
+- `gates/`: `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `GateRules` (`projectzero:gateSpawning`, `projectzero:gateAging`, `projectzero:dungeonBreaks`, `projectzero:breakCorruption` gamerules + aging/break/storm/corruption constants), `MobScaling`, `GateBlock`, `GateBlockEntity`, `RiftShape`, `AncientGate`, `AncientGateStoneBlock`, `AncientStonePiece`, `AncientGateFeature`, `ManaCrystalBlock`, `DungeonSavedData`, `CorruptionSavedData`, `CorruptionService`, `GateDungeonArena`, `GateService`, `MobCommands`, `GateCommands`, `MobEvents`.
 - `awakening/`
   - `AwakeningRules.java`: `VESSEL_DIVERT = 0.5`, `VESSEL_TIER_FRACTION = 0.6`, `MAX_SHARD_TIER = 5`, tier threshold/name/color helpers.
   - `ShardCharge.java`: `(hasShard, chargeXp, tier)` data component record with Codec + StreamCodec.
@@ -137,14 +137,15 @@ Package layout (`src/main/java/com/projectzero/`):
   - `AwakeningCommands.java`: `/pz shard give [count] [tier]` and `/pz vessel charge <xp>`.
   - `CrystalCommands.java`: `/pz crystal small|large|colossal`.
   - `AwakeningEvents.java`: registers `AwakeningCommands` and `CrystalCommands`.
+- `ui/`: `NoticeRules`, `NoticeType` (`LEVEL_UP`, `SKILL`, `QUEST`, `GATE`, `ITEM`, `COOLDOWN`, `TITLE`, `WARNING`), `SystemNotices` (shared server notice + optional `[System]` chat helper), `NoticeCommands` (`/pz notice <type> <text>`), `NoticeEvents`.
 - `network/`
-  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version `6`. Bump the version when a packet's format changes.
-  - `SyncStatsPacket`, `AllocateStatPacket`, `SyncJobPacket`, `VisionOverlayPacket`, `SyncSkillsPacket`, `CastSkillPacket`, `SyncTitlesPacket`, `CycleTitlePacket`, `SyncStatBonusesPacket`, `OpenAccessoriesPacket`.
+  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version `9`. Bump the version when a packet's format changes.
+  - `SyncStatsPacket`, `AllocateStatPacket`, `SyncJobPacket`, `VisionOverlayPacket`, `SyncSkillsPacket`, `CastSkillPacket`, `SyncTitlesPacket`, `CycleTitlePacket`, `SyncStatBonusesPacket`, `OpenAccessoriesPacket`, `SyncWornGearPacket`, `SwitchPresetPacket`, `AssignSkillSlotPacket`, `SkillVisualPacket`, `SystemNoticePacket`.
 - `client/`
-  - `ClientStatsCache`, `ClientJobCache`, `ClientSkillsCache`, `ClientTitlesCache`, `ClientBonusCache`: synced local caches with zero client-only imports so packet handlers are server-safe.
+  - `ClientStatsCache`, `ClientJobCache`, `ClientSkillsCache`, `ClientTitlesCache`, `ClientBonusCache`, `ClientNoticeCache`: synced local caches with zero client-only imports so packet handlers are server-safe.
   - `ClientEvents.java` & `ClientModEvents.java`: logout cache reset, `JobCardRenderer`, and `MenuScreens.register` for `AccessoryScreen`.
-  - `ModKeyBindings.java`: `K` opens `StatusScreen`; `Z`, `X`, `C`, `V` cast active skill slots 1â€“4.
-  - `StatusScreen.java`, `AccessoryScreen.java`, `SkillHudOverlay.java`, `VisionOverlayRenderer.java`.
+  - `ModKeyBindings.java`: `K` opens `StatusScreen`; `J` opens `SkillLoadoutScreen`; `R` cycles presets; `Z`, `X`, `C`, `V` cast active skill slots 1–4.
+  - `StatusScreen.java`, `AccessoryScreen.java`, `SkillLoadoutScreen.java`, `SkillHudOverlay.java`, `SystemNoticeOverlay.java`, `VisionOverlayRenderer.java`.
 
 Resources:
 
@@ -160,9 +161,10 @@ Resources:
 
 Player data lives in the player's persistent NBT under `projectzero:stats`:
 
-- `level` (int, 1 to 100)
+- `level` (int, 1 to 200; capped at 100 until `ceilingBroken` is true or job has `no_ceiling`)
 - `xp` (long, progress inside the current level)
 - `points` (int, unspent ability points)
+- `ceilingBroken` (boolean, whether the level 100 ceiling has been broken)
 - `stats` (compound: `strength`, `agility`, `vitality`, `sense`, `intelligence`, ints â‰¥ 10)
 
 It is copied to the new player entity in `PlayerEvent.Clone`, so it survives death and leaving the End. Attribute modifiers are transient and re-applied on login and respawn, so they never pile up in saves.
@@ -809,6 +811,163 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 
 ---
 
+### Session Log — 2026-11-27 (Reset Backlog Task 1: Bottom-right System notices)
+
+**Context & Direction Check**
+
+- Implemented Task 1 of `.agents/prompts/gemini-reset-backlog.md` (`DESIGN-DOCUMENT.md` §11) on `gemini/reset-backlog`: bottom-right sliding System notice stack (`SystemNotices` + `SystemNoticeOverlay`), `ClientConfig.NOTICE_CHAT_LINES` (`ui.noticeChatLines`, default `false`), shared routing replacing private `system(...)` helpers across services, cooldown-ready pings (`≥10s` slotted skills), and `/pz notice <type> <text>`.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/ui/`: added `NoticeRules`, `NoticeType` (`LEVEL_UP`, `SKILL`, `QUEST`, `GATE`, `ITEM`, `COOLDOWN`, `TITLE`, `WARNING`), `SystemNotices`, `NoticeCommands`, and `NoticeEvents`.
+- `src/main/java/com/projectzero/network/`: added `SystemNoticePacket` and bumped `ModNetwork.PROTOCOL_VERSION` to `9`.
+- `src/main/java/com/projectzero/client/` & `config/ClientConfig.java`: added `ClientNoticeCache`, `SystemNoticeOverlay` (6t slide-in, 4s hold, 10t fade-out, upward stack capped at 4 with FIFO eviction, per-type left accent stripe, quiet vanilla placeholder chimes), logout clear in `ClientEvents`, and `ui.noticeChatLines` (default `false`).
+- Routed messages through `SystemNotices` across `LevelingService`, `SkillService` (+ `PlayerSkills.tickCooldownsReady()` for `≥10s` slotted skill ready pings), `TitleService`, `ShardVesselService`, `JobService`, `AwakeningService`, `LibraryDomain`, and `GateService` (keeping center titles on job change and dungeon break). Also improved `GateCommands.findLookedAtAnchor` ray-stepping so non-solid foliage never blocks targeting a free-floating rift.
+- `DESIGN-DOCUMENT.md` & `src/main/resources/assets/projectzero/lang/en_us.json`: marked System notices `[Built]` and added notice header translations.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded `pz_backlog_test` creative world):
+  - Verified `/pz xp 500` + `/pz skill learn bloodlust` pushed `LEVEL_UP` and `SKILL` notices.
+  - Verified slotted `bloodlust` (`25s >= 10s`) emitted a `COOLDOWN` notice on expiry while slotted `dash` (`3s < 10s`) did not (`bodies=[Bloodlust]`).
+  - Verified `/pz gate age 7` emitted `The C-Rank gate grows unstable. (Surge 1/3)`.
+  - Spammed `/pz notice gate hi_1..6` with `ui.noticeChatLines=false` → verified `active=4`, `bodies=[hi_3, hi_4, hi_5, hi_6]` (oldest evicted first), and `chatDelta=0`.
+  - Toggled `ui.noticeChatLines=true` and ran `/pz notice warning config_on_check` → verified both notice and `[System]` chat line appeared (`chatDelta=1`). Zero errors in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): `client/SystemNoticeOverlay.java` panel ornament styling and vanilla placeholder chimes.
+
+**Remaining Recommendations**
+
+1. Task 2: Level ceiling at 100 (`PlayerStats.ceilingBroken`, `MAX_LEVEL = 200`, `LevelingService.breakCeiling`, `"no_ceiling"` job JSON flag, `/pz ceiling`).
+
+---
+
+### Session Log — 2026-11-27 (Reset Backlog Task 2: Level ceiling at 100)
+
+**Context & Direction Check**
+
+- Implemented Task 2 of `.agents/prompts/gemini-reset-backlog.md` (`DESIGN-DOCUMENT.md` §2, §8, §16): level ceiling at `100` (`CEILING_LEVEL = 100`, `MAX_LEVEL = 200` pending owner's final cap), `PlayerStats.ceilingBroken`, `StatusScreen` `LEVEL CEILING` bar readout, one-time `WARNING` notice on reaching 100, `LevelingService.breakCeiling`, optional `"no_ceiling": true` Monarch job field, and `/pz ceiling status|break|reset` + `/pz level <n>`.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/leveling/`:
+  - `LevelingRules.java`: added `CEILING_LEVEL = 100` and raised `MAX_LEVEL = 200` (with comment noting owner still has to confirm the real cap).
+  - `PlayerStats.java`: added `ceilingBroken` and `ceilingWarned` (saved to NBT, copied on clone, synced to client), `isAtCeiling(...)`, and `addXp(amount, bypassCeiling)`.
+  - `LevelingService.java`: blocked XP gain at `CEILING_LEVEL` unless `ceilingBroken` or `JobService.hasNoCeiling(player)`, emitted one-time `WARNING` notice on hitting level 100, added `breakCeiling` (`LIMIT BROKEN` center title + `LEVEL_UP` notice), `resetCeiling`, and `setLevel`.
+  - `LevelingCommands.java`: added `/pz level <n>` and `/pz ceiling status|break|reset`.
+- `src/main/java/com/projectzero/jobs/`, `network/`, `client/`:
+  - `Job.java`, `JobRegistry.java`, `JobService.java`, `SyncJobPacket.java`, `ClientJobCache.java`: added optional `"no_ceiling": true` job JSON flag (default `false`) and synced it to the client; bumped `ModNetwork.PROTOCOL_VERSION` to `10`.
+  - `StatusScreen.java` & `SkillHudOverlay.java`: rendered full XP bar with `LEVEL CEILING` label when capped at 100.
+- `DESIGN-DOCUMENT.md` & `HANDOFF.md`: updated §2 and §8 status tags and data model notes.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded `pz_backlog_test` world + death + relog cycle):
+  - Ran `/pz level 99` + `/pz xp 2000000` → capped at `level=100, xp=0`, `StatusScreen.xpBarLabel` = `LEVEL CEILING`, and emitted one-time `WARNING` notice (`Level ceiling reached. Someone of high rank must judge you.`).
+  - Killed a zombie at ceiling → verified `level=100, xp=0` and zero duplicate ceiling warnings.
+  - Ran `/pz ceiling break` + `/pz xp` → verified `ceilingBroken=true`, `level=101, xp=500`, `bar='XP 500 / 408499'`, and `XpRewards.forKill` works cleanly above 100.
+  - Killed and respawned player → verified `level=101, ceilingBroken=true`.
+  - Disconnected to `TitleScreen` and reopened world → verified `serverBroken=true, clientBroken=true, level=101`. Zero mod errors in `run/logs/latest.log`.
+- Placeholders: none added in Task 2.
+- Open question for Jaime: confirm the intended post-ceiling `MAX_LEVEL` (currently `200`).
+
+**Remaining Recommendations**
+
+1. Task 3: Storm the gate (`GateBlockEntity.stormable`, wave clear detection, wave pause while inside dungeon, boss clear inside/outside).
+
+---
+
+### Session Log — 2026-11-27 (Reset Backlog Task 3: Storm the gate)
+
+**Context & Direction Check**
+
+- Implemented Task 3 of `.agents/prompts/gemini-reset-backlog.md` (`DESIGN-DOCUMENT.md` §9 "Storm the gate"): clearing all monsters of the current break wave steadies the rift (`GateBlockEntity.stormable = true`, synced in update tag + `END_ROD` pulses), unlocks portal entry even while `BROKEN=true`, pauses outdoor break waves while any player is inside that dungeon slot, keeps interior monsters in place (removing only the interior boss if Wave 5 already walked it out), ends the break when the boss is killed inside, and resumes the remaining wave timer if everyone leaves without clearing.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/gates/GateRules.java`: added `BREAK_WAVE_SCAN_RADIUS = 128.0`, `STORM_CHECK_INTERVAL_TICKS = 20`, and `STORM_PULSE_INTERVAL_TICKS = 15`.
+- `src/main/java/com/projectzero/gates/GateBlockEntity.java`: added persisted/synced `stormable` boolean (`Stormable` in NBT and client update tag), reset to `false` when the next wave spawns.
+- `src/main/java/com/projectzero/gates/DungeonSavedData.java` & `GateDungeonArena.java`: added `bossWalkedOut` and `insidePauseStartedAt` to `DungeonRecord`, plus `GateDungeonArena.clearDungeonBossOnly(...)`. Chose the simpler population design: leave pre-built interior monsters in place when a break starts (or build & populate on first entry if unbuilt), removing only the interior boss if Wave 5 walks it outside.
+- `src/main/java/com/projectzero/gates/GateService.java` & `MobEvents.java`: tagged break-wave mobs with `projectzero:break_wave`, added instant `onBreakWaveMobKilled` + periodic `checkWaveClearedForStorm` steadying the rift with `END_ROD` pulses and a `RIFT STEADIED` notice, allowed `onEnterPortal` when `anchorBe.isStormable()`, paused waves while `hasPlayerInDungeonSlot` is true, shifted `nextWaveTime` on `returnFromDungeon` / empty check so remaining wave time resumes cleanly, and opened the dungeon exit portal when a stormed break boss dies inside.
+- `DESIGN-DOCUMENT.md` & `HANDOFF.md`: marked Storm the gate `[Built]`.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded `pz_backlog_test` world, two-run test):
+  - **Run 1:** Spawned `C SMALL` gate, ran `/pz gate break` (`4` Wave 1 mobs spawned; verified portal entry blocked while wave alive), killed all 4 Wave 1 mobs → verified `stormable=true` and `updateTagStormable=true`, entered `projectzero:dungeon` (`insideMobs=8` + `[C · BOSS · Lv 50] Vindicator`), forced `nextWaveTime` into the past while inside → verified `breakWave=1` (waves paused), killed the boss inside → verified `gateClosed=true`, `exitOpened=true`, `shards=1`, and `clearedDelta=1`.
+  - **Run 2:** Spawned `C SMALL` gate, broke it, cleared Wave 1 (`remBeforeEnter=1182`), entered dungeon for 36 ticks, ran `/pz gate leave` → verified `remAfter36tInside=1179` (timer resumed from where it paused). Zero errors in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): `GateService.emitStormablePulse` uses vanilla `END_ROD` pulses; `GateBlockEntity#isStormable()` is synced for `GateRiftRenderer` steady-rift visuals.
+
+**Remaining Recommendations**
+
+1. Task 4: Dungeon break corruption spread (`GateDungeonArena` theme palette API, `corruptible` block tag, `CorruptionSavedData`, wave-stepped conversion, 30s outer-ring-first receding cleanup, `/pz gate corruption grow|clear`).
+
+---
+
+### Session Log — 2026-11-27 (Reset Backlog Task 4: Dungeon break corruption spread)
+
+**Context & Direction Check**
+
+- Implemented Task 4 of `.agents/prompts/gemini-reset-backlog.md` (`DESIGN-DOCUMENT.md` §9 "Corruption spread"): during a dungeon break, natural `#projectzero:corruptible` terrain around the rift converts step-by-step per wave up to `GateRules.corruptionRadius(rank)` (`E=12, D=14, C=16, B=18, A=20, S=24`) using `GateDungeonArena.themePaletteFor(...)`, persists every converted block's original `BlockState` in per-dimension `CorruptionSavedData`, pauses when no player is within `BREAK_PLAYER_RADIUS`, and recedes outer-ring-first over ~30s (`600t`) when the break is contained while leaving `AncientGate.ruin` stones intact.
+
+**Changes Made**
+
+- `src/main/resources/data/projectzero/tags/block/corruptible.json` (new): natural stone/deepslate/stone variants, dirt/grass/moss/mud/sand/gravel/clay/snow/ice/terracotta, natural tree logs and leaves, and natural `ModNature` blocks (`limestone`, `salt_crust`, `glowcap_gills`, `violet_cap`, `skywood_log`, `skywood_leaves`, `baobab_log`).
+- `src/main/java/com/projectzero/gates/GateRules.java` & `GateDungeonArena.java`: added `projectzero:breakCorruption` gamerule (default `true`), rank-indexed `CORRUPTION_RADIUS`, spread/recede tick knobs, and public `GateDungeonArena.themePaletteFor(themeId, sea)` returning a theme's primary/secondary/floor/accent/kelp palette without touching the arena generator.
+- `src/main/java/com/projectzero/gates/CorruptionSavedData.java` & `CorruptionService.java` (new): per-dimension `SavedData` keyed by gate anchor recording original `BlockState`s, wave-stepped shell conversion skipping unloaded chunks, block entities/containers, non-tagged blocks, and `PERSISTENT` player-placed leaves, plus 30s (`600t`) outer-ring-first receding restoration that skips `AncientGateStoneBlock` ruins.
+- `src/main/java/com/projectzero/gates/GateService.java`, `MobEvents.java`, `GateCommands.java`, `en_us.json`, `DESIGN-DOCUMENT.md`: hooked break start/wave/containment and level tick into `CorruptionService`, added `/pz gate corruption grow|clear`, and marked Corruption spread `[Built]`.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded `pz_backlog_test` world + mid-spread reload):
+  - Spawned `C SMALL` gate over natural terrain with oak logs/leaves plus a player-placed chest (with item) and oak planks inside radius.
+  - Broke gate and advanced waves → verified corruption spread per wave (`corrupted=559`, `targetRadius=11`) while chest + contents and planks remained untouched (`chestIntact=true`, `planksIntact=true`).
+  - Saved/reloaded world mid-spread → verified `CorruptionSavedData` survived reload (`persistedBlocks=605`).
+  - Killed the break boss → verified outer-ring-first 30s recede restored every converted block (`mismatches=0/2535`, `chestOk=true`, `planksOk=true`). Zero errors in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): `CorruptionService` uses subtle vanilla `SMOKE` / `END_ROD` particles on spread and restoration.
+
+**Remaining Recommendations**
+
+1. Task 5: Fireflies (`firefly_bush` block, `FIREFLY` particle + `ambience.fireflies` config, night bush & dusk water-swarm client ticker, Forge `biome_modifier` worldgen tested in a brand-new world).
+
+---
+
+### Session Log — 2026-11-27 (Reset Backlog Task 5: Fireflies)
+
+**Context & Direction Check**
+
+- Implemented Task 5 of `.agents/prompts/gemini-reset-backlog.md` (`DESIGN-DOCUMENT.md` §15 "Fireflies"). Placement goes **only** through a Forge biome modifier; no biome JSON or `tools/biomes/` file was touched.
+
+**Changes Made**
+
+- `worldgen/FireflyBushBlock.java` (new): `BushBlock`, cross cutout, no collision, instabreak, light 6, XZ offset; grows on dirt/sand/clay/muddy roots. `animateTick` hands off to the client emitter.
+- `worldgen/FireflyBushFeature.java` (new): 2–4 bushes per chunk, clamped to the origin chunk's own 16×16 columns (worldgen 3×3 rule). Registered as `ModFeatures.FIREFLY_BUSH` (`projectzero:firefly_bush`).
+- `registry/ModNature.java` (`FIREFLY_BUSH` block + item), `ModCreativeTabs`, `en_us.json`.
+- Data: `worldgen/configured_feature/fireflies.json`, `worldgen/placed_feature/fireflies.json` (every chunk, dry surface only), `tags/worldgen/biome/has_fireflies.json` (`#minecraft:is_forest`, swamp, mangrove swamp, spirit_bamboo, bloodmoon_steppe, sunken_marsh, capwood, elderwood, cloud_forest), `forge/biome_modifier/fireflies.json` (step `vegetal_decoration`), `loot_table/blocks/firefly_bush.json` (drops itself only with shears or Silk Touch).
+- Assets: blockstate, `block/firefly_bush` (cross, cutout), item model, placeholder `textures/block/firefly_bush.png`, `particles/firefly.json` (reuses `mana_glow` sprites).
+- `fx/ModParticles.FIREFLY`, `Fx.firefly(rgb, size)`, `ClientModEvents` provider, `client/ManaParticle` `FIREFLY` style (slow sine drift, blinking alpha/size, full-bright).
+- `client/Fireflies.java` (new): bushes emit at night (12000–23500) or at any time in dark biomes (Bloodmoon Steppe, Capwood, Sunken Marsh, Cloud Forest, Dark Forest, Mangrove Swamp); a column-probe ticker adds swarms just above open water in `#projectzero:has_fireflies` biomes at dusk (12000–14000). Off at Particles = Minimal, reduced at Decreased; `ClientConfig.FIREFLIES` (`ambience.fireflies`, default true).
+- `DESIGN-DOCUMENT.md` §15: Fireflies `[Planned]` → `[Built]`.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon`, **brand-new world** `pz_task5_fresh` created through `CreateWorldScreen` (no feature-order crash):
+  - Block props: light 6, no collision, destroy speed 0. Loot: bare hand 0, shears 1, Silk Touch 1.
+  - Located `#minecraft:is_forest` (Dark Forest): 14 natural bushes within 48 blocks. At time 13000: `bushSpawns=54`, `waterSpawns=8`.
+  - Located `projectzero:bloodmoon_steppe` (about 18k blocks out; it is rare because it replaces Wooded Badlands): 48 natural bushes, and fireflies still emit at noon (`bushSpawns=6`).
+  - `ambience.fireflies=false` → 0 spawns. Zero ERROR or exception lines in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): `textures/block/firefly_bush.png` (flat 16×16), `particles/firefly.json` uses the `mana_glow` sprites; Claude to add a firefly sprite and bush art. Item uses the generated block texture.
+
+**Remaining Recommendations**
+
+1. Task 6: Companions foundation and screen.
+2. Open question for Jaime: Bloodmoon Steppe is very rare in new worlds (closest one was 10–18k blocks away in three test seeds). Consider giving it a more common slot in `ProjectZeroRegion`.
+
+---
 
 ### Session Log — 2026-11-27 (Plan expansion + PROGRESS.md)
 

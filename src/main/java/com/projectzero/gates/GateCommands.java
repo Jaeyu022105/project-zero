@@ -57,6 +57,11 @@ public final class GateCommands {
                                                 IntegerArgumentType.getInteger(ctx, "days")))))
                         .then(Commands.literal("break")
                                 .executes(ctx -> breakLookedAtGate(ctx.getSource())))
+                        .then(Commands.literal("corruption")
+                                .then(Commands.literal("grow")
+                                        .executes(ctx -> growCorruption(ctx.getSource())))
+                                .then(Commands.literal("clear")
+                                        .executes(ctx -> clearCorruption(ctx.getSource()))))
                         .then(Commands.literal("spawn")
                                 .then(Commands.argument("rank", StringArgumentType.word())
                                         .suggests((c, b) -> SharedSuggestionProvider.suggest(RANKS, b))
@@ -116,24 +121,76 @@ public final class GateCommands {
         return 1;
     }
 
-    private static @Nullable GateBlockEntity findLookedAtAnchor(ServerPlayer player, ServerLevel level) {
-        Vec3 eye = player.getEyePosition();
-        Vec3 end = eye.add(player.getLookAngle().normalize().scale(32.0));
-        BlockHitResult hit = level.clip(new ClipContext(eye, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
-        if (hit.getType() == HitResult.Type.MISS) return null;
+    private static int growCorruption(CommandSourceStack source) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        ServerLevel level = player.serverLevel();
+        GateBlockEntity anchorBe = findLookedAtAnchor(player, level);
+        if (anchorBe == null) {
+            source.sendFailure(Component.literal("Look at a Gate within 32 blocks."));
+            return 0;
+        }
+        BlockPos anchorPos = anchorBe.anchorPos();
+        BlockState st = level.getBlockState(anchorPos);
+        boolean sea = st.getBlock() instanceof GateBlock && st.getValue(GateBlock.SEA);
+        int slot = Math.max(0, anchorBe.dungeonSlot());
+        int converted = CorruptionService.growNow(level, anchorPos, slot, anchorBe.rank(), sea);
+        CorruptionSavedData.CorruptionZone zone = CorruptionSavedData.get(level).zone(anchorPos);
+        int total = zone != null ? zone.originalBlocks.size() : converted;
+        int rad = zone != null ? zone.targetRadius : 0;
+        source.sendSuccess(() -> Component.literal("Grew corruption at " + anchorPos.toShortString()
+                + " (radius " + rad + "): +" + converted + " blocks (" + total + " total)."), false);
+        return 1;
+    }
 
-        BlockPos hitPos = hit.getBlockPos();
-        BlockState hitState = level.getBlockState(hitPos);
-        BlockPos portalPos = null;
-        if (hitState.is(ModBlocks.GATE_PORTAL.get())) {
-            portalPos = hitPos;
-        } else if (hitState.is(ModBlocks.ANCIENT_GATE_STONE.get())) {
-            for (BlockPos p : BlockPos.betweenClosed(hitPos.offset(-4, -4, -4), hitPos.offset(4, 4, 4))) {
-                if (level.getBlockState(p).is(ModBlocks.GATE_PORTAL.get())) {
-                    portalPos = p.immutable();
-                    break;
+    private static int clearCorruption(CommandSourceStack source) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        ServerLevel level = player.serverLevel();
+        GateBlockEntity anchorBe = findLookedAtAnchor(player, level);
+        BlockPos targetAnchor = anchorBe != null ? anchorBe.anchorPos() : null;
+        if (targetAnchor == null) {
+            double best = 32.0 * 32.0;
+            for (CorruptionSavedData.CorruptionZone z : CorruptionSavedData.get(level).zones()) {
+                double d = z.anchor.distToCenterSqr(player.position());
+                if (d <= best) {
+                    best = d;
+                    targetAnchor = z.anchor;
                 }
             }
+        }
+        if (targetAnchor == null) {
+            source.sendFailure(Component.literal("Look at a Gate or stand within 32 blocks of active corruption."));
+            return 0;
+        }
+        final BlockPos anchorPos = targetAnchor;
+        int restored = CorruptionService.clearImmediate(level, anchorPos);
+        source.sendSuccess(() -> Component.literal("Cleared corruption at " + anchorPos.toShortString()
+                + " (" + restored + " blocks restored)."), false);
+        return 1;
+    }
+
+    public static @Nullable GateBlockEntity findLookedAtAnchor(ServerPlayer player, ServerLevel level) {
+        Vec3 eye = player.getEyePosition();
+        Vec3 dir = player.getLookAngle().normalize();
+        BlockPos portalPos = null;
+
+        // Step along the look ray so tall grass/vines in front of a free-floating rift never block targeting.
+        for (double d = 0.5; d <= 32.0; d += 0.5) {
+            BlockPos p = BlockPos.containing(eye.add(dir.scale(d)));
+            BlockState st = level.getBlockState(p);
+            if (st.is(ModBlocks.GATE_PORTAL.get())) {
+                portalPos = p;
+                break;
+            }
+            if (st.is(ModBlocks.ANCIENT_GATE_STONE.get())) {
+                for (BlockPos q : BlockPos.betweenClosed(p.offset(-4, -4, -4), p.offset(4, 4, 4))) {
+                    if (level.getBlockState(q).is(ModBlocks.GATE_PORTAL.get())) {
+                        portalPos = q.immutable();
+                        break;
+                    }
+                }
+                if (portalPos != null) break;
+            }
+            if (st.isSolidRender(level, p)) break;
         }
         if (portalPos == null) return null;
         if (!(level.getBlockEntity(portalPos) instanceof GateBlockEntity be)) return null;

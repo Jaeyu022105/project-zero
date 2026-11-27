@@ -16,7 +16,7 @@ import net.minecraft.util.Mth;
  * the options color; each family moves and fades in its own way.
  */
 public class ManaParticle extends TextureSheetParticle {
-    private enum Style { GLOW, SPARK, RUNE, SHARD, MOTE, STREAK, INFLOW, DROP, LEAF }
+    private enum Style { GLOW, SPARK, RUNE, SHARD, MOTE, STREAK, INFLOW, DROP, LEAF, FIREFLY }
 
     private final Style style;
     private final SpriteSet sprites;
@@ -60,6 +60,8 @@ public class ManaParticle extends TextureSheetParticle {
                            gravity = 1.0F; hasPhysics = true; friction = 0.98F; }
             case LEAF -> { lifetime = 140 + random.nextInt(80); baseSize = 0.09F * size * (0.8F + random.nextFloat() * 0.4F);
                            gravity = 0.012F; hasPhysics = true; friction = 0.96F; roll = random.nextFloat() * Mth.TWO_PI; }
+            case FIREFLY -> { lifetime = 65 + random.nextInt(55); baseSize = 0.065F * size * (0.85F + random.nextFloat() * 0.35F);
+                              friction = 0.96F; }
             default -> { lifetime = 6 + random.nextInt(3); baseSize = 0.13F * size; friction = 0.7F; }
         }
         this.quadSize = baseSize;
@@ -76,6 +78,7 @@ public class ManaParticle extends TextureSheetParticle {
         if (type == ModParticles.INFLOW.get()) return Style.INFLOW;
         if (type == ModParticles.DROP.get()) return Style.DROP;
         if (type == ModParticles.LEAF.get()) return Style.LEAF;
+        if (type == ModParticles.FIREFLY.get()) return Style.FIREFLY;
         return Style.GLOW;
     }
 
@@ -108,6 +111,15 @@ public class ManaParticle extends TextureSheetParticle {
                 alpha = life < 0.75F ? 1F : (1F - life) / 0.25F;
             }
             case LEAF -> tickLeaf(life);
+            case FIREFLY -> {
+                xd += Mth.sin(age * 0.11F + phase) * 0.0018;
+                yd += Mth.cos(age * 0.09F + phase * 1.3F) * 0.0012;
+                zd += Mth.cos(age * 0.10F + phase * 0.7F) * 0.0018;
+                float env = life < 0.15F ? life / 0.15F : (life > 0.82F ? (1F - life) / 0.18F : 1F);
+                float blink = 0.15F + 0.85F * Math.max(0F, Mth.sin(age * 0.22F + phase));
+                alpha = env * blink;
+                quadSize = baseSize * (0.75F + 0.35F * blink);
+            }
             default -> { quadSize = baseSize * (1F - life); alpha = 1F - life; }
         }
         if (style != Style.RUNE && style != Style.SHARD && style != Style.DROP && style != Style.LEAF) setSpriteFromAge(sprites);

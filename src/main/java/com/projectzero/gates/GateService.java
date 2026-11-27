@@ -5,8 +5,11 @@ import com.projectzero.fx.Fx;
 import com.projectzero.registry.ModBlocks;
 import com.projectzero.registry.ModItems;
 import com.projectzero.titles.MilestoneTracker;
+import com.projectzero.ui.NoticeType;
+import com.projectzero.ui.SystemNotices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -49,6 +52,7 @@ public final class GateService {
     private static final String RETURN_KEY = ProjectZero.MOD_ID + ":gate_return";
     private static final String COOLDOWN_KEY = ProjectZero.MOD_ID + ":gate_cooldown_until";
     private static final String ACTIVE_SLOT_KEY = ProjectZero.MOD_ID + ":active_dungeon_slot";
+    public static final String BREAK_WAVE_KEY = ProjectZero.MOD_ID + ":break_wave";
 
     /** Spawns a Gate rift at {@code basePos} linked to a fresh slot in {@code projectzero:dungeon}. */
     public static @Nullable DungeonSavedData.DungeonRecord spawnGate(
@@ -252,7 +256,7 @@ public final class GateService {
                 .append(Component.literal(" grows unstable. (Surge " + newSurges + "/" + GateRules.AGING_MAX_SURGES + ")")
                         .withStyle(ChatFormatting.WHITE));
         for (ServerPlayer p : playersWithin(level, anchorPos, GateRules.AGING_MESSAGE_RADIUS)) {
-            system(p, msg);
+            SystemNotices.system(p, NoticeType.GATE, Component.literal("GATE SURGE"), msg, msg);
         }
         level.playSound(null, anchorPos, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.BLOCKS, 0.9F, 0.75F);
     }
@@ -297,7 +301,7 @@ public final class GateService {
         for (ServerPlayer p : playersWithin(level, anchorPos, GateRules.AGING_MESSAGE_RADIUS)) {
             p.connection.send(new ClientboundSetTitleTextPacket(title));
             p.connection.send(new ClientboundSetSubtitleTextPacket(sub));
-            system(p, chat);
+            SystemNotices.system(p, NoticeType.GATE, Component.literal("GATE RANK UP"), sub, chat);
         }
         level.playSound(null, anchorPos, SoundEvents.END_PORTAL_SPAWN, SoundSource.BLOCKS, 1.0F, 0.7F);
     }
@@ -346,15 +350,7 @@ public final class GateService {
         if (dungeonLevel != null) {
             DungeonSavedData data = DungeonSavedData.get(dungeonLevel);
             data.markBroken(rec.slot);
-            if (rec.built) {
-                GateDungeonArena.clearDungeonMonsters(dungeonLevel, rec.slot, rec.size, rec.sea);
-                BlockPos origin = GateDungeonArena.origin(rec.slot);
-                for (ServerPlayer p : List.copyOf(dungeonLevel.players())) {
-                    if (Math.abs(p.getX() - origin.getX()) < GateRules.DUNGEON_SLOT_STRIDE / 2.0) {
-                        returnFromDungeon(p);
-                    }
-                }
-            }
+            // Leave built dungeon monsters in place so players who steady and storm the rift can fight inside.
         }
 
         long now = level.getGameTime();
@@ -386,7 +382,7 @@ public final class GateService {
         for (ServerPlayer p : playersWithin(level, anchorPos, GateRules.AGING_MESSAGE_RADIUS)) {
             p.connection.send(new ClientboundSetTitleTextPacket(title));
             p.connection.send(new ClientboundSetSubtitleTextPacket(sub));
-            system(p, chat);
+            SystemNotices.system(p, NoticeType.WARNING, Component.literal("DUNGEON BREAK"), sub, chat);
         }
         level.playSound(null, anchorPos, SoundEvents.WITHER_SPAWN, SoundSource.HOSTILE, 0.9F, 0.8F);
 
@@ -400,10 +396,41 @@ public final class GateService {
         if (!anchorBe.isBreaking()) {
             anchorBe.setBreakState(true, anchorBe.breakWave(), now);
         }
+        DungeonSavedData.DungeonRecord rec = ensureRecord(level, anchorBe, state);
+        if (rec == null || rec.cleared) return;
+
+        ServerLevel dungeonLevel = level.getServer().getLevel(DUNGEON);
+        boolean someoneInside = hasPlayerInDungeonSlot(dungeonLevel, rec.slot);
+        if (someoneInside) {
+            if (rec.insidePauseStartedAt < 0L && dungeonLevel != null) {
+                rec.insidePauseStartedAt = now;
+                DungeonSavedData.get(dungeonLevel).setDirty();
+            }
+            anchorBe.markBreakActiveTick(now);
+            return;
+        } else if (rec.insidePauseStartedAt >= 0L && dungeonLevel != null) {
+            long pausedInside = Math.max(0L, now - rec.insidePauseStartedAt);
+            rec.insidePauseStartedAt = -1L;
+            DungeonSavedData.get(dungeonLevel).setDirty();
+            if (pausedInside > 0L) {
+                pushPortalNextWaveTime(level, anchorPos, anchorBe, anchorBe.nextWaveTime() + pausedInside);
+            }
+            anchorBe.markBreakActiveTick(now);
+        }
+
         int wave = anchorBe.breakWave();
         if (wave >= GateRules.BREAK_WAVES) {
             checkMissingBreakBoss(level, anchorPos, state, anchorBe, now);
             return;
+        }
+
+        if (anchorBe.isStormable() && now % GateRules.STORM_PULSE_INTERVAL_TICKS == 0L) {
+            // TODO(claude-art): steady-rift visual in GateRiftRenderer reading GateBlockEntity#isStormable().
+            emitStormablePulse(level, anchorPos, anchorBe.size(), rec.alongX);
+        }
+        if (!anchorBe.isStormable() && wave >= 1 && now < anchorBe.nextWaveTime()
+                && now % GateRules.STORM_CHECK_INTERVAL_TICKS == 0L) {
+            checkWaveClearedForStorm(level, anchorPos, anchorBe, rec, null);
         }
 
         // Pause the wave timer while no player is within BREAK_PLAYER_RADIUS.
@@ -427,9 +454,6 @@ public final class GateService {
         }
         if (now < anchorBe.nextWaveTime()) return;
 
-        DungeonSavedData.DungeonRecord rec = ensureRecord(level, anchorBe, state);
-        if (rec == null || rec.cleared) return;
-
         int nextWave = wave + 1;
         long nextTime = now + GateRules.BREAK_WAVE_TICKS;
         boolean alongX = rec.alongX;
@@ -437,14 +461,90 @@ public final class GateService {
         for (int w = 0; w < size.portalWidth(); w++) {
             for (int h = 0; h < size.portalHeight(); h++) {
                 BlockPos p = alongX ? anchorPos.offset(w, h, 0) : anchorPos.offset(0, h, w);
+                BlockState st = level.getBlockState(p);
                 if (level.getBlockEntity(p) instanceof GateBlockEntity be) {
                     be.setBreakState(true, nextWave, nextTime);
+                    level.sendBlockUpdated(p, st, st, Block.UPDATE_ALL);
                 }
             }
         }
 
         spawnBreakWave(level, anchorPos, rec, anchorBe.rank(), size, anchorBe.surges(),
                 state.getValue(GateBlock.SEA), nextWave);
+        CorruptionService.onBreakWave(level, anchorPos, rec.slot, anchorBe.rank(),
+                state.getValue(GateBlock.SEA), nextWave);
+    }
+
+    /** Instant hook when a break-wave monster dies outside so the rift steadies right away on the last kill. */
+    public static void onBreakWaveMobKilled(ServerLevel level, LivingEntity killed) {
+        if (!killed.getPersistentData().contains(BREAK_WAVE_KEY)) return;
+        if (!killed.getPersistentData().contains(GateDungeonArena.DUNGEON_SLOT_KEY)) return;
+        int slot = killed.getPersistentData().getInt(GateDungeonArena.DUNGEON_SLOT_KEY);
+
+        ServerLevel dungeonLevel = level.getServer().getLevel(DUNGEON);
+        if (dungeonLevel == null) return;
+        DungeonSavedData.DungeonRecord rec = DungeonSavedData.get(dungeonLevel).record(slot);
+        if (rec == null || rec.cleared || !rec.broken) return;
+        if (!level.dimension().location().equals(rec.originDim)) return;
+        if (!level.isLoaded(rec.gateAnchor)) return;
+
+        if (level.getBlockEntity(rec.gateAnchor) instanceof GateBlockEntity anchorBe) {
+            checkWaveClearedForStorm(level, rec.gateAnchor, anchorBe, rec, killed);
+        }
+    }
+
+    private static void checkWaveClearedForStorm(ServerLevel level, BlockPos anchorPos, GateBlockEntity anchorBe,
+                                                 DungeonSavedData.DungeonRecord rec, @Nullable LivingEntity ignoreDying) {
+        if (!anchorBe.isBreaking() || anchorBe.isStormable()) return;
+        int wave = anchorBe.breakWave();
+        if (wave < 1 || wave >= GateRules.BREAK_WAVES) return;
+        if (level.getGameTime() >= anchorBe.nextWaveTime()) return;
+
+        Vec3 center = Vec3.atCenterOf(anchorPos);
+        AABB scan = new AABB(center, center).inflate(GateRules.BREAK_WAVE_SCAN_RADIUS);
+        boolean anyWaveMobAlive = !level.getEntitiesOfClass(Mob.class, scan, m ->
+                m != ignoreDying
+                        && m.isAlive()
+                        && m.getPersistentData().getInt(GateDungeonArena.DUNGEON_SLOT_KEY) == rec.slot
+                        && m.getPersistentData().getInt(BREAK_WAVE_KEY) == wave
+        ).isEmpty();
+        if (anyWaveMobAlive) return;
+
+        GateSize size = anchorBe.size();
+        for (int w = 0; w < size.portalWidth(); w++) {
+            for (int h = 0; h < size.portalHeight(); h++) {
+                BlockPos p = rec.alongX ? anchorPos.offset(w, h, 0) : anchorPos.offset(0, h, w);
+                BlockState st = level.getBlockState(p);
+                if (level.getBlockEntity(p) instanceof GateBlockEntity be) {
+                    be.setStormable(true);
+                    level.sendBlockUpdated(p, st, st, Block.UPDATE_ALL);
+                }
+            }
+        }
+
+        emitStormablePulse(level, anchorPos, size, rec.alongX);
+        level.playSound(null, anchorPos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.9F, 1.35F);
+
+        Component msg = Component.literal("Wave cleared! The rift steadies — storm the gate before the next wave!")
+                .withStyle(ChatFormatting.AQUA);
+        for (ServerPlayer p : playersWithin(level, anchorPos, GateRules.AGING_MESSAGE_RADIUS)) {
+            SystemNotices.system(p, NoticeType.GATE, Component.literal("RIFT STEADIED"), msg, msg);
+        }
+    }
+
+    private static void emitStormablePulse(ServerLevel level, BlockPos anchorPos, GateSize size, boolean alongX) {
+        double cx = anchorPos.getX() + (alongX ? size.portalWidth() * 0.5 : 0.5);
+        double cy = anchorPos.getY() + size.portalHeight() * 0.5;
+        double cz = anchorPos.getZ() + (alongX ? 0.5 : size.portalWidth() * 0.5);
+        level.sendParticles(ParticleTypes.END_ROD, cx, cy, cz, 14, 0.6, 0.9, 0.6, 0.04);
+    }
+
+    public static boolean hasPlayerInDungeonSlot(@Nullable ServerLevel dungeonLevel, int slot) {
+        if (dungeonLevel == null || slot < 0) return false;
+        BlockPos origin = GateDungeonArena.origin(slot);
+        return dungeonLevel.players().stream()
+                .anyMatch(p -> !p.isSpectator() && p.isAlive()
+                        && Math.abs(p.getX() - origin.getX()) < GateRules.DUNGEON_SLOT_STRIDE / 2.0);
     }
 
     private static void pushPortalNextWaveTime(ServerLevel level, BlockPos anchorPos, GateBlockEntity anchorBe, long nextWaveTime) {
@@ -536,6 +636,7 @@ public final class GateService {
             Vec3 pos = breakSpawnSpot(level, anchorPos, random);
             Mob mob = GateDungeonArena.createGateMonster(level, rec.slot, rank, surges, sea, pos, random);
             if (mob != null) {
+                mob.getPersistentData().putInt(BREAK_WAVE_KEY, waveNumber);
                 if (nearestTarget != null) mob.setTarget(nearestTarget);
                 level.addFreshEntity(mob);
             }
@@ -543,9 +644,18 @@ public final class GateService {
 
         boolean finalWave = (waveNumber >= GateRules.BREAK_WAVES);
         if (finalWave) {
+            ServerLevel dungeonLevel = level.getServer().getLevel(DUNGEON);
+            if (dungeonLevel != null) {
+                rec.bossWalkedOut = true;
+                DungeonSavedData.get(dungeonLevel).setDirty();
+                if (rec.built) {
+                    GateDungeonArena.clearDungeonBossOnly(dungeonLevel, rec.slot, rec.size, rec.sea);
+                }
+            }
             Vec3 bossPos = breakSpawnSpot(level, anchorPos, random);
             Mob boss = GateDungeonArena.createGateBoss(level, rec.slot, rank, sea, bossPos);
             if (boss != null) {
+                boss.getPersistentData().putInt(BREAK_WAVE_KEY, waveNumber);
                 if (nearestTarget != null) boss.setTarget(nearestTarget);
                 level.addFreshEntity(boss);
             }
@@ -556,8 +666,9 @@ public final class GateService {
                         + ": The Dungeon Boss has emerged from the rift!").withStyle(ChatFormatting.RED, ChatFormatting.BOLD)
                 : Component.literal("Dungeon Break Wave " + waveNumber + "/" + GateRules.BREAK_WAVES + " emerging!")
                         .withStyle(ChatFormatting.GOLD);
+        NoticeType waveNotice = finalWave ? NoticeType.WARNING : NoticeType.GATE;
         for (ServerPlayer p : playersWithin(level, anchorPos, GateRules.AGING_MESSAGE_RADIUS)) {
-            system(p, waveMsg);
+            SystemNotices.system(p, waveNotice, waveMsg);
         }
         level.playSound(null, anchorPos, SoundEvents.RAID_HORN.value(), SoundSource.HOSTILE, 1.2F, 0.85F);
     }
@@ -572,6 +683,10 @@ public final class GateService {
             topY = anchorPos.getY();
         }
         return new Vec3(x + 0.5, topY, z + 0.5);
+    }
+
+    public static boolean hasPlayerNear(ServerLevel level, BlockPos pos, double radius) {
+        return hasPlayerWithin(level, pos, radius);
     }
 
     private static boolean hasPlayerWithin(ServerLevel level, BlockPos pos, double radius) {
@@ -599,20 +714,9 @@ public final class GateService {
             return;
         }
 
-        if (state.getValue(GateBlock.BROKEN)) {
-            system(player, Component.literal("Dungeon break in progress! The rift cannot be entered.")
-                    .withStyle(ChatFormatting.RED));
-            return;
-        }
-
         if (!(player.level().getBlockEntity(pos) instanceof GateBlockEntity touchedBe)) return;
         BlockPos anchorPos = touchedBe.anchorPos();
         GateBlockEntity anchorBe = player.level().getBlockEntity(anchorPos) instanceof GateBlockEntity abe ? abe : touchedBe;
-        if (anchorBe.isBreaking()) {
-            system(player, Component.literal("Dungeon break in progress! The rift cannot be entered.")
-                    .withStyle(ChatFormatting.RED));
-            return;
-        }
 
         MinecraftServer server = player.getServer();
         if (server == null) return;
@@ -624,13 +728,21 @@ public final class GateService {
         if (rec == null) return;
 
         if (rec.cleared) {
-            system(player, Component.literal("This gate has already collapsed.").withStyle(ChatFormatting.GRAY));
+            SystemNotices.system(player, NoticeType.WARNING,
+                    Component.literal("This gate has already collapsed.").withStyle(ChatFormatting.GRAY));
             return;
         }
-        if (rec.broken) {
-            system(player, Component.literal("Dungeon break in progress! The rift cannot be entered.")
-                    .withStyle(ChatFormatting.RED));
+        boolean isBreak = state.getValue(GateBlock.BROKEN) || anchorBe.isBreaking() || rec.broken;
+        if (isBreak && !anchorBe.isStormable()) {
+            SystemNotices.system(player, NoticeType.WARNING,
+                    Component.literal("Dungeon break in progress! Clear the current wave to steady the rift.")
+                            .withStyle(ChatFormatting.RED));
             return;
+        }
+
+        if (isBreak && rec.insidePauseStartedAt < 0L) {
+            rec.insidePauseStartedAt = now;
+            data.setDirty();
         }
 
         // Sync record rank/surges with the gate's live state.
@@ -691,7 +803,7 @@ public final class GateService {
         if (rec == null || rec.cleared) return;
 
         data.markCleared(slot);
-        if (!rec.broken && rec.built) {
+        if (rec.built) {
             GateDungeonArena.openExitPortal(dungeonLevel, slot, rec.size, rec.rank, rec.sea);
         }
 
@@ -752,7 +864,23 @@ public final class GateService {
             }
         }
         // Ancient gates leave their ruined stone ring behind (dark runes, fallen stones, a seal).
+        java.util.Map<BlockPos, BlockState> beforeRuin = new java.util.HashMap<>();
+        for (BlockPos p : BlockPos.betweenClosed(rec.gateAnchor.offset(-8, -4, -8), rec.gateAnchor.offset(8, 8, 8))) {
+            if (originLevel.isLoaded(p)) beforeRuin.put(p.immutable(), originLevel.getBlockState(p));
+        }
         AncientGate.ruin(originLevel, rec.gateAnchor, rec.size, rec.alongX);
+        java.util.List<BlockPos> ruinTouched = new java.util.ArrayList<>();
+        for (var e : beforeRuin.entrySet()) {
+            if (originLevel.getBlockState(e.getKey()) != e.getValue()) {
+                ruinTouched.add(e.getKey());
+            }
+        }
+        if (!ruinTouched.isEmpty()) {
+            CorruptionService.dropPositions(originLevel, ruinTouched);
+        }
+        if (rec.broken) {
+            CorruptionService.startRecede(originLevel, rec.gateAnchor);
+        }
         originLevel.sendParticles(Fx.mote(rec.rank.argb() & 0xFFFFFF, 1.6F),
                 rec.gateAnchor.getX() + 1.0, rec.gateAnchor.getY() + 1.5, rec.gateAnchor.getZ() + 0.5,
                 40, 1.0, 1.2, 1.0, 0.08);
@@ -761,6 +889,8 @@ public final class GateService {
     public static void returnFromDungeon(ServerPlayer player) {
         MinecraftServer server = player.getServer();
         if (server == null) return;
+        int prevSlot = player.getPersistentData().contains(ACTIVE_SLOT_KEY)
+                ? player.getPersistentData().getInt(ACTIVE_SLOT_KEY) : -1;
         CompoundTag back = player.getPersistentData().getCompound(RETURN_KEY);
         ServerLevel target = null;
         if (back.contains("dim")) {
@@ -778,6 +908,28 @@ public final class GateService {
         player.getPersistentData().remove(RETURN_KEY);
         player.getPersistentData().remove(ACTIVE_SLOT_KEY);
         player.getPersistentData().putLong(COOLDOWN_KEY, target.getGameTime() + GateRules.PORTAL_COOLDOWN_TICKS);
+
+        // If every player has now left a breaking gate's dungeon without clearing it, shift & resume nextWaveTime.
+        ServerLevel dungeonLevel = server.getLevel(DUNGEON);
+        if (prevSlot >= 0 && dungeonLevel != null && !hasPlayerInDungeonSlot(dungeonLevel, prevSlot)) {
+            DungeonSavedData data = DungeonSavedData.get(dungeonLevel);
+            DungeonSavedData.DungeonRecord rec = data.record(prevSlot);
+            if (rec != null && rec.broken && !rec.cleared && rec.insidePauseStartedAt >= 0L) {
+                ServerLevel originLevel = server.getLevel(ResourceKey.create(Registries.DIMENSION, rec.originDim));
+                if (originLevel != null && originLevel.isLoaded(rec.gateAnchor)
+                        && originLevel.getBlockEntity(rec.gateAnchor) instanceof GateBlockEntity anchorBe) {
+                    long now = originLevel.getGameTime();
+                    long pausedInside = Math.max(0L, now - rec.insidePauseStartedAt);
+                    rec.insidePauseStartedAt = -1L;
+                    data.setDirty();
+                    if (pausedInside > 0L) {
+                        pushPortalNextWaveTime(originLevel, rec.gateAnchor, anchorBe,
+                                anchorBe.nextWaveTime() + pausedInside);
+                    }
+                    anchorBe.markBreakActiveTick(now);
+                }
+            }
+        }
     }
 
     private static void saveReturnPoint(ServerPlayer player) {
@@ -826,14 +978,15 @@ public final class GateService {
                 : spawnGate(level, pos, rank, size, alongX, sea);
         if (rec != null) {
             String kind = sea ? "Sea Gate" : ancient ? "Ancient Gate" : "Gate";
-            system(anchor, Component.literal("A ")
+            Component msg = Component.literal("A ")
                     .withStyle(ChatFormatting.WHITE)
                     .append(Component.literal(rank.name() + "-Rank " + kind).withStyle(rank.chatColor()))
-                    .append(Component.literal(" has opened nearby!").withStyle(ChatFormatting.WHITE)));
+                    .append(Component.literal(" has opened nearby!").withStyle(ChatFormatting.WHITE));
+            SystemNotices.system(anchor, NoticeType.GATE, Component.literal("GATE OPENED"), msg, msg);
         }
     }
 
     public static void system(ServerPlayer player, Component msg) {
-        player.sendSystemMessage(Component.literal("[System] ").withStyle(ChatFormatting.AQUA).append(msg));
+        SystemNotices.system(player, NoticeType.GATE, msg);
     }
 }

@@ -71,6 +71,8 @@ public final class ModFeatures {
             FEATURES.register("sunken_ruin", com.projectzero.worldgen.SunkenRuinFeature::new);
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> SHATTERED_PLATEAU =
             FEATURES.register("shattered_plateau", com.projectzero.worldgen.ShatteredPlateauFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> FIREFLY_BUSH =
+            FEATURES.register("firefly_bush", com.projectzero.worldgen.FireflyBushFeature::new);
 
     // Polish pass.
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> BONE_REMAINS =

@@ -3,6 +3,8 @@ package com.projectzero.awakening;
 import com.projectzero.leveling.LevelingService;
 import com.projectzero.registry.ModDataComponents;
 import com.projectzero.registry.ModItems;
+import com.projectzero.ui.NoticeType;
+import com.projectzero.ui.SystemNotices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -104,11 +106,12 @@ public final class ShardVesselService {
         vessel.set(ModDataComponents.SHARD_CHARGE.get(), next);
 
         if (updatedTier > current.tier()) {
-            player.sendSystemMessage(Component.literal("[System] ").withStyle(ChatFormatting.AQUA)
-                    .append(Component.literal("Your Awakening Shard has reached ").withStyle(ChatFormatting.WHITE))
-                    .append(AwakeningRules.tierDisplayName(updatedTier))
-                    .append(Component.literal(" (Tier " + updatedTier + "/" + AwakeningRules.MAX_SHARD_TIER + ").")
-                            .withStyle(ChatFormatting.GRAY)));
+            Component body = AwakeningRules.tierDisplayName(updatedTier).copy()
+                    .append(Component.literal(" (Tier " + updatedTier + "/" + AwakeningRules.MAX_SHARD_TIER + ")")
+                            .withStyle(ChatFormatting.GRAY));
+            Component chat = Component.literal("Your Awakening Shard has reached ").withStyle(ChatFormatting.WHITE)
+                    .append(body);
+            SystemNotices.system(player, NoticeType.ITEM, Component.translatable("notice.projectzero.vessel_tier"), body, chat);
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.0F, 0.8F + updatedTier * 0.12F);
         }

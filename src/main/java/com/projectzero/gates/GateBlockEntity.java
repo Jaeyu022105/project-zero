@@ -34,6 +34,7 @@ public class GateBlockEntity extends BlockEntity {
     private boolean breaking = false;
     private int breakWave = 0;
     private long nextWaveTime = 0L;
+    private boolean stormable = false;
     private long pausedBreakTicks = 0L;
     private long lastBreakTickSeen = -1L;
     private boolean bossRespawned = false;
@@ -58,6 +59,7 @@ public class GateBlockEntity extends BlockEntity {
     public boolean isBreaking() { return breaking; }
     public int breakWave() { return breakWave; }
     public long nextWaveTime() { return nextWaveTime; }
+    public boolean isStormable() { return stormable; }
     public long pausedBreakTicks() { return pausedBreakTicks; }
     public boolean bossRespawned() { return bossRespawned; }
 
@@ -112,12 +114,18 @@ public class GateBlockEntity extends BlockEntity {
         this.breaking = breaking;
         this.breakWave = breakWave;
         this.nextWaveTime = nextWaveTime;
+        this.stormable = false;
         this.lastBreakTickSeen = nextWaveTime;
         if (!breaking || breakWave == 0) {
             this.bossRespawned = false;
             this.missingBossTicks = 0L;
             this.lastBossCheckTick = -1L;
         }
+        setChanged();
+    }
+
+    public void setStormable(boolean stormable) {
+        this.stormable = stormable;
         setChanged();
     }
 
@@ -193,6 +201,7 @@ public class GateBlockEntity extends BlockEntity {
         tag.putBoolean("Breaking", breaking);
         tag.putInt("BreakWave", breakWave);
         tag.putLong("NextWaveTime", nextWaveTime);
+        tag.putBoolean("Stormable", stormable);
         if (pausedBreakTicks > 0L) tag.putLong("PausedBreakTicks", pausedBreakTicks);
         if (bossRespawned) tag.putBoolean("BossRespawned", true);
         if (missingBossTicks > 0L) tag.putLong("MissingBossTicks", missingBossTicks);
@@ -217,6 +226,7 @@ public class GateBlockEntity extends BlockEntity {
         this.breaking = tag.getBoolean("Breaking");
         this.breakWave = Math.max(0, tag.getInt("BreakWave"));
         this.nextWaveTime = tag.getLong("NextWaveTime");
+        this.stormable = tag.getBoolean("Stormable");
         this.pausedBreakTicks = Math.max(0L, tag.getLong("PausedBreakTicks"));
         this.bossRespawned = tag.getBoolean("BossRespawned");
         this.missingBossTicks = Math.max(0L, tag.getLong("MissingBossTicks"));

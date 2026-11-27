@@ -15,7 +15,9 @@ public final class ModNetwork {
     // 7: SyncWornGearPacket + AssignSkillSlotPacket + SkillVisualPacket.
     // Bump whenever the packet list or a packet's format changes.
     // 8: skill presets (AssignSkillSlotPacket preset field, SwitchPresetPacket, preset sync).
-    private static final int PROTOCOL_VERSION = 8;
+    // 9: SystemNoticePacket.
+    // 10: level ceiling sync (PlayerStats.ceilingBroken + SyncJobPacket.noCeiling).
+    private static final int PROTOCOL_VERSION = 10;
 
     public static final SimpleChannel CHANNEL = ChannelBuilder
             .named(ProjectZero.id("main"))
@@ -104,6 +106,12 @@ public final class ModNetwork {
                 .encoder(SkillVisualPacket::encode)
                 .decoder(SkillVisualPacket::decode)
                 .consumerMainThread(SkillVisualPacket::handle)
+                .add();
+
+        CHANNEL.messageBuilder(SystemNoticePacket.class, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(SystemNoticePacket::encode)
+                .decoder(SystemNoticePacket::decode)
+                .consumerMainThread(SystemNoticePacket::handle)
                 .add();
     }
 

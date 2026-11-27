@@ -221,6 +221,16 @@ public final class GateDungeonArena {
                          BlockState[] ruin, BlockState ceilingLight, BlockState floorLight, BlockState hanging,
                          BlockState[] flora, BlockState wallGrowth, double crystals) {}
 
+    /** Public read-only palette for a dungeon slot's theme, used by Dungeon Break corruption spread. */
+    public record CorruptionPalette(String themeName, BlockState[] ground, BlockState[] subsurface,
+                                    BlockState[] accents, BlockState lightBlock, boolean sea) {}
+
+    public static CorruptionPalette themePaletteFor(int slot, GateRank rank, boolean sea) {
+        int[] pool = worldsFor(rank);
+        World w = world(sea ? 1 : pool[Math.floorMod(slot * 31 + 7, pool.length)]);
+        return new CorruptionPalette(w.name, w.floors, w.walls, w.ruin, w.ceilingLight, sea);
+    }
+
     private static World world(int index) {
         return switch (index) {
             case 0 -> new World("Crystal Grotto",
@@ -965,6 +975,17 @@ public final class GateDungeonArena {
                         && m.getPersistentData().getInt(DUNGEON_SLOT_KEY) == slot);
         for (Mob m : mobs) m.discard();
         return mobs.size();
+    }
+
+    /** Removes only the interior gate boss of {@code slot} when Wave 5 walks the boss outside. */
+    public static void clearDungeonBossOnly(ServerLevel dungeonLevel, int slot, GateSize size, boolean sea) {
+        Layout layout = layout(slot, size, sea);
+        touchCaveChunks(dungeonLevel, layout);
+        List<Mob> bosses = dungeonLevel.getEntitiesOfClass(Mob.class, dungeonBounds(slot, size, sea),
+                m -> m.isAlive()
+                        && m.getPersistentData().getBoolean(MobScaling.GATE_BOSS_KEY)
+                        && m.getPersistentData().getInt(DUNGEON_SLOT_KEY) == slot);
+        for (Mob b : bosses) b.discard();
     }
 
     private static BlockPos spawnSpot(Grid g, Cave c, RandomSource random) {

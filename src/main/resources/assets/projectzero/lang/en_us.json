@@ -134,6 +134,7 @@
   "gamerule.projectzero:gateSpawning": "Natural Gate Spawning",
   "gamerule.projectzero:gateAging": "Uncleared Gate Aging",
   "gamerule.projectzero:dungeonBreaks": "Gate Dungeon Breaks",
+  "gamerule.projectzero:breakCorruption": "Dungeon Break Corruption Spread",
   "block.projectzero.mana_crystal": "Mana Crystal",
   "item.projectzero.mana_crystal_shard": "Mana Crystal Shard",
   "key.projectzero.skills": "Open Skills Window",
@@ -165,5 +166,15 @@
   "biome.projectzero.bloodmoon_steppe": "Bloodmoon Steppe",
   "biome.projectzero.spirit_bamboo": "Spirit Bamboo Sea",
   "biome.projectzero.sunken_marsh": "Sunken Ruins Marsh",
-  "biome.projectzero.shattered_plateau": "Shattered Sky Plateau"
+  "biome.projectzero.shattered_plateau": "Shattered Sky Plateau",
+  "notice.projectzero.level_up": "Level Up",
+  "notice.projectzero.skill": "Skill Learned",
+  "notice.projectzero.quest": "System Quest",
+  "notice.projectzero.gate": "Gate Alert",
+  "notice.projectzero.item": "Item Notice",
+  "notice.projectzero.cooldown": "Skill Ready",
+  "notice.projectzero.title": "Title Acquired",
+  "notice.projectzero.warning": "System Warning",
+  "notice.projectzero.vessel_tier": "Shard Vessel",
+  "block.projectzero.firefly_bush": "Firefly Bush"
 }

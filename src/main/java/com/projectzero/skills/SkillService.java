@@ -8,6 +8,9 @@ import com.projectzero.leveling.LevelingService;
 import com.projectzero.leveling.StatEffects;
 import com.projectzero.network.ModNetwork;
 import com.projectzero.network.SyncSkillsPacket;
+import com.projectzero.ui.NoticeRules;
+import com.projectzero.ui.NoticeType;
+import com.projectzero.ui.SystemNotices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -75,8 +78,10 @@ public final class SkillService {
         }
         set(player, data);
         if (notify) {
-            system(player, Component.literal("Skill learned: ").withStyle(ChatFormatting.WHITE)
-                    .append(skill.displayName().copy().withStyle(ChatFormatting.AQUA)));
+            Component chat = Component.literal("Skill learned: ").withStyle(ChatFormatting.WHITE)
+                    .append(skill.displayName().copy().withStyle(ChatFormatting.AQUA));
+            SystemNotices.system(player, NoticeType.SKILL, NoticeType.SKILL.defaultTitle(),
+                    skill.displayName().copy().withStyle(ChatFormatting.AQUA), chat);
         }
         return true;
     }
@@ -213,8 +218,19 @@ public final class SkillService {
     /** Called each server tick on the player to decrement cooldowns and regenerate mana once per second. */
     public static void tickPlayer(ServerPlayer player) {
         PlayerSkills data = get(player);
-        boolean cdFinished = data.tickCooldowns();
+        List<ResourceLocation> readySkills = data.tickCooldownsReady();
+        boolean cdFinished = !readySkills.isEmpty();
         boolean changed = cdFinished || !data.cooldownsView().isEmpty();
+
+        for (ResourceLocation readyId : readySkills) {
+            if (data.slotOf(readyId) >= 0) {
+                Skill def = SkillRegistry.get(readyId);
+                if (def != null && def.cooldownTicks() >= NoticeRules.COOLDOWN_NOTICE_MIN_TICKS) {
+                    SystemNotices.send(player, NoticeType.COOLDOWN, NoticeType.COOLDOWN.defaultTitle(),
+                            def.displayName().copy().withStyle(ChatFormatting.AQUA));
+                }
+            }
+        }
 
         boolean syncNow = cdFinished;
         if (player.tickCount % 20 == 0) {
@@ -282,9 +298,5 @@ public final class SkillService {
     public static void copy(Player from, Player to) {
         CompoundTag data = from.getPersistentData().getCompound(DATA_KEY);
         to.getPersistentData().put(DATA_KEY, data.copy());
-    }
-
-    private static void system(ServerPlayer player, Component message) {
-        player.sendSystemMessage(Component.literal("[System] ").withStyle(ChatFormatting.AQUA).append(message));
     }
 }

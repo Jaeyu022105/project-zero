@@ -15,6 +15,7 @@ Last updated: **2026-11-27**
 - Random jobs by rarity at level 10, chosen in the Library domain (orbiting face-down cards).
 - Skills: mana, cooldowns, 4 basic skills, 10 job signature skills, Skillbooks, Skills window with 3 presets (J, R to cycle).
 - Titles and milestones, milestone skills.
+- System notices (bottom right), level ceiling at 100, storming a breaking gate, corruption spread around dungeon breaks, fireflies.
 - Equipment: 8 accessory slots with rolled stats, mob drops, GEAR screen.
 - Awakening Stones and crystal formations, Awakening Shards, Shard Vessel charging, Reawakening vision, reroll that keeps 3 random skills.
 - Player animations for every movement and held item; enemy blood and skill marks; boss weakness table.
@@ -30,7 +31,7 @@ Last updated: **2026-11-27**
 
 ## In progress
 
-- **Gemini, branch `gemini/reset-backlog`** (`.agents/prompts/gemini-reset-backlog.md`): done and pushed there, not yet merged: System notices (bottom right), level ceiling at 100, storming a breaking gate, corruption spread, fireflies. Working on: companions foundation and screen. Then: Spirit Bamboo Sea and Shattered Sky Plateau polish (Task 7).
+- **Gemini's reset backlog** (`.agents/prompts/gemini-reset-backlog.md`): Tasks 1 to 5 are done and merged into this branch (System notices bottom right, level ceiling at 100, storming a breaking gate, corruption spread, fireflies). Gemini ran out of tokens there, so Task 6 (companions foundation and screen) is not started, and Task 7 (Spirit Bamboo Sea and Shattered Sky Plateau polish) moved to Claude.
 - **Claude, polish pass on every existing biome** (DESIGN-DOCUMENT §15), starting with the biomes Gemini's Task 7 doesn't touch. Round 1 written, being built and tested: bigger Spirit Bamboo Sea (also replaces Flower Forest), Bloodmoon Steppe dead trees and giant skeletons, Baobab Savanna kopjes, Salt Mirror Flats salt cones.
 
 ## Next, from the plan

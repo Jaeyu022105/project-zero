@@ -155,7 +155,8 @@ public final class SkillHudOverlay {
         barRow(g, mc, x + 4, panelY + 27, "MP", mp, maxMp, mpShown, mpShown, MP_FILL, MP_HI);
 
         // XP, thin line along the bottom of the panel
-        float xpFrac = stats.isMaxLevel() ? 1F : Mth.clamp(stats.xp() / (float) Math.max(1L, stats.xpToNext()), 0F, 1F);
+        boolean atCeiling = stats.isAtCeiling(ClientJobCache.noCeiling());
+        float xpFrac = (stats.isMaxLevel() || atCeiling) ? 1F : Mth.clamp(stats.xp() / (float) Math.max(1L, stats.xpToNext()), 0F, 1F);
         xpShown += (xpFrac - xpShown) * 0.2F;
         int xpY = panelY + PANEL_H - 4;
         g.fill(x + 4, xpY, x + PANEL_W - 4, xpY + 2, BAR_BG);

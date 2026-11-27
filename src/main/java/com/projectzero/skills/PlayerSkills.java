@@ -135,20 +135,25 @@ public final class PlayerSkills {
 
     /** Decrements all active cooldowns by 1 tick. Returns true if any cooldown reached 0. */
     public boolean tickCooldowns() {
-        if (cooldowns.isEmpty()) return false;
-        boolean finishedAny = false;
+        return !tickCooldownsReady().isEmpty();
+    }
+
+    /** Decrements all active cooldowns by 1 tick and returns the skill ids whose cooldown just hit 0. */
+    public java.util.List<ResourceLocation> tickCooldownsReady() {
+        if (cooldowns.isEmpty()) return java.util.List.of();
+        java.util.List<ResourceLocation> ready = new java.util.ArrayList<>();
         var it = cooldowns.entrySet().iterator();
         while (it.hasNext()) {
             var e = it.next();
             int next = e.getValue() - 1;
             if (next <= 0) {
+                ready.add(e.getKey());
                 it.remove();
-                finishedAny = true;
             } else {
                 e.setValue(next);
             }
         }
-        return finishedAny;
+        return ready;
     }
 
     public Map<ResourceLocation, Integer> cooldownsView() {

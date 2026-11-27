@@ -3,6 +3,8 @@ package com.projectzero.awakening;
 import com.projectzero.domain.LibraryDomain;
 import com.projectzero.domain.ReawakeningVision;
 import com.projectzero.jobs.JobService;
+import com.projectzero.ui.NoticeType;
+import com.projectzero.ui.SystemNotices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -37,16 +39,18 @@ public final class AwakeningService {
         if (last != null && now - last < TOUCH_COOLDOWN_TICKS && now >= last) return;
         LAST_TOUCH.put(player.getUUID(), now);
 
-        system(player, Component.literal("An Awakening Stone. Offer an Awakening Shard to reawaken your job.")
-                .withStyle(ChatFormatting.WHITE));
+        SystemNotices.system(player, NoticeType.ITEM,
+                Component.literal("An Awakening Stone. Offer an Awakening Shard to reawaken your job.")
+                        .withStyle(ChatFormatting.WHITE));
         player.level().playSound(null, stonePos, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 0.8F, 0.7F);
     }
 
     /** Right-click holding an Awakening Shard. */
     public static void awaken(ServerPlayer player, ItemStack shard, BlockPos stonePos) {
         if (!JobService.get(player).hasJob()) {
-            system(player, Component.literal("The stone does not answer. You have no job to reawaken.")
-                    .withStyle(ChatFormatting.WHITE));
+            SystemNotices.system(player, NoticeType.WARNING,
+                    Component.literal("The stone does not answer. You have no job to reawaken.")
+                            .withStyle(ChatFormatting.WHITE));
             return;
         }
 
@@ -55,8 +59,9 @@ public final class AwakeningService {
         int shardTier = ShardVesselService.getShardTier(shard);
         JobService.AwakeningResult result = JobService.awakeningRerollQuiet(player, shardTier);
         if (result == null) {
-            system(player, Component.literal("The stone does not answer. No other job could be drawn.")
-                    .withStyle(ChatFormatting.WHITE));
+            SystemNotices.system(player, NoticeType.WARNING,
+                    Component.literal("The stone does not answer. No other job could be drawn.")
+                            .withStyle(ChatFormatting.WHITE));
             return;
         }
 
@@ -77,9 +82,5 @@ public final class AwakeningService {
             JobService.announceAwakening(player, result);
             ReawakeningVision.auraBurst(player, result.job().rarity());
         }
-    }
-
-    private static void system(ServerPlayer player, Component message) {
-        player.sendSystemMessage(Component.literal("[System] ").withStyle(ChatFormatting.AQUA).append(message));
     }
 }
