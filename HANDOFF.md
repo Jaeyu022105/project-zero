@@ -809,3 +809,27 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 
 ---
 
+
+### Session Log — 2026-11-27 (Spirit Bamboo Sea polish)
+
+**Context & Direction Check**
+
+- DESIGN-DOCUMENT §15 "[Next] Polish pass", Spirit Bamboo Sea item, plus the owner's request to make the biome noticeably larger. Picked up the paused draft from `.agents/prompts/wip/bamboo-polish/` (folder removed now that it is in the code).
+
+**Changes Made**
+
+- `worldgen/GiantBambooFeature.java`: rewritten. Once per chunk it (1) paints the origin chunk's ground: lanes from two world-wide simplex noises (`lane(x, z) < 1`), paved with dirt path, stone/mossy/cracked brick flagstones and moss edges, plants and shoots cleared off them; stone lanterns on lane edges where a position hash is the lowest within 6 blocks (pure function, so spacing holds across chunks); moss patches, moss carpet and a little podzol on the grove floor; (2) grows a grove of 45 to 64 culm attempts within 7 blocks of the origin: size 1/2/3, flat footprint (max 1 block step), off lanes (`LANE_CLEAR`), no touching culms, per-grove height and lean, node rings, branches with leaf sprays, crown, an occasional hanging soul lantern. All writes are clipped to 15 blocks from the origin, and biomes come from the biome source (cached per quart), never the level.
+- `worldgen/ProjectZeroRegion.java`: Flower Forest is now Spirit Bamboo Sea too (bigger biome, flatter ground).
+- `tools/biomes/ours.py` (+ regenerated `spirit_bamboo.json`): `bamboo_shoots` now runs before `giant_bamboo` so lanes can clear the shoots. Both are unique to the biome, so no order cycle; `gen.py` confirmed.
+
+**Verification Executed**
+
+- `tools/biomes/ours.py` then `gen.py` against misode/mcmeta 1.21.1-data: no feature order cycles.
+- Build: see the commit/thread; the cloud sandbox cannot reach maven.minecraftforge.net, so the build runs on the owner's PC.
+
+**Remaining Recommendations**
+
+1. Fly over a Spirit Bamboo Sea in `runClient` and tune lane width (`0.04` / `0.028` in `lane`), grove density and lantern spacing by eye.
+2. Shattered Sky Plateau polish is still open.
+
+---
