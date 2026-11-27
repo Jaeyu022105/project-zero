@@ -11,6 +11,7 @@ public final class ClientConfig {
     public static final ForgeConfigSpec.BooleanValue HIT_FLASH;
     public static final ForgeConfigSpec.BooleanValue GORE;
     public static final ForgeConfigSpec.BooleanValue FALLING_LEAVES;
+    public static final ForgeConfigSpec.BooleanValue FIREFLIES;
     public static final ForgeConfigSpec.BooleanValue NOTICE_CHAT_LINES;
 
     static {
@@ -30,6 +31,8 @@ public final class ClientConfig {
         b.push("ambience");
         FALLING_LEAVES = b.comment("Leaves drift down from trees (and some get pulled into open gates).")
                 .define("fallingLeaves", true);
+        FIREFLIES = b.comment("Glowing fireflies drift around firefly bushes at night and swarm over water at dusk.")
+                .define("fireflies", true);
         b.pop();
         SPEC = b.build();
     }

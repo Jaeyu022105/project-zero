@@ -34,4 +34,6 @@ public final class ModParticles {
     public static final RegistryObject<ManaParticleType> DROP = PARTICLES.register("blood_drop", ManaParticleType::new);
     /** A lit leaf that drifts down from trees, swaying and tumbling; near an open gate some get pulled in. */
     public static final RegistryObject<ManaParticleType> LEAF = PARTICLES.register("falling_leaf", ManaParticleType::new);
+    /** A warm blinking firefly mote that drifts around firefly bushes at night and water at dusk. */
+    public static final RegistryObject<ManaParticleType> FIREFLY = PARTICLES.register("firefly", ManaParticleType::new);
 }

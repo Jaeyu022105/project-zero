@@ -63,6 +63,16 @@ public final class ModNature {
     public static final RegistryObject<Block> MANA_CRYSTAL_BLOCK = block("mana_crystal_block",
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.AMETHYST_BLOCK)
                     .mapColor(MapColor.COLOR_LIGHT_BLUE).lightLevel(s -> 10).emissiveRendering((s, l, p) -> true)));
+    /** Softly glowing night-firefly bush (light 6, shears/Silk Touch drop). TODO(claude-art): placeholder texture. */
+    public static final RegistryObject<Block> FIREFLY_BUSH = block("firefly_bush",
+            () -> new com.projectzero.worldgen.FireflyBushBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.PLANT)
+                    .noCollission()
+                    .instabreak()
+                    .lightLevel(s -> 6)
+                    .sound(SoundType.GRASS)
+                    .offsetType(BlockBehaviour.OffsetType.XZ)
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
 
     private static RegistryObject<Block> block(String name, Supplier<Block> make) {
         RegistryObject<Block> b = ModBlocks.BLOCKS.register(name, make);

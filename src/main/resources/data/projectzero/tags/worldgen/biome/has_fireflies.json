@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:is_forest",
+    "minecraft:swamp",
+    "minecraft:mangrove_swamp",
+    "projectzero:spirit_bamboo",
+    "projectzero:bloodmoon_steppe",
+    "projectzero:sunken_marsh",
+    "projectzero:capwood",
+    "projectzero:elderwood",
+    "projectzero:cloud_forest"
+  ]
+}

@@ -51,6 +51,7 @@ public final class ClientModEvents {
         event.registerSpriteSet(ModParticles.INFLOW.get(), ManaParticle.Provider::new);
         event.registerSpriteSet(ModParticles.DROP.get(), ManaParticle.Provider::new);
         event.registerSpriteSet(ModParticles.LEAF.get(), ManaParticle.Provider::new);
+        event.registerSpriteSet(ModParticles.FIREFLY.get(), ManaParticle.Provider::new);
     }
 
     @SubscribeEvent

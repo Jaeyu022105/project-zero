@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Reset backlog Task 4: dungeon break corruption spread, per-dimension `CorruptionSavedData`, and 30s outer-ring-first receding cleanup).
+Last caught up: **2026-11-27** (Reset backlog Task 5: fireflies — `firefly_bush` block, `FIREFLY` particle, night/dusk client emitter, biome-modifier worldgen).
 
 ---
 
@@ -932,6 +932,40 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 **Remaining Recommendations**
 
 1. Task 5: Fireflies (`firefly_bush` block, `FIREFLY` particle + `ambience.fireflies` config, night bush & dusk water-swarm client ticker, Forge `biome_modifier` worldgen tested in a brand-new world).
+
+---
+
+### Session Log — 2026-11-27 (Reset Backlog Task 5: Fireflies)
+
+**Context & Direction Check**
+
+- Implemented Task 5 of `.agents/prompts/gemini-reset-backlog.md` (`DESIGN-DOCUMENT.md` §15 "Fireflies"). Placement goes **only** through a Forge biome modifier; no biome JSON or `tools/biomes/` file was touched.
+
+**Changes Made**
+
+- `worldgen/FireflyBushBlock.java` (new): `BushBlock`, cross cutout, no collision, instabreak, light 6, XZ offset; grows on dirt/sand/clay/muddy roots. `animateTick` hands off to the client emitter.
+- `worldgen/FireflyBushFeature.java` (new): 2–4 bushes per chunk, clamped to the origin chunk's own 16×16 columns (worldgen 3×3 rule). Registered as `ModFeatures.FIREFLY_BUSH` (`projectzero:firefly_bush`).
+- `registry/ModNature.java` (`FIREFLY_BUSH` block + item), `ModCreativeTabs`, `en_us.json`.
+- Data: `worldgen/configured_feature/fireflies.json`, `worldgen/placed_feature/fireflies.json` (every chunk, dry surface only), `tags/worldgen/biome/has_fireflies.json` (`#minecraft:is_forest`, swamp, mangrove swamp, spirit_bamboo, bloodmoon_steppe, sunken_marsh, capwood, elderwood, cloud_forest), `forge/biome_modifier/fireflies.json` (step `vegetal_decoration`), `loot_table/blocks/firefly_bush.json` (drops itself only with shears or Silk Touch).
+- Assets: blockstate, `block/firefly_bush` (cross, cutout), item model, placeholder `textures/block/firefly_bush.png`, `particles/firefly.json` (reuses `mana_glow` sprites).
+- `fx/ModParticles.FIREFLY`, `Fx.firefly(rgb, size)`, `ClientModEvents` provider, `client/ManaParticle` `FIREFLY` style (slow sine drift, blinking alpha/size, full-bright).
+- `client/Fireflies.java` (new): bushes emit at night (12000–23500) or at any time in dark biomes (Bloodmoon Steppe, Capwood, Sunken Marsh, Cloud Forest, Dark Forest, Mangrove Swamp); a column-probe ticker adds swarms just above open water in `#projectzero:has_fireflies` biomes at dusk (12000–14000). Off at Particles = Minimal, reduced at Decreased; `ClientConfig.FIREFLIES` (`ambience.fireflies`, default true).
+- `DESIGN-DOCUMENT.md` §15: Fireflies `[Planned]` → `[Built]`.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon`, **brand-new world** `pz_task5_fresh` created through `CreateWorldScreen` (no feature-order crash):
+  - Block props: light 6, no collision, destroy speed 0. Loot: bare hand 0, shears 1, Silk Touch 1.
+  - Located `#minecraft:is_forest` (Dark Forest): 14 natural bushes within 48 blocks. At time 13000: `bushSpawns=54`, `waterSpawns=8`.
+  - Located `projectzero:bloodmoon_steppe` (about 18k blocks out; it is rare because it replaces Wooded Badlands): 48 natural bushes, and fireflies still emit at noon (`bushSpawns=6`).
+  - `ambience.fireflies=false` → 0 spawns. Zero ERROR or exception lines in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): `textures/block/firefly_bush.png` (flat 16×16), `particles/firefly.json` uses the `mana_glow` sprites; Claude to add a firefly sprite and bush art. Item uses the generated block texture.
+
+**Remaining Recommendations**
+
+1. Task 6: Companions foundation and screen.
+2. Open question for Jaime: Bloodmoon Steppe is very rare in new worlds (closest one was 10–18k blocks away in three test seeds). Consider giving it a more common slot in `ProjectZeroRegion`.
 
 ---
 
