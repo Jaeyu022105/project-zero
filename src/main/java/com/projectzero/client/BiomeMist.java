@@ -13,7 +13,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 /**
- * Biome mist. Shattered Sky Plateau: cloud fills the chasms, thicker the deeper you are. Cloud Forest: thick fog all the time. Karst Tower Bay: light sea haze. Sky Pillars: fog thickens near the valley floor so the pillars fade into haze
+ * Biome mist. Cloud Forest: thick fog all the time. Karst Tower Bay: light sea haze. Sky Pillars: fog thickens near the valley floor so the pillars fade into haze
  * row behind row, and thins out as you climb above the pillar tops. Fades in and out over a few
  * seconds when you cross the biome edge.
  */
@@ -41,8 +41,7 @@ public final class BiomeMist {
         } else if (biome.is(ModBiomes.MANA_WASTES)) {
             target = 0.55F;   // mana haze
         } else if (biome.is(ModBiomes.SHATTERED_PLATEAU)) {
-            // Light haze on the table; down in a chasm low cloud thickens the deeper you go.
-            target = 0.35F + 0.85F * chasmDepth(mc, at);
+            target = 0.35F;
         } else if (biome.is(ModBiomes.BLOODMOON_STEPPE)) {
             target = 0.3F;
         } else if (biome.is(ModBiomes.GEYSER_BASIN)) {
@@ -51,21 +50,6 @@ public final class BiomeMist {
             target = 0.55F;   // sea haze between the towers
         }
         mist += (target - mist) * 0.02F;
-    }
-
-    /**
-     * How deep the player is inside a chasm, 0 (on the table) to 1 (60+ blocks below the rim). The rim
-     * is the highest ground found 10 blocks out in the four directions; only loaded client chunks are read.
-     */
-    private static float chasmDepth(Minecraft mc, BlockPos at) {
-        int rim = Integer.MIN_VALUE;
-        for (net.minecraft.core.Direction d : net.minecraft.core.Direction.Plane.HORIZONTAL) {
-            BlockPos q = at.relative(d, 10);
-            if (!mc.level.hasChunkAt(q)) continue;
-            rim = Math.max(rim, mc.level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, q.getX(), q.getZ()));
-        }
-        if (rim == Integer.MIN_VALUE) return 0F;
-        return Mth.clamp((rim - at.getY() - 8F) / 60F, 0F, 1F);
     }
 
     @SubscribeEvent
