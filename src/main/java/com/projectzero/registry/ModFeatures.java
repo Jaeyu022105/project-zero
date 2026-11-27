@@ -70,7 +70,9 @@ public final class ModFeatures {
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> SUNKEN_RUIN =
             FEATURES.register("sunken_ruin", com.projectzero.worldgen.SunkenRuinFeature::new);
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> SHATTERED_PLATEAU =
-            FEATURES.register("shattered_plateau", com.projectzero.worldgen.ShatteredPlateauFeature::new);
+            FEATURES.register("shattered_plateau", com.projectzero.worldgen.ShatteredPlateauFeature::shape);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> SHATTERED_SKY =
+            FEATURES.register("shattered_sky", com.projectzero.worldgen.ShatteredPlateauFeature::sky);
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> FIREFLY_BUSH =
             FEATURES.register("firefly_bush", com.projectzero.worldgen.FireflyBushFeature::new);
 

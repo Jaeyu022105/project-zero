@@ -71,15 +71,16 @@ def features():
     placed("crystal_outcrop", "projectzero:crystal_outcrop", rarity=2)
 
     # Round 5.
-    for n in ["mana_waste", "dead_tree", "giant_bamboo", "sunken_ruin", "shattered_plateau"]:
+    for n in ["mana_waste", "dead_tree", "giant_bamboo", "sunken_ruin", "shattered_plateau", "shattered_sky"]:
         configured(n, {"type": "projectzero:" + n, "config": {}})
     placed("mana_waste", "projectzero:mana_waste", count=2, water=False)
     placed("dead_tree", "projectzero:dead_tree", count=2)
     placed("giant_bamboo", "projectzero:giant_bamboo", count=1)
     placed("sunken_ruin", "projectzero:sunken_ruin", rarity=2, water=False, heightmap="OCEAN_FLOOR_WG")
-    # Whole-chunk pass from the chunk corner; it checks the biome per column itself.
-    gen.write(os.path.join(MOD, 'placed_feature', 'shattered_plateau.json'), {"feature": "projectzero:shattered_plateau",
-        "placement": [{"type": "minecraft:heightmap", "heightmap": "WORLD_SURFACE_WG"}]})
+    # Whole-chunk passes from the chunk corner; they weigh the biome per column themselves.
+    # shattered_plateau levels the table and cuts the chasms (raw generation, before anything grows);
+    # shattered_sky floats slabs and arches over the chasms (last in vegetation).
+    placed_plain("shattered_plateau"); placed_plain("shattered_sky")
     # Polish pass: kopjes, salt cones, bone remains.
     for n in ["kopje", "salt_mound", "bone_remains"]:
         configured(n, {"type": "projectzero:" + n, "config": {}})
@@ -179,8 +180,9 @@ BIOMES = {
          "particle": {"options": {"type": "minecraft:spore_blossom_air"}, "probability": 0.003}}}),
     "shattered_plateau": ("stony_peaks", [],
         ["boulder_stone", "boulder_andesite_rare", "shrub_spruce_sparse", "undergrowth"],
-        {VEG: ["projectzero:shattered_plateau"]},
-        {"effects": {"fog_color": 14213354, "sky_color": 9418992, "water_color": 4159204, "water_fog_color": 329011}}),
+        {0: ["projectzero:shattered_plateau"], VEG: ["projectzero:shattered_sky"]},
+        {"effects": {"fog_color": 14213354, "sky_color": 9418992, "water_color": 4159204, "water_fog_color": 329011,
+         "grass_color": 8166234, "foliage_color": 6527568}}),
 }
 
 def build(vanilla_dir):

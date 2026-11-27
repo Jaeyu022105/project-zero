@@ -1011,3 +1011,35 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 2. Open questions for Jaime are listed at the end of §16.
 
 ---
+
+### Session Log — 2026-11-27 (Polish pass: Shattered Sky Plateau)
+
+- `worldgen/ShatteredPlateauFeature` is now two features from one class:
+  - `shattered_plateau` (`shape()`, raw generation step, first in the biome): levels every column to a flat table at `TABLE` = y 168 (terraces at -3/0/+4 from low-frequency noise). Too-high rock is cut up to the first air or tuff; too-low ground is filled with stone. Near the biome edge the target eases back to the natural height, weighted by a ring of biome-source samples (never level reads far away). Then lays grass / coarse dirt / stone cover with 3 dirt below, and cuts chasms (domain-warped noise, narrower than before) in stepped ledges with moss/grass on ledges and scree on the deep floor.
+  - `shattered_sky` (`sky()`, last in vegetation): 0 to 2 big tilted slabs per chasm chunk (tuff body, grass top, hanging roots) and, 30% of chasm chunks, a natural tuff arch with moss on top spanning the crack between both rims. Everything stays inside the 3x3 chunks around the origin.
+  - Floating rock is tuff on its underside so a neighbour chunk that levels later stops its cut there.
+- `ModSurfaceRules`: plateau floor is grass with coarse dirt and stone patches, dirt below. Biome gets its own grass/foliage color (ours.py).
+- `client/BiomeMist`: plateau mist goes from 0.3 on the table to 1.35 thirty blocks below it; cloud particles drift in chasms near the player (respects the Particles setting).
+- Regenerated with `tools/biomes/ours.py` + `gen.py` (no feature order cycles).
+- Tested: build on the owner's PC (see commit/PR). In-game look not yet checked; things to check in a new world: edge cliffs, arch feet, chunk seams in the chasms, frame time while exploring.
+
+### Session Log — 2026-11-27 (Biome polish rounds 1 to 4)
+
+**Context & Direction Check**
+- Jaime asked to polish every existing biome. The Spirit Bamboo Sea and the Shattered Sky Plateau have their own threads; this covers the rest.
+
+**Changes Made**
+- Round 1: `DeadTreeFeature` (plain, snapped, great forked trees with roots), new `BoneRemainsFeature` (Bloodmoon Steppe), `KopjeFeature` (Baobab Savanna), `SaltMoundFeature` (Salt Mirror Flats). `ProjectZeroRegion`: Savanna Plateau now maps to Bloodmoon Steppe (it was 10 to 18k blocks away), so Baobab Savanna only takes Savanna.
+- Round 2: `TravertineTerraceFeature` (Geyser Basin), `FrozenPondFeature` (Crystal Tundra).
+- Round 3: `ManaCraterFeature` (Mana Wastes), `FairyRingFeature` (Capwood), `ElvenRuinFeature` (Elderwood).
+- Round 4: `TreeFernFeature` (Cloud Forest), `IceShardFeature` (Ice Cathedral), `StiltHutFeature` (Sunken Ruins Marsh).
+- All registered in `ModFeatures`, configured/placed through `tools/biomes/ours.py` and appended last in each biome's vegetal step (unique to one biome, so no order cycles). Capwood and Elderwood JSONs are hand-written; their new entries were appended directly.
+
+**Verification Executed**
+- Owner's PC: `gradlew build` passes at 3139da0; `gen.py` reports no feature order cycles. Round 1 got a code read for floating blocks (four fixes). No in-game look yet: Jaime is testing.
+
+**Remaining Recommendations**
+1. In-game check of each new feature in a new world (floating parts, chunk seams).
+2. Still to polish: Sky Pillars, Skyfall Isles, Tsingy, Karst Tower Bay.
+
+---
