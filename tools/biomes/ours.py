@@ -66,7 +66,7 @@ def features():
     for n in ["salt_pool", "geyser", "ice_arch", "crystal_outcrop"]:
         configured(n, {"type": "projectzero:" + n, "config": {}})
     placed("salt_pool", "projectzero:salt_pool", count=3)
-    placed("geyser", "projectzero:geyser", count=1)
+    placed("geyser", "projectzero:geyser", rarity=2)
     placed("ice_arch", "projectzero:ice_arch", rarity=2)
     placed("crystal_outcrop", "projectzero:crystal_outcrop", rarity=2)
 

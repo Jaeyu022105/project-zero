@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * and the world still feels like Minecraft. Weight sets how much of the world uses this region.
  */
 public class ProjectZeroRegion extends Region {
-    public static final int WEIGHT = 15;   // vanilla's own region is 10: ours covers about 60% of the world, so vanilla structures stay easy to find early on
+    public static final int WEIGHT = 30;   // vanilla's own region is 10: ours covers about 75% of the world (Plains stay vanilla for villages)
 
     public ProjectZeroRegion(ResourceLocation name) {
         super(name, RegionType.OVERWORLD, WEIGHT);

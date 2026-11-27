@@ -54,7 +54,7 @@ public final class ModSurfaceRules {
         SurfaceRules.RuleSource geyser = SurfaceRules.ifTrue(SurfaceRules.isBiome(ModBiomes.GEYSER_BASIN),
                 SurfaceRules.ifTrue(SurfaceRules.abovePreliminarySurface(),
                         SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.ifTrue(SurfaceRules.waterBlockCheck(-1, 0), SurfaceRules.sequence(
-                                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.5D), state(Blocks.YELLOW_TERRACOTTA)),
+                                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.75D), state(Blocks.YELLOW_TERRACOTTA)),
                                 SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.05D), state(Blocks.CALCITE)))))));
         // Ice Cathedral: packed snow over packed ice.
         SurfaceRules.RuleSource ice = SurfaceRules.ifTrue(SurfaceRules.isBiome(ModBiomes.ICE_CATHEDRAL),
