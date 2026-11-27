@@ -20,7 +20,7 @@ Status: ✅ done · 🔨 in progress · ⏳ next · ⬜ later
 4b. ✅ **Equipment and accessories** (gauntlets, rings, amulets, earrings, belts, charms with rolled stats, dropped by mobs), DESIGN-DOCUMENT.md §12. 8 active slots + locked Relic slot, `AccessoryData` component, `AccessoryMenu`/`AccessoryScreen`, `AccessoryLootModifier`, 9 starter items, `StatusScreen` `GEAR` button & `(+X)` bonus stats, `/pz gear roll` built & verified (Claude item art & worn arm models later).
 
 ## Phase 2: The world
-5. ⬜ **New terrain:** medieval to comic-fantasy biomes (e.g. banner-dotted highlands, giant-mushroom woods, floating-rock fields, crystal tundra). Claude. *Needs the owner's OK on a biome library (TerraBlender), see Open decisions.*
+5. 🔨 **New terrain:** 17 biomes built; polish pass on all of them, crater basins and unique blocks per biome in progress. Original note: medieval to comic-fantasy biomes (e.g. banner-dotted highlands, giant-mushroom woods, floating-rock fields, crystal tundra). Claude. *Needs the owner's OK on a biome library (TerraBlender), see Open decisions.*
 6. ✅ **Gates, ancient/sea variants, aging & dungeon breaks:** free-floating rank-colored rifts (`GateRiftRenderer`), sea gates, carved stone-ring ancient gates (`AncientGate` + worldgen), `GateRank` & `MobScaling`, `XpRewards` rank & level-gap formula, gate aging surges/rank-ups (`projectzero:gateAging`, `AncientGate.setRank`), 5-wave + boss dungeon breaks (`projectzero:dungeonBreaks`), `/pz gate spawn|leave|age|break` & `/pz mob spawn`.
 7. ✅ **First dungeon:** `projectzero:dungeon` void dimension, `DungeonSavedData` instance slots, multi-chamber remnant-world cave networks (`GateDungeonArena`, 8 world themes + flooded sea caves, mana crystal clusters, scattered chests, entrance return rift except S-rank, boss exit rift, and overworld gate closure / ancient ruin).
 8. ⬜ **First gate monsters** (2-3 original mobs, models + animation). Claude.
@@ -37,6 +37,17 @@ Status: ✅ done · 🔨 in progress · ⏳ next · ⬜ later
 15. ⬜ **New materials and weapon crafting:** ores and monster parts from gates and red-gate worlds (e.g. mana-steel, beast fangs, essence stones) feeding new weapons and armor with their own recipes and stations. Gemini: items, recipes, stats. Claude: textures, models, stations.
 16. ⬜ **Weapon-themed mobs:** monsters whose drops are the parts for specific weapons.
 17. ⬜ **Summons and pets**, DESIGN-DOCUMENT.md §13. Pets can start with the first gate monsters (Phase 2); job summons after the skills foundation and first mobs. Gemini: roster, AI, leveling, saving. Claude: creature models, summon sigil effects.
+
+## Phase 5: Living civilizations (owner expansion 2026-11-27, DESIGN-DOCUMENT §16a to §18)
+18. ⬜ **Lowest-tier town:** shabby-shed spawn, waypoint stone in every house, Awakening Stone in the center.
+19. ⬜ **Hunter's Association, licenses, currency, selling monster parts and crystals.**
+20. ⬜ **NPC roles** (blacksmith, artisan, merchant, guard, realtor, builder) and crafting stations (Synthesizer, skill workbench).
+21. ⬜ **Minimap with quest markers**, Association quests.
+22. ⬜ **Trains between tiers**, then subways, craftable waypoint stones.
+23. ⬜ **Backpacks**, chosen-and-stacking skill retention on reroll.
+24. ⬜ **Land, apartments, builder schematics** with hologram and worker NPCs; magic stores, auctions, arenas; civilization-locked NPCs.
+25. ⬜ **Continents** as dimensions, airports and planes, 5 mythical bosses per continent.
+26. ⬜ **Cinematic texture pass.**
 
 ## Later
 - Job trials and job upgrades, more jobs, bosses and biomes, mana crystal shard uses, the Monarch path.

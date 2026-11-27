@@ -4,10 +4,11 @@ Shared instructions for every AI agent working on this repo (Claude, Gemini, Cod
 
 ## 1. Read first
 
-1. `HANDOFF.md`: what exists now, known gaps, session logs.
-2. `DESIGN-DOCUMENT.md`: the game design and where it is going.
-3. `.agents/rules/`: code style and workflow rules.
-4. `.agents/skills/`: step-by-step playbooks. Pick the one that fits your task.
+1. `PROGRESS.md`: one page on what's done, in progress and next, plus the log of plan additions.
+2. `HANDOFF.md`: what exists now, known gaps, session logs.
+3. `DESIGN-DOCUMENT.md`: the game design and where it is going.
+4. `.agents/rules/`: code style and workflow rules.
+5. `.agents/skills/`: step-by-step playbooks. Pick the one that fits your task.
 
 ## 2. Project facts
 
@@ -22,6 +23,7 @@ Shared instructions for every AI agent working on this repo (Claude, Gemini, Cod
 - Server is authoritative. Validate every client packet on the server.
 - Do not copy names, characters, art or text from Solo Leveling or any existing game. Inspired by, never copied.
 - Update `HANDOFF.md` (session log + any stale reference section) at the end of every task.
+- Keep `PROGRESS.md` current: move finished and started work between its lists, and when the owner adds to the plan, log it there in the same commit as the `DESIGN-DOCUMENT.md` change.
 
 ## 4. Roles
 

@@ -809,3 +809,21 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 
 ---
 
+
+### Session Log — 2026-11-27 (Plan expansion + PROGRESS.md)
+
+**Context & Direction Check**
+- Jaime added a large batch of direction: polish every biome and enlarge the Spirit Bamboo Sea, crater basins, unique blocks and plants per biome with crafting uses, a cinematic texture pass, backpacks, a skill workbench, chosen-and-stacking skill retention on reroll, mob body-part drops, a top-right minimap with quest markers, civilization tiers and NPC roles, the Hunter's Association, currency and stores, housing and builders, trains, subways, planes, waypoint stones, continents as dimensions and 5 mythical bosses per continent. Docs only in this step.
+
+**Changes Made**
+- `DESIGN-DOCUMENT.md`: §4 skill workbench, §6 reroll retention change, §11 minimap, §12 backpacks, §15 polish-all + bigger bamboo + crater basins + unique blocks per biome, §16 rewritten travel and new §16a to §16g, new §17 art direction and §18 monster materials.
+- New `PROGRESS.md` (done / in progress / next / plan log). `AGENTS.md` lists it first and requires keeping it current; `handoff-update` skill step added. `ROADMAP.md` Phase 5.
+
+**Verification Executed**
+- Docs only, nothing to build.
+
+**Remaining Recommendations**
+1. Biome polish pass (Claude), avoiding Gemini's Task 7 files until that branch merges.
+2. Open questions for Jaime are listed at the end of §16.
+
+---

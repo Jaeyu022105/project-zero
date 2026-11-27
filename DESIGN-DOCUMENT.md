@@ -74,6 +74,8 @@ Up to 4 active skill slots on keys, more slots as the player levels. **[Idea]**
 - Cooldowns belong to skills, not slots, so swapping can't dodge a cooldown.
 - The HUD shows the live preset (I, II, III), and the slots drop in after a swap. Old saves move into preset I.
 
+**[Planned] Skill workbench** (owner idea 2026-11-27): a craftable station for skills, separate from the normal crafting table. Ideas to settle when we build it: copy a known skill into a blank Skillbook (costs mana crystals and monster parts), combine or upgrade Skillbooks, and pick which skills ride along on the next reroll (section 6). Its look follows the System style: a stone desk with a floating blue window over it.
+
 ## 5. Jobs
 
 - **[Built]** At **level 10** the System gives the player a **Job Change Quest**. Clearing it assigns a job. For now the quest completes instantly; the trial dungeon is **[Planned]**. (Solo Leveling uses level 40; 10 keeps the early game short. Tune once we can playtest.)
@@ -104,6 +106,7 @@ Our own mechanic, not in Solo Leveling.
   - **[Built]** Draws a new random job (different from the current one) with the same rarity weights.
   - **[Built]** Resets the player's level back to the level they first got a job (level 10 by default). XP resets to 0, stats reset to base, and stat points are refunded to `(level - 1) × 5`.
   - **[Built]** Keeps **3 random skills** from the previous job (`SkillService.retainRandomJobSkillsOnReroll`). The rest are lost. Basic skills, milestone skills and skillbook skills are always kept.
+  - **[Planned] The player chooses the 3 skills, and they stack per job** (owner decision 2026-11-27, replaces the random pick). Before the reroll, a System window lists the current job's skills and the player picks 3 to keep. Kept skills are remembered per job. If the player rolls that job again later, they get 3 more on the next reroll, so the pile grows each time: keep 3 from Slinger, roll Slinger again later, reroll away from it and you now carry 6 Slinger skills, then 9, and so on until the job has none left to give. Kept skills from every job stay usable together, which is how long-lived players build hybrids.
 - **[Built] Reawakening vision (owner idea 2026-11-26):** offering the shard plays a short vision instead of an instant reroll (`ReawakeningVision`, about 14 s). The player's eyes close (eyelid overlay), they stand on a dark mirror sea in a starry void with a sea of face-down cards drifting over the water, one card glides up to them, trembles (heartbeat), then flips to show the new job while the rest burn away. Eyes close again, open back home, and a split-second aura bursts around the player in the job's rarity color (bigger for rarer jobs, visible to everyone nearby). The reroll is saved before the vision starts, so a logout cannot lose the shard. Test with `/pz reawaken`.
 - **Cost [Built]** (owner decision 2026-11-26): each reroll consumes one **Awakening Shard** on success. Shards drop from gate dungeon bosses (`GateService.onDungeonBossKilled`), plus `/pz shard give` for testing.
 - **Shard Vessel: charging a shard [Built]** (owner idea 2026-11-26; Vessel art & golden vision sea **[Planned]** for Claude). A carried item that charges an Awakening Shard for a better reroll, paid for with your own XP:
@@ -232,6 +235,7 @@ Our own mechanic, not in Solo Leveling.
 - Blue translucent windows with cyan borders, all caps headers (status window is the reference). **[Built]**
 - [System] chat lines, on-screen titles for level ups, quest windows that slide in. Quest windows **[Planned]**.
 - **[Planned] System notices** (owner idea 2026-11-27): small blue System panels that slide in at the **bottom right**, hold for a few seconds, then fade out. Several stack upward, and the oldest leaves first. They're used for level ups, skills unlocked, quest updates, gate alerts (opened nearby, surge, rank up), item pickups worth noting, and cooldown-ready pings. They use the same style as the status window, with a soft chime by type. Important ones (job change, dungeon break) still also get the center title. Chat lines become optional, behind a client config toggle, so notices don't spam chat.
+- **[Planned] Minimap, top right** (owner idea 2026-11-27): a round System-style map in the top-right corner, north-up with the player arrow in the middle. It shows terrain colors, nearby gates (rank-colored dots), known waypoint stones and civilizations. **Quest markers:** once you accept a quest, the map points to the next step (a marker on the target, or an arrow on the rim when it's off the map) and a one-line objective sits under it. A full-screen map on a key shows everything you've discovered. Our own code, no map library (adding one needs the owner's OK).
 - Notification sound: a soft chime. Avoid vanilla sounds long term.
 - Daily quest ("Preparation to Become Strong": push-ups, sit-ups, running) is a fun nod. **[Idea]**, only if the owner wants it.
 
@@ -244,6 +248,7 @@ Our own mechanic, not in Solo Leveling.
 - **[Built] Drops:** via `AccessoryLootModifier` (`EquipmentRules`): vanilla hostile mobs 1.5% (Common/Uncommon, rank E), other mods' mobs 3%, gate monsters 8%, bosses 100%. Named boss **set pieces** are **[Planned]**.
 - **[Built]** Stats from gear (and equipped Title) add to the status window as a separate `(+X)` (`SyncStatBonusesPacket`) so players see base vs. bonus.
 - Gear later ties into item 15 (materials and crafting): materials can reforge or upgrade pieces.
+- **[Planned] Backpacks** (owner idea 2026-11-27): wearable backpacks that add inventory rows, in tiers (leather satchel, hunter's pack, rank packs made from monster parts). Worn on the back and visible on the player model, opened with a key. Saved with the player. They share the chest slot problem with armor, so they get their own slot next to the accessory slots.
 
 ## 13. Summons and pets
 
@@ -305,9 +310,12 @@ Our biomes are placed with **TerraBlender** (`worldgen/ProjectZeroRegion`, weigh
     - **Shattered Sky Plateau** (replaces Stony Peaks): chasms 45 to 95 deep split the plateau, following world-wide noise so they run on across chunks (`ShatteredPlateauFeature`), with broken-off slabs hovering over them.
   - **Not biomes, built with their systems:** the **Corrupted Zone** is the dungeon-break spread (section 7), made at runtime around a break and healing once it's cleared. The **Monarch's Graveyard** (colossal bones and broken weapons where a monarch fell) is a rare story structure for the main path (section 16).
 
-- **[Next] Polish pass** (owner review 2026-11-27, overworld terraforming is otherwise done):
+- **[Next] Polish pass** (owner review 2026-11-27, overworld terraforming is otherwise done). **Owner direction 2026-11-27: polish every existing biome**, not only these two. Each gets denser, more varied features, its own ground detail and its own unique blocks (below). Bamboo and plateau are listed first because they were reviewed first:
+  - **Enlarge the Spirit Bamboo Sea:** today it only replaces Cherry Grove, which is small and rare, so the biome is hard to find and ends quickly. Give it more room (swap a second, larger vanilla biome too, in `ProjectZeroRegion`) so it reads as a sea of bamboo.
   - **Spirit Bamboo Sea:** stalks read thin and uniform. Make them thicker (2x2 and 3x3 culms with a node ring every 4 to 6 blocks), vary the height and lean in each grove, add real bamboo leaf sprays on side branches, pack groves densely on flat ground with narrow walkable lanes, and add stone lantern paths and moss underfoot.
   - **Shattered Sky Plateau:** the chasms read as a valley between pillars. Make it a flat, high table first (lift and level the ground in the biome), then cut narrower, sharper chasms with stepped ledges, fill them with low cloud and mist (`client/BiomeMist` by depth), and float more and bigger slabs, some linked by stone arches.
+- **[Planned] Crater basins** (owner idea 2026-11-27): some biomes sit inside a ring of mountains, so from outside you see a wall of peaks and from the rim you look down into a bowl with the biome inside. Good fits: Spirit Bamboo Sea (a hidden valley for the martial order), Mana Wastes (the bowl the dead gate blasted out), Geyser Basin, Skyfall Isles. Built as a terrain shape per biome (raise the ground along the biome's edge, keep the inside low), read only through the biome source for anything outside the 3x3 chunks (AGENTS.md worldgen rule). One or two passes in, rim passes or a single gorge give a way in on foot.
+- **[Planned] Unique blocks, plants, trees and foliage per biome** (owner direction 2026-11-27): every biome gets things that only grow or form there: at least one plant or flower, one foliage or ground cover, and where it fits one tree species and one stone or mineral. Examples: Bloodmoon Steppe gets blood grass and a red thornwood tree, Mana Wastes gets mana-glass and crystal moss, Salt Mirror Flats gets salt blocks and brine reeds, Spirit Bamboo Sea gets spirit bamboo planks and lotus pads, Capwood gets glowcap shelves. **Nothing is decoration only:** each new block is used in crafting (building sets like planks, slabs, stairs, walls; dyes; food; potions or alchemy; or a station recipe). Crafting recipes come later, together with the mob materials (section 18), so blocks get their full uses then.
 - **[Planned] Underground biomes** (owner direction 2026-11-27). Placed as TerraBlender cave biomes (the same way as vanilla Lush Caves and Dripstone Caves), from the new deep layer at y -64 up to about y 0, plus a few placed by structure where they need to be huge. Each is a region to explore and the home or ruin of a people (section 16):
   - **Glowroot Hollows:** huge caverns lit by hanging glowing roots from the surface trees above, moss lakes, the elven underground (below Elderwood).
   - **Mycelial Deep:** cave-sized mushrooms, spore fog, the deep cousin of Capwood, home of a fungus folk.
@@ -335,8 +343,83 @@ Our biomes are placed with **TerraBlender** (`worldgen/ProjectZeroRegion`, weigh
   4. At level 100, a high-ranked NPC there gives the ceiling-break quest. Report back to them to break the level ceiling (section 2).
   5. Past the ceiling: S-rank gates, dungeon breaks that threaten cities, and the Monarch path (section 8) for the few who reach it.
 - **Civilizations above and below** (owner direction 2026-11-27): each surface people has a home biome (the martial order in the Spirit Bamboo Sea, the elves in Elderwood around the World Tree, salt traders on the Salt Mirror Flats, sky folk on the Skyfall Isles), and some live underground (forge folk in the Magma Forges, fungus folk in the Mycelial Deep, the drowned city in the Drowned Halls).
-- **Travel between civilizations** (owner direction 2026-11-27): biomes are huge, so walking can't be the only way.
-  - **Transport networks** that civilizations run and the player unlocks with reputation: rail lines and mine carts between the forge cities, lift shafts from surface towns down to the underground cities, riverboats, and sky ships or tamed flyers between the isles and the plateau. Each line has stations; riding is fast but follows the route.
-  - **Portal keys:** a key item, earned through quests or bought from a city's guild, that opens a fixed portal to that city's waystone. Keys are found or earned one city at a time, so travel unlocks with the main path. Some underground regions can only be reached by a key at first.
-  - **Waystones:** each city has one. Attuning to it lets you return there with a key or a portal scroll. The System shows known waystones on its map.
-- **Open questions for the owner:** how many civilizations to start with, whether they can be hostile or at war, and whether reputation can be lost.
+- **Travel between civilizations** (owner direction 2026-11-27, first draft; superseded in part by the transport rules below): biomes are huge, so walking can't be the only way.
+  - Earlier ideas kept as **[Idea]**: lift shafts from surface towns down to the underground cities, riverboats, sky ships or tamed flyers between the isles and the plateau, and **portal keys** (a key item, earned through quests or bought from a city's guild, that opens a fixed portal to a city). Some underground regions may only be reachable by a key at first.
+
+### 16a. Civilization tiers and your start (owner direction 2026-11-27)
+
+- Civilizations come in **tiers**, from the lowest (a frontier town) up to the highest (an advanced city). Better tiers have better NPCs, better stores and more services. The path through the tiers *is* the main path.
+- **Spawn:** a new player starts in a lowest-tier civilization, in a **shabby shed**. Every house, the shed included, has a **waypoint stone** in it.
+- **Awakening Stones:** every civilization has an Awakening Stone formation in its center (bigger city, bigger stone, section 6). That's where you reawaken.
+- What a civilization has depends on its type and tier. Arenas, auctions and apartments are examples, not a fixed list per tier.
+
+### 16b. NPCs (owner direction 2026-11-27)
+
+- NPCs have **roles**, each with its own functions. Higher tiers have better versions (more stock, better work, rarer services).
+  - **Blacksmith:** repairs your weapon for a fee, forges a new weapon from weapons you hand in, or enhances your weapon with materials you bring.
+  - **Artisan:** crafts tools, furniture and accessories from materials.
+  - **Merchant:** buys and sells goods.
+  - **Realtor:** sells land plots in the civilization; in advanced civilizations also apartments.
+  - **Builder:** sells building schematics and sends worker NPCs (16e).
+  - **Guard:** keeps order, checks tickets at stations.
+  - **Hunter's Association staff:** registration, licenses, quests, buying monster materials (16c).
+  - More later (innkeeper, alchemist, trainer...).
+- **Civilization-locked NPCs:** some roles exist only in certain peoples' cities. Elves in Elderwood can **enchant**; **priests** give **blessings** (timed buffs). Each people gets at least one role nobody else has, so every civilization is worth a visit.
+- **Crafting stations:** besides the vanilla table, there are craftable stations for special items, for example a **Synthesizer** that fuses materials into new ones (monster parts plus mana crystals into an alloy, say). Some stations are only sold or used in certain civilizations. The skill workbench (section 4) is one of these.
+
+### 16c. Hunter's Association (owner direction 2026-11-27)
+
+- Every civilization has a **Hunter's Association** building. Register **inside the building** to get a **hunter license**. The license carries your hunter rank.
+- **Higher rank, more benefits:** discounts with NPCs and on transport, access to harder quests, and rank-locked services.
+- **Quests:** the Association hands out quests: hunts, gate clears, deliveries, escorts. Some send you somewhere you reach by **subway** (16f). Accepting a quest updates the minimap's quest marker (section 11).
+- **Buying your loot:** the Association buys monster materials and mana crystals at good prices.
+
+### 16d. Economy (owner direction 2026-11-27)
+
+- **[Planned] Currency:** one money for everything (name to decide). You pay NPCs, stores, tickets, land and auctions with it.
+- **Income:** selling monster drops pays well, and **monster crystals** (cores dropped by gate monsters, see section 18) pay the most.
+- **Magic stores:** shops that sell magical items with rolled stats, like gear drops (section 12). Stock and quality grow with the civilization's tier.
+- **Auctions** in bigger cities: buy rare items, put your own up for sale.
+- **Arenas** in some civilizations: fights for money and rank. Conceptual for now; depends on the civilization type.
+
+### 16e. Land, housing and builders (owner direction 2026-11-27)
+
+- **Realtors** sell land plots inside a civilization, and **apartments** in advanced ones. You own and build on your plot.
+- **Builders** sell **schematics**. Placing one on your plot shows the building as a **hologram** you can move and rotate until it doesn't overlap anything. Then you provide the listed materials, and **worker NPCs** come and build it block by block.
+- Every house gets a waypoint stone.
+
+### 16f. Transport (owner direction 2026-11-27)
+
+| Way | Where it goes | How it runs | Unlock |
+|---|---|---|---|
+| **Train** | From one civilization to the next tier up | Waits for every ticket holder to board, then leaves | Lowest tier has only the train, and it's costly |
+| **Subway** | Local areas inside a continent (other districts and towns away from your main line of cities) | Continuous: runs on a schedule and never waits | Bigger civilizations |
+| **Plane** | Another continent | Like the train: waits for every ticket holder | Reach the highest civilization in your area; the city there has the airport |
+| **Waypoint stone** | Any stone you've used before | Instant | Craft one, or use the ones in houses |
+
+- **Riding the train:** pay at the station, the guards let you through the gate, you board and take the seat you chose. When every player who bought a ticket for that departure is aboard, the train leaves for the next-tier civilization. You can **skip the ride** (a short cutscene skip) or ride it out: sit and look out the window, or get up and walk the train.
+- **Subways** look like Japanese subways: tiled stations, ticket gates, platform screen doors, **escalators**, maps on the walls.
+- **Planes** work like the train with an airport instead of a station: ticket, gate, seat, then the flight (skippable).
+- Hunter rank gives transport discounts (16c).
+- **Waypoint stones [Planned]:** craftable and placeable, so you can return to places you've been. One in every house. **They can't be placed in a dungeon** (or any gate dimension).
+
+### 16g. Continents (owner direction 2026-11-27)
+
+- The world has several **continents**. **Each continent is its own dimension** (owner and coordinator agreed 2026-11-27) with its own terrain, sky and **biome set**: today's biomes are split between continents, and each continent gets new biomes over time. The normal overworld is the first continent (TerraBlender only places biomes there); every other continent is its own dimension with its own data-driven biome layout.
+- You **choose which continent you spawn on**.
+- Planes are the only regular way between continents. Trains and subways stay inside one.
+- **5 mythical bosses per continent**, hidden: in ruins, in underground dungeons, under a civilization, under a shrine and so on. They are the hardest fights on each continent, Souls-style (section 10).
+
+- **Open questions for the owner:** how many civilizations to start with, whether they can be hostile or at war, and whether reputation can be lost. New ones (2026-11-27): the currency's name; how many continents to start with; whether a train leaves after a time limit if a ticket holder never boards (multiplayer); whether land can be lost or taxed.
+
+## 17. Art direction (owner direction 2026-11-27)
+
+- **[Planned] After the biomes:** move every texture toward a more **cinematic** look and feel: richer shading and color ramps, more depth and contrast, sharper silhouettes, and lighting that sets a mood (warm sunsets, cold caves, the gate glow). Still 16x16 and readable at a distance; no copied resource packs.
+- Order: new blocks first (so they set the style), then our existing blocks, then the items.
+
+## 18. Monster materials and drops (owner direction 2026-11-27)
+
+- **[Planned]** Our mobs drop an item plus **parts of their bodies**, and the parts are what crafting needs. A wolf type drops **teeth, claws and fur** (the most wanted parts) and **meat** you can cook and eat.
+- **All parts sell** (Hunter's Association, merchants). Better and rarer parts from higher-rank monsters sell for more.
+- Gate monsters also drop **monster crystals** (cores), worth the most money and used in stations like the Synthesizer.
+- Recipes that use parts and biome blocks are designed together with the mobs (roadmap Phase 2 and 4).

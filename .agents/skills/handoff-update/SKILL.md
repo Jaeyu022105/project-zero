@@ -26,4 +26,5 @@ description: Update HANDOFF.md (and DESIGN-DOCUMENT.md when design changed) at t
 2. Fix any **reference section** above "Operating Guidance For Future AI" that your work made wrong: Current App State, Architecture Notes, Data Model Notes, Known Gaps.
 3. Update the "Last caught up" line at the top.
 4. If the design changed, update `DESIGN-DOCUMENT.md` and its status tags in the same commit.
-5. Never rewrite old session logs.
+5. Update `PROGRESS.md`: move the work between Done / In progress / Next, and add a plan-log line for any plan change.
+6. Never rewrite old session logs.
