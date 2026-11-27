@@ -31,7 +31,7 @@ Last updated: **2026-11-27**
 ## In progress
 
 - **Gemini, branch `gemini/reset-backlog`** (`.agents/prompts/gemini-reset-backlog.md`): done and pushed there, not yet merged: System notices (bottom right), level ceiling at 100, storming a breaking gate, corruption spread, fireflies. Working on: companions foundation and screen. Then: Spirit Bamboo Sea and Shattered Sky Plateau polish (Task 7).
-- **Claude, polish pass on every existing biome** (DESIGN-DOCUMENT §15), starting with the biomes Gemini's Task 7 doesn't touch, plus making the Spirit Bamboo Sea bigger.
+- **Claude, polish pass on every existing biome** (DESIGN-DOCUMENT §15), starting with the biomes Gemini's Task 7 doesn't touch. Round 1 written, being built and tested: bigger Spirit Bamboo Sea (also replaces Flower Forest), Bloodmoon Steppe dead trees and giant skeletons, Baobab Savanna kopjes, Salt Mirror Flats salt cones.
 
 ## Next, from the plan
 

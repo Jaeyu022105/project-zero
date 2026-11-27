@@ -80,6 +80,12 @@ def features():
     # Whole-chunk pass from the chunk corner; it checks the biome per column itself.
     gen.write(os.path.join(MOD, 'placed_feature', 'shattered_plateau.json'), {"feature": "projectzero:shattered_plateau",
         "placement": [{"type": "minecraft:heightmap", "heightmap": "WORLD_SURFACE_WG"}]})
+    # Polish pass: kopjes, salt cones, bone remains.
+    for n in ["kopje", "salt_mound", "bone_remains"]:
+        configured(n, {"type": "projectzero:" + n, "config": {}})
+    placed("kopje", "projectzero:kopje", rarity=6)
+    placed("salt_mound", "projectzero:salt_mound", rarity=5, water=False)
+    placed("bone_remains", "projectzero:bone_remains", rarity=9)
     gen.plant_patch("bloodmoon_brush", [("minecraft:dead_bush", 3, {}), ("minecraft:short_grass", 2, {})], tries=24)
     placed("bloodmoon_brush", "projectzero:bloodmoon_brush", count=1, heightmap="MOTION_BLOCKING")
     gen.plant_patch("bamboo_shoots", [("minecraft:bamboo", 1, {"age": 0, "leaves": "small", "stage": 0})], tries=32, spread=5)
@@ -97,7 +103,7 @@ BIOMES = {
          "water_fog_color": 329011, "grass_color": 6200906, "foliage_color": 5016122}}),
     "baobab_savanna": ("savanna", [],
         ["coarse_dirt_patch", "boulder_granite_rare", "shrub_acacia_sparse", "dry_grass", "undergrowth"],
-        {VEG: ["projectzero:baobab", "projectzero:termite_mound"]},
+        {VEG: ["projectzero:baobab", "projectzero:termite_mound", "projectzero:kopje"]},
         {"effects": {"fog_color": 15254192, "sky_color": 8104959, "water_color": 4159204, "water_fog_color": 329011,
          "grass_color": 12564309, "foliage_color": 11445290}}),
     "tsingy": ("badlands", [],
@@ -113,7 +119,7 @@ BIOMES = {
     # Round 4.
     "salt_flats": ("desert", ["minecraft:patch_cactus_desert", "minecraft:patch_dead_bush_2"],
         ["boulder_stone_rare"],
-        {VEG: ["projectzero:salt_pool"]},
+        {VEG: ["projectzero:salt_pool", "projectzero:salt_mound"]},
         {"effects": {"fog_color": 15791352, "sky_color": 11063551, "water_color": 10475760, "water_fog_color": 12642552}}),
     "geyser_basin": ("old_growth_pine_taiga", [],
         ["boulder_stone_rare", "fallen_spruce_rare", "fern_carpet"],
@@ -137,7 +143,7 @@ BIOMES = {
          "particle": {"options": {"type": "minecraft:reverse_portal"}, "probability": 0.004}}}),
     "bloodmoon_steppe": ("wooded_badlands", ["minecraft:trees_badlands", "minecraft:patch_cactus_decorated"],
         ["coarse_dirt_patch", "boulder_granite_rare", "dry_grass", "undergrowth"],
-        {VEG: ["projectzero:dead_tree", "projectzero:bloodmoon_brush"]},
+        {VEG: ["projectzero:dead_tree", "projectzero:bloodmoon_brush", "projectzero:bone_remains"]},
         {"effects": {"fog_color": 11553850, "sky_color": 13129290, "water_color": 7023146, "water_fog_color": 4200990,
          "grass_color": 8004644, "foliage_color": 6168094,
          "particle": {"options": {"type": "minecraft:crimson_spore"}, "probability": 0.006}}}),

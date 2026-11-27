@@ -56,6 +56,8 @@ public class ProjectZeroRegion extends Region {
             builder.replaceBiome(Biomes.WINDSWEPT_SAVANNA, ModBiomes.MANA_WASTES);
             builder.replaceBiome(Biomes.WOODED_BADLANDS, ModBiomes.BLOODMOON_STEPPE);
             builder.replaceBiome(Biomes.CHERRY_GROVE, ModBiomes.SPIRIT_BAMBOO);
+            // Cherry Grove alone is small and rare; Flower Forest is a full temperate lowland slot, so the bamboo sea gets room.
+            builder.replaceBiome(Biomes.FLOWER_FOREST, ModBiomes.SPIRIT_BAMBOO);
             builder.replaceBiome(Biomes.MANGROVE_SWAMP, ModBiomes.SUNKEN_MARSH);
             builder.replaceBiome(Biomes.STONY_PEAKS, ModBiomes.SHATTERED_PLATEAU);
         });
