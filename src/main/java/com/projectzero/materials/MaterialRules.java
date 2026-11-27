@@ -61,6 +61,23 @@ public final class MaterialRules {
             Map.entry(EntityType.ZOMBIE, ZOMBIE_DROPS), Map.entry(EntityType.HUSK, ZOMBIE_DROPS),
             Map.entry(EntityType.DROWNED, ZOMBIE_DROPS));
 
+    private static final Map<Item, Integer> SELL_VALUES = Map.ofEntries(
+            Map.entry(ModMaterials.BEAST_FANG.get(), 4),
+            Map.entry(ModMaterials.BEAST_CLAW.get(), 4),
+            Map.entry(ModMaterials.BEAST_PELT.get(), 5),
+            Map.entry(ModMaterials.RAW_BEAST_MEAT.get(), 2),
+            Map.entry(ModMaterials.COOKED_BEAST_MEAT.get(), 3),
+            Map.entry(ModMaterials.CHITIN_PLATE.get(), 5),
+            Map.entry(ModMaterials.VENOM_GLAND.get(), 7),
+            Map.entry(ModMaterials.BONE_SHARD.get(), 3),
+            Map.entry(ModMaterials.ROTTEN_SINEW.get(), 3),
+            Map.entry(ModMaterials.MONSTER_CRYSTAL_E.get(), 40),
+            Map.entry(ModMaterials.MONSTER_CRYSTAL_D.get(), 80),
+            Map.entry(ModMaterials.MONSTER_CRYSTAL_C.get(), 160),
+            Map.entry(ModMaterials.MONSTER_CRYSTAL_B.get(), 320),
+            Map.entry(ModMaterials.MONSTER_CRYSTAL_A.get(), 640),
+            Map.entry(ModMaterials.MONSTER_CRYSTAL_S.get(), 1280));
+
     public static List<PartDrop> partDrops(EntityType<?> type) {
         return PART_DROPS.getOrDefault(type, List.of());
     }
@@ -68,5 +85,10 @@ public final class MaterialRules {
     public static int crystalChancePercent(GateRank rank) {
         return Math.min(MAX_CRYSTAL_DROP_PERCENT,
                 CRYSTAL_DROP_BASE_PERCENT + rank.ordinal() * CRYSTAL_DROP_PERCENT_PER_RANK);
+    }
+
+    /** Returns the future merchant value, or zero for items outside the material system. */
+    public static int sellValue(Item item) {
+        return SELL_VALUES.getOrDefault(item, 0);
     }
 }
