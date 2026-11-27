@@ -471,6 +471,8 @@ public final class GateService {
 
         spawnBreakWave(level, anchorPos, rec, anchorBe.rank(), size, anchorBe.surges(),
                 state.getValue(GateBlock.SEA), nextWave);
+        CorruptionService.onBreakWave(level, anchorPos, rec.slot, anchorBe.rank(),
+                state.getValue(GateBlock.SEA), nextWave);
     }
 
     /** Instant hook when a break-wave monster dies outside so the rift steadies right away on the last kill. */
@@ -683,6 +685,10 @@ public final class GateService {
         return new Vec3(x + 0.5, topY, z + 0.5);
     }
 
+    public static boolean hasPlayerNear(ServerLevel level, BlockPos pos, double radius) {
+        return hasPlayerWithin(level, pos, radius);
+    }
+
     private static boolean hasPlayerWithin(ServerLevel level, BlockPos pos, double radius) {
         return !playersWithin(level, pos, radius).isEmpty();
     }
@@ -858,7 +864,23 @@ public final class GateService {
             }
         }
         // Ancient gates leave their ruined stone ring behind (dark runes, fallen stones, a seal).
+        java.util.Map<BlockPos, BlockState> beforeRuin = new java.util.HashMap<>();
+        for (BlockPos p : BlockPos.betweenClosed(rec.gateAnchor.offset(-8, -4, -8), rec.gateAnchor.offset(8, 8, 8))) {
+            if (originLevel.isLoaded(p)) beforeRuin.put(p.immutable(), originLevel.getBlockState(p));
+        }
         AncientGate.ruin(originLevel, rec.gateAnchor, rec.size, rec.alongX);
+        java.util.List<BlockPos> ruinTouched = new java.util.ArrayList<>();
+        for (var e : beforeRuin.entrySet()) {
+            if (originLevel.getBlockState(e.getKey()) != e.getValue()) {
+                ruinTouched.add(e.getKey());
+            }
+        }
+        if (!ruinTouched.isEmpty()) {
+            CorruptionService.dropPositions(originLevel, ruinTouched);
+        }
+        if (rec.broken) {
+            CorruptionService.startRecede(originLevel, rec.gateAnchor);
+        }
         originLevel.sendParticles(Fx.mote(rec.rank.argb() & 0xFFFFFF, 1.6F),
                 rec.gateAnchor.getX() + 1.0, rec.gateAnchor.getY() + 1.5, rec.gateAnchor.getZ() + 0.5,
                 40, 1.0, 1.2, 1.0, 0.08);

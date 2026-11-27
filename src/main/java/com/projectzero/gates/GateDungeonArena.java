@@ -221,6 +221,16 @@ public final class GateDungeonArena {
                          BlockState[] ruin, BlockState ceilingLight, BlockState floorLight, BlockState hanging,
                          BlockState[] flora, BlockState wallGrowth, double crystals) {}
 
+    /** Public read-only palette for a dungeon slot's theme, used by Dungeon Break corruption spread. */
+    public record CorruptionPalette(String themeName, BlockState[] ground, BlockState[] subsurface,
+                                    BlockState[] accents, BlockState lightBlock, boolean sea) {}
+
+    public static CorruptionPalette themePaletteFor(int slot, GateRank rank, boolean sea) {
+        int[] pool = worldsFor(rank);
+        World w = world(sea ? 1 : pool[Math.floorMod(slot * 31 + 7, pool.length)]);
+        return new CorruptionPalette(w.name, w.floors, w.walls, w.ruin, w.ceilingLight, sea);
+    }
+
     private static World world(int index) {
         return switch (index) {
             case 0 -> new World("Crystal Grotto",

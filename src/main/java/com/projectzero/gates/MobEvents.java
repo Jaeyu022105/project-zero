@@ -34,6 +34,7 @@ public final class MobEvents {
     public static void onLevelTick(TickEvent.LevelTickEvent.Post event) {
         if (event.level instanceof ServerLevel serverLevel) {
             GateService.tickNaturalSpawning(serverLevel);
+            CorruptionService.tickLevel(serverLevel);
         }
     }
 

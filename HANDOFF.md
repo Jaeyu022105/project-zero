@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Reset backlog Task 3: storming a breaking gate, wave pause while inside, and interior boss break containment).
+Last caught up: **2026-11-27** (Reset backlog Task 4: dungeon break corruption spread, per-dimension `CorruptionSavedData`, and 30s outer-ring-first receding cleanup).
 
 ---
 
@@ -127,7 +127,7 @@ Package layout (`src/main/java/com/projectzero/`):
 - `titles/`: `MilestoneTracker` (`projectzero:milestones`), `Title`, `TitleRegistry` (`data/<ns>/titles/*.json`), `PlayerTitles` (`projectzero:titles`), `TitleService`, `TitleCommands`, `TitleEvents`.
 - `equipment/`: `AccessorySlotType`, `AccessoryData`, `EquipmentRules`, `AccessoryItem`, `PlayerAccessories` (`projectzero:accessories`), `EquipmentService`, `AccessoryMenu`, `AccessoryLootModifier`, `EquipmentCommands`, `EquipmentEvents`.
 - `combat/`: `BossAffinity` (boss elemental weaknesses/resistances), hit feedback, player movement/action poses (`PlayerPoses`).
-- `gates/`: `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `GateRules` (`projectzero:gateSpawning`, `projectzero:gateAging`, `projectzero:dungeonBreaks` gamerules + aging/break constants), `MobScaling`, `GateBlock`, `GateBlockEntity`, `RiftShape`, `AncientGate`, `AncientGateStoneBlock`, `AncientStonePiece`, `AncientGateFeature`, `ManaCrystalBlock`, `DungeonSavedData`, `GateDungeonArena`, `GateService`, `MobCommands`, `GateCommands`, `MobEvents`.
+- `gates/`: `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `GateRules` (`projectzero:gateSpawning`, `projectzero:gateAging`, `projectzero:dungeonBreaks`, `projectzero:breakCorruption` gamerules + aging/break/storm/corruption constants), `MobScaling`, `GateBlock`, `GateBlockEntity`, `RiftShape`, `AncientGate`, `AncientGateStoneBlock`, `AncientStonePiece`, `AncientGateFeature`, `ManaCrystalBlock`, `DungeonSavedData`, `CorruptionSavedData`, `CorruptionService`, `GateDungeonArena`, `GateService`, `MobCommands`, `GateCommands`, `MobEvents`.
 - `awakening/`
   - `AwakeningRules.java`: `VESSEL_DIVERT = 0.5`, `VESSEL_TIER_FRACTION = 0.6`, `MAX_SHARD_TIER = 5`, tier threshold/name/color helpers.
   - `ShardCharge.java`: `(hasShard, chargeXp, tier)` data component record with Codec + StreamCodec.
@@ -905,4 +905,34 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 1. Task 4: Dungeon break corruption spread (`GateDungeonArena` theme palette API, `corruptible` block tag, `CorruptionSavedData`, wave-stepped conversion, 30s outer-ring-first receding cleanup, `/pz gate corruption grow|clear`).
 
 ---
+
+### Session Log — 2026-11-27 (Reset Backlog Task 4: Dungeon break corruption spread)
+
+**Context & Direction Check**
+
+- Implemented Task 4 of `.agents/prompts/gemini-reset-backlog.md` (`DESIGN-DOCUMENT.md` §9 "Corruption spread"): during a dungeon break, natural `#projectzero:corruptible` terrain around the rift converts step-by-step per wave up to `GateRules.corruptionRadius(rank)` (`E=12, D=14, C=16, B=18, A=20, S=24`) using `GateDungeonArena.themePaletteFor(...)`, persists every converted block's original `BlockState` in per-dimension `CorruptionSavedData`, pauses when no player is within `BREAK_PLAYER_RADIUS`, and recedes outer-ring-first over ~30s (`600t`) when the break is contained while leaving `AncientGate.ruin` stones intact.
+
+**Changes Made**
+
+- `src/main/resources/data/projectzero/tags/block/corruptible.json` (new): natural stone/deepslate/stone variants, dirt/grass/moss/mud/sand/gravel/clay/snow/ice/terracotta, natural tree logs and leaves, and natural `ModNature` blocks (`limestone`, `salt_crust`, `glowcap_gills`, `violet_cap`, `skywood_log`, `skywood_leaves`, `baobab_log`).
+- `src/main/java/com/projectzero/gates/GateRules.java` & `GateDungeonArena.java`: added `projectzero:breakCorruption` gamerule (default `true`), rank-indexed `CORRUPTION_RADIUS`, spread/recede tick knobs, and public `GateDungeonArena.themePaletteFor(themeId, sea)` returning a theme's primary/secondary/floor/accent/kelp palette without touching the arena generator.
+- `src/main/java/com/projectzero/gates/CorruptionSavedData.java` & `CorruptionService.java` (new): per-dimension `SavedData` keyed by gate anchor recording original `BlockState`s, wave-stepped shell conversion skipping unloaded chunks, block entities/containers, non-tagged blocks, and `PERSISTENT` player-placed leaves, plus 30s (`600t`) outer-ring-first receding restoration that skips `AncientGateStoneBlock` ruins.
+- `src/main/java/com/projectzero/gates/GateService.java`, `MobEvents.java`, `GateCommands.java`, `en_us.json`, `DESIGN-DOCUMENT.md`: hooked break start/wave/containment and level tick into `CorruptionService`, added `/pz gate corruption grow|clear`, and marked Corruption spread `[Built]`.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded `pz_backlog_test` world + mid-spread reload):
+  - Spawned `C SMALL` gate over natural terrain with oak logs/leaves plus a player-placed chest (with item) and oak planks inside radius.
+  - Broke gate and advanced waves → verified corruption spread per wave (`corrupted=559`, `targetRadius=11`) while chest + contents and planks remained untouched (`chestIntact=true`, `planksIntact=true`).
+  - Saved/reloaded world mid-spread → verified `CorruptionSavedData` survived reload (`persistedBlocks=605`).
+  - Killed the break boss → verified outer-ring-first 30s recede restored every converted block (`mismatches=0/2535`, `chestOk=true`, `planksOk=true`). Zero errors in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): `CorruptionService` uses subtle vanilla `SMOKE` / `END_ROD` particles on spread and restoration.
+
+**Remaining Recommendations**
+
+1. Task 5: Fireflies (`firefly_bush` block, `FIREFLY` particle + `ambience.fireflies` config, night bush & dusk water-swarm client ticker, Forge `biome_modifier` worldgen tested in a brand-new world).
+
+---
+
 

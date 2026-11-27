@@ -57,6 +57,11 @@ public final class GateCommands {
                                                 IntegerArgumentType.getInteger(ctx, "days")))))
                         .then(Commands.literal("break")
                                 .executes(ctx -> breakLookedAtGate(ctx.getSource())))
+                        .then(Commands.literal("corruption")
+                                .then(Commands.literal("grow")
+                                        .executes(ctx -> growCorruption(ctx.getSource())))
+                                .then(Commands.literal("clear")
+                                        .executes(ctx -> clearCorruption(ctx.getSource()))))
                         .then(Commands.literal("spawn")
                                 .then(Commands.argument("rank", StringArgumentType.word())
                                         .suggests((c, b) -> SharedSuggestionProvider.suggest(RANKS, b))
@@ -113,6 +118,53 @@ public final class GateCommands {
             return 0;
         }
         source.sendSuccess(() -> Component.literal("Started Dungeon Break at " + anchorPos.toShortString() + "."), false);
+        return 1;
+    }
+
+    private static int growCorruption(CommandSourceStack source) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        ServerLevel level = player.serverLevel();
+        GateBlockEntity anchorBe = findLookedAtAnchor(player, level);
+        if (anchorBe == null) {
+            source.sendFailure(Component.literal("Look at a Gate within 32 blocks."));
+            return 0;
+        }
+        BlockPos anchorPos = anchorBe.anchorPos();
+        BlockState st = level.getBlockState(anchorPos);
+        boolean sea = st.getBlock() instanceof GateBlock && st.getValue(GateBlock.SEA);
+        int slot = Math.max(0, anchorBe.dungeonSlot());
+        int converted = CorruptionService.growNow(level, anchorPos, slot, anchorBe.rank(), sea);
+        CorruptionSavedData.CorruptionZone zone = CorruptionSavedData.get(level).zone(anchorPos);
+        int total = zone != null ? zone.originalBlocks.size() : converted;
+        int rad = zone != null ? zone.targetRadius : 0;
+        source.sendSuccess(() -> Component.literal("Grew corruption at " + anchorPos.toShortString()
+                + " (radius " + rad + "): +" + converted + " blocks (" + total + " total)."), false);
+        return 1;
+    }
+
+    private static int clearCorruption(CommandSourceStack source) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        ServerLevel level = player.serverLevel();
+        GateBlockEntity anchorBe = findLookedAtAnchor(player, level);
+        BlockPos targetAnchor = anchorBe != null ? anchorBe.anchorPos() : null;
+        if (targetAnchor == null) {
+            double best = 32.0 * 32.0;
+            for (CorruptionSavedData.CorruptionZone z : CorruptionSavedData.get(level).zones()) {
+                double d = z.anchor.distToCenterSqr(player.position());
+                if (d <= best) {
+                    best = d;
+                    targetAnchor = z.anchor;
+                }
+            }
+        }
+        if (targetAnchor == null) {
+            source.sendFailure(Component.literal("Look at a Gate or stand within 32 blocks of active corruption."));
+            return 0;
+        }
+        final BlockPos anchorPos = targetAnchor;
+        int restored = CorruptionService.clearImmediate(level, anchorPos);
+        source.sendSuccess(() -> Component.literal("Cleared corruption at " + anchorPos.toShortString()
+                + " (" + restored + " blocks restored)."), false);
         return 1;
     }
 
