@@ -35,7 +35,7 @@ public final class ClientModEvents {
     @SubscribeEvent
     public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
         for (PlayerSkin.Model skin : event.getSkins()) {
-            if (event.getSkin(skin) instanceof PlayerRenderer renderer) {
+            if (event.getPlayerSkin(skin) instanceof PlayerRenderer renderer) {
                 renderer.addLayer(new GauntletLayer(renderer, event.getEntityModels(), skin == PlayerSkin.Model.SLIM));
             }
         }
