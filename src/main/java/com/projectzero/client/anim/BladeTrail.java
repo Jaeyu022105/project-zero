@@ -38,6 +38,12 @@ public final class BladeTrail {
     private static final int RGB = 0xC8DCFF;
     /** Hilt end and tip of a sword-shaped item, in item model space (0..1, y up). */
     private static final Vector3f HILT = new Vector3f(0.40F, 0.40F, 0.5F), TIP = new Vector3f(0.95F, 0.95F, 0.5F);
+    /** Axes cut with the edge of the head only: a short band beside the top of the handle, not the whole length. */
+    private static final Vector3f AXE_HEEL = new Vector3f(0.36F, 0.56F, 0.5F), AXE_TOE = new Vector3f(0.52F, 0.86F, 0.5F);
+
+    private static boolean isAxe(ItemStack stack) { return stack.getItem() instanceof net.minecraft.world.item.AxeItem; }
+    private static Vector3f base(ItemStack stack) { return isAxe(stack) ? AXE_HEEL : HILT; }
+    private static Vector3f edge(ItemStack stack, Style style) { return isAxe(stack) ? AXE_TOE : reach(style); }
 
     private record Sample(Vec3 base, Vec3 tip, long t, int rgb, long life) {}
 
@@ -112,7 +118,7 @@ public final class BladeTrail {
         Vec3 at = p.getPosition(partial);
         Matrix4f m = pose.last().pose();
         Style style = styleOf(stack);
-        Vec3 hilt = at.add(point(m, HILT)), tip = at.add(point(m, reach(style)));
+        Vec3 hilt = at.add(point(m, base(stack))), tip = at.add(point(m, edge(stack, style)));
         add(WORLD.computeIfAbsent(p, k -> new ArrayDeque<>()), hilt, tip, style);
         shed(p, tip, style);
     }
@@ -123,7 +129,7 @@ public final class BladeTrail {
         itemTransform(pose, stack, p, leftHand ? ItemDisplayContext.FIRST_PERSON_LEFT_HAND : ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, leftHand);
         Matrix4f m = pose.last().pose();
         Style style = styleOf(stack);
-        Vec3 hilt = point(m, HILT), tip = point(m, reach(style));
+        Vec3 hilt = point(m, base(stack)), tip = point(m, edge(stack, style));
         add(HAND, hilt, tip, style);
         shedHand(hilt, tip, style, true);
         pose.popPose();
@@ -136,7 +142,7 @@ public final class BladeTrail {
         pose.pushPose();
         itemTransform(pose, stack, p, leftHand ? ItemDisplayContext.FIRST_PERSON_LEFT_HAND : ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, leftHand);
         Matrix4f m = pose.last().pose();
-        shedHand(point(m, HILT), point(m, reach(style)), style, false);
+        shedHand(point(m, base(stack)), point(m, edge(stack, style)), style, false);
         pose.popPose();
     }
 

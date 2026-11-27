@@ -115,12 +115,15 @@ public final class PlayerPoses {
             k(0.48F, -0.70F, -0.70F, 0.1F, 0.10F, 0F, -0.2F, -0.45F, 8F, -0.30F, -0.02F, -0.15F, -40, -45, 30),
             k(0.80F, -0.65F, -0.70F, 0.1F, 0.10F, 0F, -0.2F, -0.45F, 7F, -0.30F, -0.02F, -0.15F, -40, -45, 30)};
     public static final Key[][] AXE = {AXE_CHOP, SWING_BACK};
-    /** Shovel: dig low and forward, then scoop up. */
+    /**
+     * Shovel: both hands on the shaft (off hand reaching across), lean in and drive it down and
+     * forward with bent knees, then lever the scoop up. Low and two-handed, never above the chest.
+     */
     public static final Key[] SHOVEL = {
-            k(0.18F, -0.50F, 0F, 0.1F, -0.70F, 0.3F, 0F, 0.10F, 4F, 0F, -0.10F, 0.05F, -20, 0, 0),
-            k(0.42F, -1.10F, 0F, 0.1F, -1.00F, 0.3F, 0F, 0.10F, 7F, 0F, -0.05F, -0.30F, -35, 0, 0),
-            k(0.62F, -1.60F, 0F, 0.1F, -1.30F, 0.3F, 0F, 0F, 2F, 0F, 0.12F, -0.20F, 15, 0, 0),
-            k(0.85F, -1.50F, 0F, 0.1F, -1.20F, 0.3F, 0F, 0F, 2F, 0F, 0.12F, -0.20F, 15, 0, 0)};
+            k(0.18F, -0.35F, -0.20F, 0.05F, -0.85F, 0.55F, 0F, 0.20F, 3F, 0F, -0.10F, 0.05F, -20, 0, 0),
+            k(0.42F, -0.85F, -0.25F, 0F, -0.70F, 0.55F, 0F, -0.10F, 12F, 0F, -0.05F, -0.30F, -35, 0, 0),
+            k(0.64F, -1.15F, -0.20F, 0F, -0.95F, 0.50F, 0F, 0F, 5F, 0F, 0.12F, -0.20F, 15, 0, 0),
+            k(0.86F, -1.10F, -0.20F, 0F, -0.90F, 0.50F, 0F, 0F, 4F, 0F, 0.12F, -0.20F, 15, 0, 0)};
     /** Hoe: reach out and rake back toward you. */
     public static final Key[] HOE = {
             k(0.20F, -1.55F, 0.30F, 0F, -0.30F, 0F, -0.1F, 0.20F, 5F, 0.05F, 0.05F, -0.35F, -10, 15, 0),
@@ -197,7 +200,7 @@ public final class PlayerPoses {
         joints(UPPERCUT, 1.9F, 1.8F, 0.55F, 1.0F, 1.8F, 0.1F, 1.1F, 1.8F, 0.1F);
         joints(PICK, 1.3F, 0.4F, 0.15F, 0.2F, 0.4F, 0.3F, 0.25F, 0.4F, 0.3F);
         joints(AXE_CHOP, 1.2F, 0.6F, 0.2F, 0.1F, 0.6F, 0.45F, 0.15F, 0.6F, 0.4F);
-        joints(SHOVEL, 0.3F, 0.5F, 0.4F, 0.2F, 0.6F, 0.5F, 0.6F, 0.8F, 0.2F, 0.6F, 0.8F, 0.2F);
+        joints(SHOVEL, 0.6F, 0.7F, 0.35F, 0.5F, 0.6F, 0.7F, 0.6F, 0.7F, 0.25F, 0.6F, 0.7F, 0.2F);
         joints(HOE, 0.2F, 0.3F, 0.2F, 1.0F, 0.3F, 0.15F, 1.0F, 0.3F, 0.15F);
         joints(STAB, 1.6F, 0.6F, 0.3F, 0.05F, 0.6F, 0.35F, 0.1F, 0.6F, 0.35F);
         joints(PLACE, 0.7F, 0.3F, 0.1F, 0.2F, 0.3F, 0.15F, 0.25F, 0.3F, 0.15F);
