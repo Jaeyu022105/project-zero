@@ -16,7 +16,15 @@ public final class ClientSkillVisuals {
         /** A big shield emblem that pops up in front of the entity and fades. */
         SHIELD_POP,
         /** A hex-lattice aura bubble around the entity. */
-        BUBBLE;
+        BUBBLE,
+        /** Hit reaction: white flash then a short shake in place (our hitstop). */
+        HIT_FLASH,
+        /** A crescent slash arc swept around the entity, facing its look direction at the start. */
+        SLASH,
+        /** Camera shake for the local player (heavy hits). */
+        SHAKE,
+        /** FOV punch-in that snaps back (finishers). */
+        PUNCH;
 
         public static Kind byId(int id) {
             Kind[] all = values();
@@ -30,6 +38,8 @@ public final class ClientSkillVisuals {
         public final int rgb;
         public final int total;
         public int age;
+        /** Facing locked on first draw (slash arcs); NaN until then. */
+        public float yaw = Float.NaN;
 
         Visual(int entityId, Kind kind, int rgb, int total) {
             this.entityId = entityId;
@@ -49,12 +59,22 @@ public final class ClientSkillVisuals {
     public static void add(int entityId, int kind, int rgb, int ticks) {
         Kind k = Kind.byId(kind);
         // One bubble per entity: a recast refreshes it.
-        if (k == Kind.BUBBLE) ACTIVE.removeIf(v -> v.entityId == entityId && v.kind == Kind.BUBBLE);
+        if (k == Kind.BUBBLE || k == Kind.HIT_FLASH || k == Kind.SHAKE || k == Kind.PUNCH)
+            ACTIVE.removeIf(v -> v.entityId == entityId && v.kind == k);
         ACTIVE.add(new Visual(entityId, k, rgb, ticks));
     }
 
     public static List<Visual> active() {
         return ACTIVE;
+    }
+
+    /** The newest visual of this kind on the entity, or null. */
+    public static Visual find(int entityId, Kind kind) {
+        for (int i = ACTIVE.size() - 1; i >= 0; i--) {
+            Visual v = ACTIVE.get(i);
+            if (v.entityId == entityId && v.kind == kind) return v;
+        }
+        return null;
     }
 
     public static void tick() {

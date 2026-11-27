@@ -29,6 +29,7 @@ public final class SkillVisualRenderer {
 
     private static final ResourceLocation EMBLEM = ProjectZero.id("textures/entity/fx/aegis_emblem.png");
     private static final ResourceLocation BUBBLE = ProjectZero.id("textures/entity/fx/aegis_bubble.png");
+    private static final ResourceLocation SLASH = ProjectZero.id("textures/entity/fx/slash_arc.png");
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent.Post event) {
@@ -60,11 +61,17 @@ public final class SkillVisualRenderer {
             switch (v.kind) {
                 case SHIELD_POP -> shield(pose, buffers, e, partial, life, r, g, b);
                 case BUBBLE -> bubble(pose, buffers, e, life, v.age + partial, r, g, b);
+                case SLASH -> {
+                    if (Float.isNaN(v.yaw)) v.yaw = e.getViewYRot(partial);
+                    slash(pose, buffers, e, v.yaw, life, r, g, b);
+                }
+                default -> {}
             }
             pose.popPose();
         }
         buffers.endBatch(RenderType.eyes(EMBLEM));
         buffers.endBatch(RenderType.eyes(BUBBLE));
+        buffers.endBatch(RenderType.eyes(SLASH));
     }
 
     /** Pops up (overshoot), holds, fades; faces where the caster's body faces, ~1.2 blocks ahead. */
@@ -91,6 +98,40 @@ public final class SkillVisualRenderer {
         pose.translate(0, e.getBbHeight() / 2F, 0);
         pose.mulPose(Axis.YP.rotationDegrees(age * 1.5F));
         sphere(pose, buffers.getBuffer(RenderType.eyes(BUBBLE)), radius * (0.96F + 0.04F * fadeIn), r * k, g * k, b * k);
+    }
+
+    /**
+     * A crescent swept around the caster's chest, tracing the blade tip: the leading edge sweeps
+     * across in the first 35% of life, alpha is 0 at the tail and full at the leading edge, then the
+     * whole arc fades. Additive (eyes), so darker = more transparent.
+     */
+    private static void slash(PoseStack pose, MultiBufferSource buffers, Entity e, float yaw, float life,
+                              float r, float g, float b) {
+        float sweep = Math.min(1F, life / 0.35F);
+        sweep = 1F - (1F - sweep) * (1F - sweep) * (1F - sweep);          // ease out: fast start, settles
+        float fade = life < 0.35F ? 1F : 1F - (life - 0.35F) / 0.65F;
+        float from = -80F, lead = Mth.lerp(sweep, from, 80F);
+        float tail = Mth.lerp(Math.max(0F, (life - 0.2F) / 0.8F), from, lead);  // tail chases the lead
+        if (lead - tail < 1F || fade <= 0F) return;
+        float inner = 1.0F + e.getBbWidth() * 0.5F, outer = inner + 1.1F;
+        pose.translate(0, e.getBbHeight() * 0.6, 0);
+        pose.mulPose(Axis.YP.rotationDegrees(-yaw));
+        pose.mulPose(Axis.ZP.rotationDegrees(-14F));                       // slight diagonal tilt
+        VertexConsumer vc = buffers.getBuffer(RenderType.eyes(SLASH));
+        PoseStack.Pose p = pose.last();
+        int seg = 20;
+        for (int i = 0; i < seg; i++) {
+            float a0 = Mth.lerp(i / (float) seg, tail, lead), a1 = Mth.lerp((i + 1) / (float) seg, tail, lead);
+            float k0 = (float) Math.pow(i / (float) seg, 1.5) * fade, k1 = (float) Math.pow((i + 1) / (float) seg, 1.5) * fade;
+            float u0 = i / (float) seg, u1 = (i + 1) / (float) seg;
+            // Angle 0 = straight ahead (+Z), positive = to the right.
+            float s0 = Mth.sin(a0 * Mth.DEG_TO_RAD), c0 = Mth.cos(a0 * Mth.DEG_TO_RAD);
+            float s1 = Mth.sin(a1 * Mth.DEG_TO_RAD), c1 = Mth.cos(a1 * Mth.DEG_TO_RAD);
+            float[][] q = {{-s0 * inner, c0 * inner, u0, 0, k0}, {-s1 * inner, c1 * inner, u1, 0, k1},
+                           {-s1 * outer, c1 * outer, u1, 1, k1}, {-s0 * outer, c0 * outer, u0, 1, k0}};
+            for (float[] c : q) vertex(vc, p, c[0], 0, c[1], c[2], c[3], r * c[4], g * c[4], b * c[4], 0, 1, 0);
+            for (int k = 3; k >= 0; k--) { float[] c = q[k]; vertex(vc, p, c[0], 0, c[1], c[2], c[3], r * c[4], g * c[4], b * c[4], 0, -1, 0); }
+        }
     }
 
     private static void quad(PoseStack pose, VertexConsumer vc, float s, float r, float g, float b) {

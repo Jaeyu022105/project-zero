@@ -110,6 +110,11 @@ public final class ModNetwork {
         CHANNEL.send(message, PacketDistributor.TRACKING_ENTITY_AND_SELF.with(player));
     }
 
+    /** Sends to every client tracking {@code entity} (and the entity itself if it is a player). */
+    public static void sendToTrackingEntity(net.minecraft.world.entity.Entity entity, Object message) {
+        CHANNEL.send(message, PacketDistributor.TRACKING_ENTITY_AND_SELF.with(entity));
+    }
+
     public static void sendToServer(Object message) {
         CHANNEL.send(message, PacketDistributor.SERVER.noArg());
     }

@@ -156,10 +156,13 @@ public final class SkillBehaviors {
         Vec3 impact = player.getEyePosition().add(look.scale(2.0));
         float damage = baseDamage + (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) * atkScale;
 
-        for (LivingEntity target : hostilesNear(player, impact, range)) {
+        List<LivingEntity> hits = hostilesNear(player, impact, range);
+        for (LivingEntity target : hits) {
             target.hurt(player.damageSources().playerAttack(player), damage);
             target.knockback(knockback, -look.x, -look.z);
+            HitJuice.impact(player, target, SkillFx.EMBER, HitJuice.Weight.HEAVY);
         }
+        if (!hits.isEmpty()) HitJuice.casterFeel(player, HitJuice.Weight.HEAVY);
 
         level.sendParticles(ParticleTypes.EXPLOSION, impact.x, impact.y, impact.z, 2, 0.2, 0.2, 0.2, 0.0);
         level.sendParticles(Fx.shard(SkillFx.STEEL, 1.2F), impact.x, impact.y, impact.z, 18, 0.4, 0.4, 0.4, 0.2);
@@ -195,6 +198,7 @@ public final class SkillBehaviors {
             for (int i = 0; i <= bounces && current != null; i++) {
                 hit.add(current);
                 current.hurt(player.damageSources().playerAttack(player), curDmg);
+                HitJuice.impact(player, current, SkillFx.STEEL, HitJuice.Weight.LIGHT);
                 curDmg *= bounceRetention;
 
                 LivingEntity prev = current;
@@ -289,11 +293,14 @@ public final class SkillBehaviors {
                 if (struck.add(target)) {
                     target.hurt(player.damageSources().indirectMagic(player, player), damage);
                     target.addEffect(new MobEffectInstance(MobEffects.WITHER, witherTicks, 1));
+                    HitJuice.impact(player, target, SkillFx.HEX, HitJuice.Weight.LIGHT);
                 }
             }
         }
+        HitJuice.slash(player, SkillFx.HEX, 10);
         if (!struck.isEmpty()) {
             player.heal(struck.size() * healPerHit);
+            HitJuice.casterFeel(player, HitJuice.Weight.HEAVY);
         }
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 0.7F, 1.3F);
@@ -362,7 +369,9 @@ public final class SkillBehaviors {
                 LivingEntity t = targets.get(i);
                 spawnVisualBolt(level, t.position());
                 t.hurt(skillDamage(player, DamageTypes.LIGHTNING_BOLT), damage);
+                HitJuice.impact(player, t, SkillFx.STORM, HitJuice.Weight.LIGHT);
             }
+            HitJuice.casterFeel(player, HitJuice.Weight.HEAVY);
         }
         level.sendParticles(Fx.spark(SkillFx.STORM, 1.5F), player.getX(), player.getY() + 1.0, player.getZ(),
                 30, 0.8, 0.8, 0.8, 0.25);
@@ -429,6 +438,7 @@ public final class SkillBehaviors {
         for (LivingEntity target : hostilesNear(player, player.position(), radius)) {
             target.hurt(player.damageSources().indirectMagic(player, player), damage);
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, rootTicks, 5));
+            HitJuice.impact(player, target, SkillFx.SOUL, HitJuice.Weight.LIGHT);
             totalDealt += damage;
             level.sendParticles(Fx.rune(SkillFx.SOUL, 1F), target.getX(), target.getY() + 0.8, target.getZ(),
                     10, 0.3, 0.4, 0.3, 0.03);
@@ -461,10 +471,13 @@ public final class SkillBehaviors {
         int fireResTicks = GsonHelper.getAsInt(params, "fire_res_ticks", 200);
 
         ServerLevel level = player.serverLevel();
-        for (LivingEntity target : hostilesNear(player, player.position(), radius)) {
+        List<LivingEntity> burned = hostilesNear(player, player.position(), radius);
+        for (LivingEntity target : burned) {
             target.igniteForSeconds(burnSeconds);
             target.hurt(skillDamage(player, DamageTypes.IN_FIRE), damage);
+            HitJuice.impact(player, target, SkillFx.SUN, HitJuice.Weight.HEAVY);
         }
+        if (!burned.isEmpty()) HitJuice.casterFeel(player, HitJuice.Weight.FINISHER);
 
         List<MobEffectInstance> harmful = new ArrayList<>();
         for (MobEffectInstance inst : player.getActiveEffects()) {
@@ -518,7 +531,10 @@ public final class SkillBehaviors {
             float hpBonus = Math.min(maxBonus, target.getMaxHealth() * maxHpFraction);
             target.hurt(player.damageSources().playerAttack(player), atkPart + hpBonus);
             target.knockback(0.9, -look.x, -look.z);
+            HitJuice.impact(player, target, SkillFx.EMBER, HitJuice.Weight.FINISHER);
         }
+        HitJuice.slash(player, SkillFx.EMBER, 9);
+        if (!targets.isEmpty()) HitJuice.casterFeel(player, HitJuice.Weight.FINISHER);
 
         level.sendParticles(ParticleTypes.SONIC_BOOM, center.x, center.y + 0.8, center.z, 1, 0.0, 0.0, 0.0, 0.0);
         level.sendParticles(Fx.shard(SkillFx.EMBER, 1.4F), center.x, center.y + 0.8, center.z, 24, 0.5, 0.5, 0.5, 0.25);

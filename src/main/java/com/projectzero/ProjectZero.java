@@ -47,6 +47,7 @@ public final class ProjectZero {
         com.projectzero.fx.ModParticles.PARTICLES.register(modBus);
 
         GateRules.init();
+        context.registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT, com.projectzero.config.ClientConfig.SPEC);
         ModNetwork.register();
         LOGGER.info("[System] Project Zero loaded. Welcome, Player.");
     }
