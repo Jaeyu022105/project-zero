@@ -1,4 +1,4 @@
-# Gemini backlog: notices, level ceiling, break storming, corruption, fireflies, companions
+# Gemini backlog: notices, level ceiling, break storming, corruption, fireflies, companions, biome polish
 
 You are working alone for several hours while Claude is away. Claude (visuals, models, world gen, review) will review and polish what you push afterwards. Work **top to bottom**. Each task is one or more commits, pushed before you start the next. A finished, tested task beats three half-done ones.
 
@@ -28,10 +28,7 @@ Commit and push only to `gemini/reset-backlog` (`git push -u origin gemini/reset
 
 ## Do not touch
 
-Two other sessions are editing these right now. Do not open them for writing, reformat them, or "fix" them:
-
-- `worldgen/GiantBambooFeature.java`, `worldgen/ShatteredPlateauFeature.java`, `worldgen/ModSurfaceRules.java`, `client/BiomeMist.java`
-- the biome JSONs for `spirit_bamboo` and `shattered_plateau`, and anything under `tools/biomes/`
+Until you reach Task 7, leave these alone: `worldgen/GiantBambooFeature.java`, `worldgen/ShatteredPlateauFeature.java`, `worldgen/ModSurfaceRules.java`, `client/BiomeMist.java`, the biome JSONs for `spirit_bamboo` and `shattered_plateau`, and anything under `tools/biomes/`. Claude's polish work on them was paused partway; Task 7 hands it to you.
 
 Also Claude's visual areas (small hooks only): `client/GateRiftRenderer`, `client/JobCardRenderer`, `client/VisionOverlay*`, `client/anim/*`, `domain/*` visuals, `awakening/CrystalFormation`, finished textures and models. If you need something there, write it in HANDOFF instead.
 
@@ -104,6 +101,15 @@ Backend and a plain screen only. No new mob models (Claude does models and anima
 - Gear: store and show only for now (stats from gear add to the companion's stats). Showing gear on the model is Claude's.
 - Commands: `/pz companion list|add <entity> <name>|xp <name> <amount>`.
 - Test: Beastcaller job via `/pz job set`, cast Pack Howl, open SUMMONS, give XP, spend points, use a Bond Crystal, relog.
+
+## Task 7: Bamboo and plateau polish (DESIGN-DOCUMENT §15 "[Next] Polish pass")
+
+Claude started this and paused. First run `git log --oneline -5 -- src/main/java/com/projectzero/worldgen/GiantBambooFeature.java src/main/java/com/projectzero/worldgen/ShatteredPlateauFeature.java` and read both files as they are now, so you build on what was pushed instead of redoing it. Load `forge-mod-dev` and follow the worldgen rule above strictly (3x3 chunks, biome checks far away go through the biome source).
+
+- **Spirit Bamboo Sea** (`GiantBambooFeature`): thicker culms (2x2 and 3x3) with a node ring every 4 to 6 blocks, varied height and lean per grove, leaf sprays on short side branches, dense groves on flat ground with narrow walkable lanes, stone lantern paths and moss underfoot. Use existing blocks (bamboo block, stripped bamboo, green wool or leaves for sprays, stone lanterns from stone brick walls plus soul lanterns) and mark any new-block wish as `TODO(claude-art)`.
+- **Shattered Sky Plateau** (`ShatteredPlateauFeature`, `ModSurfaceRules`): a flat high table first (fill up to a level top in the biome, within the chunk), then narrower, sharper chasms with stepped ledges that keep following the world-wide noise across chunks, more and bigger floating slabs, some linked by stone arches. Mist in the chasms by depth goes in `client/BiomeMist` (keep its current behaviour for other biomes).
+- Never reorder vanilla features in a biome JSON. If you change a biome JSON, run `tools/biomes/gen.py`'s check as HANDOFF describes.
+- Test: **new world**, `/locate biome projectzero:spirit_bamboo` and `projectzero:shattered_plateau`, fly across several chunk borders (no seams, no "connection lost"), screenshots into HANDOFF.
 
 ## If you finish early
 
