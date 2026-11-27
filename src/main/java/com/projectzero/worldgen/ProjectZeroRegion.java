@@ -42,7 +42,6 @@ public class ProjectZeroRegion extends Region {
             builder.replaceBiome(Biomes.MEADOW, ModBiomes.SKYFALL_ISLES);
             builder.replaceBiome(Biomes.TAIGA, ModBiomes.CLOUD_FOREST);
             builder.replaceBiome(Biomes.SAVANNA, ModBiomes.BAOBAB_SAVANNA);
-            builder.replaceBiome(Biomes.SAVANNA_PLATEAU, ModBiomes.BAOBAB_SAVANNA);
             builder.replaceBiome(Biomes.BADLANDS, ModBiomes.TSINGY);
             builder.replaceBiome(Biomes.ERODED_BADLANDS, ModBiomes.TSINGY);
             builder.replaceBiome(Biomes.WARM_OCEAN, ModBiomes.KARST_BAY);
@@ -55,9 +54,9 @@ public class ProjectZeroRegion extends Region {
             builder.replaceBiome(Biomes.SNOWY_PLAINS, ModBiomes.CRYSTAL_TUNDRA);
             builder.replaceBiome(Biomes.WINDSWEPT_SAVANNA, ModBiomes.MANA_WASTES);
             builder.replaceBiome(Biomes.WOODED_BADLANDS, ModBiomes.BLOODMOON_STEPPE);
+            // Wooded Badlands alone made the steppe 10-18k blocks away in test seeds; the hot dry plateaus give it a common slot.
+            builder.replaceBiome(Biomes.SAVANNA_PLATEAU, ModBiomes.BLOODMOON_STEPPE);
             builder.replaceBiome(Biomes.CHERRY_GROVE, ModBiomes.SPIRIT_BAMBOO);
-            // Cherry Grove alone is small and rare; Flower Forest is a full temperate lowland slot, so the bamboo sea gets room.
-            builder.replaceBiome(Biomes.FLOWER_FOREST, ModBiomes.SPIRIT_BAMBOO);
             builder.replaceBiome(Biomes.MANGROVE_SWAMP, ModBiomes.SUNKEN_MARSH);
             builder.replaceBiome(Biomes.STONY_PEAKS, ModBiomes.SHATTERED_PLATEAU);
         });
