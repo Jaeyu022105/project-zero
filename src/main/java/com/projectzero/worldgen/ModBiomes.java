@@ -15,6 +15,8 @@ public final class ModBiomes {
 
     /** Giant-mushroom woods: huge caps among dark oaks, mycelium and podzol floor, drifting spores. */
     public static final ResourceKey<Biome> CAPWOOD = key("capwood");
+    /** Elven woods: giant pale elder trees with leaf-cloud crowns and glowing berry vines, birch between them. */
+    public static final ResourceKey<Biome> ELDERWOOD = key("elderwood");
 
     private static ResourceKey<Biome> key(String name) {
         return ResourceKey.create(Registries.BIOME, ProjectZero.id(name));

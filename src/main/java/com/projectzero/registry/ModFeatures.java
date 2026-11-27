@@ -18,4 +18,8 @@ public final class ModFeatures {
     /** Rare ancient gate in a stone ring on a dais (see gates/AncientGate). */
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> ANCIENT_GATE =
             FEATURES.register("ancient_gate", AncientGateFeature::new);
+
+    /** Giant elven-style tree for the Elderwood (see worldgen/ElderTreeFeature). */
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> ELDER_TREE =
+            FEATURES.register("elder_tree", com.projectzero.worldgen.ElderTreeFeature::new);
 }

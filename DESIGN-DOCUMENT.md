@@ -268,9 +268,16 @@ Our own mechanic, not in Solo Leveling.
 
 ## 15. Biomes and world ambience
 
-Our biomes are placed with **TerraBlender** (`worldgen/ProjectZeroRegion`, weight 3). Inside our region the vanilla climate layout is kept, and some vanilla biomes are swapped for ours, so each one sits where its vanilla cousin would. Each biome is data (`data/projectzero/worldgen/biome/`), with ground cover from `worldgen/ModSurfaceRules`. New biomes are tagged into `#minecraft:is_overworld` (so gates and ancient gates appear there) plus their kind (`is_forest` and so on).
+**Owner direction (2026-11-27): giant biomes, replace and improve vanilla, more extreme, huge fantasy trees, fantasy and real-life biomes.**
+
+- **[Built] Giant biomes:** the default overworld uses the Large Biomes climate layout (`data/minecraft/worldgen/noise_settings/overworld.json`), so every biome is about 4× wider. Only new chunks change.
+- **[Planned] More extreme terrain:** taller mountains and deeper valleys, done by reshaping the terrain splines after the biome pass.
+- **[Planned] Better vanilla biomes:** override each vanilla biome's data (denser and bigger features, stronger colors, new ground cover), one family at a time.
+
+Our biomes are placed with **TerraBlender** (`worldgen/ProjectZeroRegion`, weight 6). Inside our region the vanilla climate layout is kept, and some vanilla biomes are swapped for ours, so each one sits where its vanilla cousin would. Each biome is data (`data/projectzero/worldgen/biome/`), with ground cover from `worldgen/ModSurfaceRules`. New biomes are tagged into `#minecraft:is_overworld` (so gates and ancient gates appear there) plus their kind (`is_forest` and so on).
 
 - **[Built] Capwood** (giant-mushroom woods, replaces some Dark Forest): red and brown giant mushrooms (2-4 a chunk) among a few dark oaks, a floor of mycelium drifts, podzol and coarse dirt over the grass, moss patches, and clumps of small mushrooms and ferns. A lilac haze in the fog, a cornflower sky, deep blue water, and spores drifting in the air. Rabbits, sheep and pigs. Its falling leaves come from the dark oaks.
+- **[Built] Elderwood** (elven woods, replaces some Birch and Old Growth Birch forests): giant **elder trees** (`worldgen/ElderTreeFeature`, about one every two chunks) 26 to 40 blocks tall. Each has a pale trunk that sways slightly, buttress roots that flare out and dive into the ground, upward-reaching branches ending in leaf clouds, a leafy crown, and glowing berry vines hanging from the canopy. Between them are tall birches, moss, ferns, lilies of the valley, alliums and bluets. Teal-green foliage, turquoise water, a pale mint haze and drifting motes.
 - **[Planned] Next biomes** (roadmap step 5): crystal tundra (snow fields with mana-crystal outcrops), banner-dotted highlands, floating-rock fields.
 
 - **[Built] Falling leaves** (`client/FallingLeaves`, `ManaParticle` LEAF): any leaf block with air under it sheds leaves, in every biome, so dense forests shed more than a lone tree. Each leaf takes the color the game draws that leaf block with, so it follows the biome's foliage tint, and cherry or azalea keep their own color. Leaves sway, tumble, rest on the ground for a moment, then fade. Rain shakes more loose. Client option `ambience.fallingLeaves`, and it respects the Particles video setting.

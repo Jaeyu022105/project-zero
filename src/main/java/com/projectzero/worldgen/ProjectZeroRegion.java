@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * and the world still feels like Minecraft. Weight sets how much of the world uses this region.
  */
 public class ProjectZeroRegion extends Region {
-    public static final int WEIGHT = 3;
+    public static final int WEIGHT = 6;
 
     public ProjectZeroRegion(ResourceLocation name) {
         super(name, RegionType.OVERWORLD, WEIGHT);
@@ -28,6 +28,8 @@ public class ProjectZeroRegion extends Region {
     public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper) {
         this.addModifiedVanillaOverworldBiomes(mapper, builder -> {
             builder.replaceBiome(Biomes.DARK_FOREST, ModBiomes.CAPWOOD);
+            builder.replaceBiome(Biomes.BIRCH_FOREST, ModBiomes.ELDERWOOD);
+            builder.replaceBiome(Biomes.OLD_GROWTH_BIRCH_FOREST, ModBiomes.ELDERWOOD);
         });
     }
 }
