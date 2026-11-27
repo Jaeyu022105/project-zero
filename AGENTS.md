@@ -36,5 +36,6 @@ The owner works with several AI chats at once. One acts as **adviser/reviewer**:
 | `review-and-direct` | Acting as the reviewer: critiquing work and writing instructions for other chats |
 | `handoff-update` | Ending a task: updating `HANDOFF.md` and the design doc |
 | `system-ui-style` | Building any screen, HUD or [System] message |
+| `game-feel` | Making a skill, attack, boss move or mob animation feel weighty and readable (Souls timing + hit juice, Minecraft-safe) |
 
 Each skill is a folder with a `SKILL.md` (YAML front matter `name` + `description`, then instructions). Claude Code and Gemini CLI both read this format.

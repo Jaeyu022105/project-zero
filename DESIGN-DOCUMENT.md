@@ -170,6 +170,18 @@ Our own mechanic, not in Solo Leveling.
 - Stagger/poise: enough hits in a window stagger the boss and open a punish.
 - Boss arenas lock the exit until the fight ends.
 - Use GeckoLib (or similar) for animated models when we get there; this adds a dependency, so confirm with the owner first.
+- **Attack timing and feel follow `.agents/skills/game-feel/SKILL.md`.** Every attack has five phases: opening pose, signal, strike, end pose, return. For enemy attacks, signal + strike lasts at least 7 ticks. The return is the punish window. Make fights harder through timing, not damage.
+- **Cue language (one meaning everywhere):**
+  - Red glow: unblockable, dodge it.
+  - White glint: parry or block window.
+  - Blue rune ring on the ground: area attack lands here.
+  - Each cue has its own sound.
+- **Hit juice:**
+  - Every hit gets a flash, directional sparks, a white flash and flinch on the victim, and a sound on the impact tick.
+  - Every hit gets hitstop in tiers: light 1-2 ticks, heavy 3-4, finisher 5-6. The hitstop is client visual only.
+  - Finishers and ultimates also get the "anime hit" extras: a longer freeze, an inverted frame, burst lines and an FOV punch-in.
+- Camera shake is small (≤0.5°, ≤6 ticks), used only for heavy and boss hits, and can be turned off in config.
+- **[Idea]** A dodge dash with i-frames needs the owner's approval. There is no separate stamina bar; cooldowns and mana are the commitment cost.
 
 ## 11. The System's feel (UI and messages)
 
