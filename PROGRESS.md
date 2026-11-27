@@ -16,6 +16,7 @@ Last updated: **2026-11-28**
 - Skills: mana, cooldowns, 4 basic skills, 10 job signature skills, Skillbooks, Skills window with 3 presets (J, R to cycle).
 - Titles and milestones, milestone skills.
 - System notices (bottom right), level ceiling at 100, storming a breaking gate, corruption spread around dungeon breaks, fireflies.
+- Top-right minimap (first version): north-up terrain, rank-colored nearby gates, player dots, objective-marker hook, biome tint, coordinates, and cave layer.
 - Equipment: 8 accessory slots with rolled stats, mob drops, GEAR screen.
 - Awakening Stones and crystal formations, Awakening Shards, Shard Vessel charging, Reawakening vision, reroll that keeps 3 random skills.
 - Player animations for every movement and held item; enemy blood and skill marks; boss weakness table.
@@ -44,7 +45,7 @@ In roughly this order (see `ROADMAP.md` for the full list):
 2. First gate monsters with full animation sets, dropping body parts and monster crystals (§18, roadmap 8).
 3. First Souls-style boss (§10, roadmap 12).
 4. Civilizations: lowest-tier town first, with the shabby-shed spawn, house waypoint stones, an Awakening Stone in the center, the Hunter's Association, currency and basic NPC roles (§16a to 16d).
-5. Minimap with quest markers (§11), quests from the Association.
+5. Connect Association quests to the minimap objective hook; add waypoint/civilization discovery and a full-screen map (§11).
 6. Trains between civilization tiers, then subways, waypoint stones (§16f).
 7. Backpacks (§12), skill workbench and the chosen-and-stacking skill retention on reroll (§4, §6), crafting stations like the Synthesizer.
 8. Cinematic texture pass (§17).
