@@ -48,6 +48,7 @@ public final class ProjectZero {
         ModLootModifiers.LOOT_MODIFIERS.register(modBus);
         com.projectzero.fx.ModParticles.PARTICLES.register(modBus);
         com.projectzero.registry.ModFeatures.FEATURES.register(modBus);
+        com.projectzero.registry.ModFeatures.TREE_DECORATORS.register(modBus);
         modBus.addListener(com.projectzero.worldgen.ModWorldgen::onCommonSetup);
 
         GateRules.init();

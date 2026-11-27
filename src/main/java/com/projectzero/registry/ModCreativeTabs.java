@@ -22,6 +22,9 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.AWAKENING_STONE.get());
                         output.accept(ModNature.GLOWCAP_GILLS.get());
                         output.accept(ModNature.VIOLET_CAP.get());
+                        output.accept(ModNature.SKYWOOD_LOG.get());
+                        output.accept(ModNature.SKYWOOD_PLANKS.get());
+                        output.accept(ModNature.SKYWOOD_LEAVES.get());
                         output.accept(ModItems.AWAKENING_SHARD.get());
                         output.accept(ModItems.SHARD_VESSEL.get());
                         output.accept(ModItems.SKILLBOOK.get());

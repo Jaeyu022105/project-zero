@@ -3,14 +3,14 @@
   "config": {
     "features": [
       {
-        "chance": 0.4,
-        "feature": "minecraft:fancy_oak_checked"
+        "chance": 0.35,
+        "feature": "projectzero:skywood_tall"
       },
       {
-        "chance": 0.3,
-        "feature": "minecraft:birch_checked"
+        "chance": 0.15,
+        "feature": "minecraft:fancy_oak_checked"
       }
     ],
-    "default": "minecraft:oak_checked"
+    "default": "projectzero:skywood"
   }
 }

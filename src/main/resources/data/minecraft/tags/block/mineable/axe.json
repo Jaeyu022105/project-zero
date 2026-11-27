@@ -1,1 +1,9 @@
-{"replace":false,"values":["projectzero:glowcap_gills","projectzero:violet_cap"]}
+{
+  "replace": false,
+  "values": [
+    "projectzero:glowcap_gills",
+    "projectzero:skywood_log",
+    "projectzero:skywood_planks",
+    "projectzero:violet_cap"
+  ]
+}

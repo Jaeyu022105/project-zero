@@ -3,14 +3,22 @@
   "config": {
     "features": [
       {
-        "chance": 0.35,
-        "feature": "minecraft:fancy_oak_checked"
+        "chance": 0.3,
+        "feature": "minecraft:jungle_tree"
       },
       {
-        "chance": 0.35,
-        "feature": "minecraft:spruce_checked"
+        "chance": 0.1,
+        "feature": "minecraft:mega_jungle_tree_checked"
+      },
+      {
+        "chance": 0.2,
+        "feature": "minecraft:pine_checked"
+      },
+      {
+        "chance": 0.2,
+        "feature": "minecraft:fancy_oak_checked"
       }
     ],
-    "default": "minecraft:oak_checked"
+    "default": "minecraft:spruce_checked"
   }
 }

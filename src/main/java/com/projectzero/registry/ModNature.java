@@ -30,6 +30,17 @@ public final class ModNature {
             () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(0.2F)
                     .sound(SoundType.WOOD)));
 
+    // ---- Skywood: the pale tree of the Skyfall Isles ----
+    public static final RegistryObject<Block> SKYWOOD_LOG = block("skywood_log",
+            () -> new net.minecraft.world.level.block.RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BIRCH_LOG)
+                    .mapColor(MapColor.QUARTZ)));
+    public static final RegistryObject<Block> SKYWOOD_PLANKS = block("skywood_planks",
+            () -> new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BIRCH_PLANKS)
+                    .mapColor(MapColor.ICE)));
+    public static final RegistryObject<Block> SKYWOOD_LEAVES = block("skywood_leaves",
+            () -> new net.minecraft.world.level.block.LeavesBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.CHERRY_LEAVES)
+                    .mapColor(MapColor.COLOR_LIGHT_BLUE)));
+
     private static RegistryObject<Block> block(String name, Supplier<Block> make) {
         RegistryObject<Block> b = ModBlocks.BLOCKS.register(name, make);
         ModItems.ITEMS.register(name, () -> new BlockItem(b.get(), new Item.Properties()));

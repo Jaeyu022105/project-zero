@@ -39,4 +39,10 @@ public final class ModFeatures {
     /** Floating islands with hanging vines and waterfalls (Skyfall Isles). */
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> FLOATING_ISLAND =
             FEATURES.register("floating_island", com.projectzero.worldgen.FloatingIslandFeature::new);
+
+    public static final DeferredRegister<net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType<?>> TREE_DECORATORS =
+            DeferredRegister.create(net.minecraft.core.registries.Registries.TREE_DECORATOR_TYPE, ProjectZero.MOD_ID);
+    /** Buttress roots at the base of a tree (see worldgen/RootsDecorator). */
+    public static final RegistryObject<net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType<com.projectzero.worldgen.RootsDecorator>> ROOTS =
+            TREE_DECORATORS.register("roots", () -> new net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType<>(com.projectzero.worldgen.RootsDecorator.CODEC));
 }

@@ -115,17 +115,26 @@ public class FloatingIslandFeature extends Feature<NoneFeatureConfiguration> {
         }
     }
 
+    /** Mostly skywood (pale bark, blue-white leaves trailing below the crown), now and then a flowering azalea. */
     private static void tree(WorldGenLevel level, BlockPos at, RandomSource r) {
-        boolean azalea = r.nextBoolean();
-        BlockState log = (azalea ? Blocks.OAK_LOG : Blocks.BIRCH_LOG).defaultBlockState();
-        BlockState leaves = (azalea ? Blocks.FLOWERING_AZALEA_LEAVES : Blocks.OAK_LEAVES).defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
-        int h = 4 + r.nextInt(3);
+        boolean azalea = r.nextFloat() < 0.2F;
+        BlockState log = (azalea ? Blocks.OAK_LOG : com.projectzero.registry.ModNature.SKYWOOD_LOG.get()).defaultBlockState();
+        BlockState leaves = (azalea ? Blocks.FLOWERING_AZALEA_LEAVES : com.projectzero.registry.ModNature.SKYWOOD_LEAVES.get())
+                .defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+        int h = (azalea ? 4 : 6) + r.nextInt(3);
         for (int y = 0; y < h; y++) if (level.getBlockState(at.above(y)).canBeReplaced() || level.getBlockState(at.above(y)).isAir()) level.setBlock(at.above(y), log, 2);
         BlockPos crown = at.above(h - 1);
-        for (int dx = -2; dx <= 2; dx++) for (int dy = -1; dy <= 2; dy++) for (int dz = -2; dz <= 2; dz++) {
-            if (dx * dx + dy * dy * 2 + dz * dz > 6) continue;
+        int rad = azalea ? 2 : 3;
+        for (int dx = -rad; dx <= rad; dx++) for (int dy = -1; dy <= 2; dy++) for (int dz = -rad; dz <= rad; dz++) {
+            if (dx * dx + dy * dy * 2 + dz * dz > rad * rad + 2) continue;
             BlockPos lp = crown.offset(dx, dy, dz);
-            if (level.getBlockState(lp).isAir()) level.setBlock(lp, leaves, 2);
+            if (!level.getBlockState(lp).isAir()) continue;
+            level.setBlock(lp, leaves, 2);
+            // Skywood leaves trail down in strands from the underside of the crown.
+            if (!azalea && dy == -1 && r.nextFloat() < 0.3F) {
+                int len = 1 + r.nextInt(3);
+                for (int k = 1; k <= len && level.getBlockState(lp.below(k)).isAir(); k++) level.setBlock(lp.below(k), leaves, 2);
+            }
         }
     }
 }

@@ -14,9 +14,10 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 /**
- * A sheer stone pillar 50 to 130 blocks tall (Sky Pillars biome): banded rock with an uneven,
- * weathered outline, mossy streaks, a grassy cap with a couple of wind-bent pines, and vines
- * hanging down the cliffs from the top.
+ * A sheer stone pillar 40 to 170 blocks tall (Sky Pillars biome, after the sandstone pillars of
+ * Zhangjiajie): banded rock with an uneven, weathered outline, mossy streaks, pines and shrubs
+ * clinging to ledges on the cliff faces, a forested cap, and vines hanging from the rim. Placed
+ * one to three per chunk so they stand as a crowded forest of pillars over a jungle valley.
  */
 public class StoneSpireFeature extends Feature<NoneFeatureConfiguration> {
     private static final int REACH = 14;
@@ -30,10 +31,12 @@ public class StoneSpireFeature extends Feature<NoneFeatureConfiguration> {
         WorldGenLevel level = ctx.level();
         RandomSource r = ctx.random();
         BlockPos base = ctx.origin().below(3);
-        int height = 50 + r.nextInt(81);
+        int height = 40 + r.nextInt(70) + (r.nextFloat() < 0.3F ? r.nextInt(60) : 0);
         if (base.getY() + height + 10 >= level.getMaxBuildHeight()) height = level.getMaxBuildHeight() - base.getY() - 12;
         if (height < 30) return false;
-        double r0 = 4 + r.nextDouble() * 3.5, r1 = r0 * (0.55 + r.nextDouble() * 0.25);
+        // Mostly slender columns, some broad ones.
+        double r0 = r.nextFloat() < 0.6F ? 2.5 + r.nextDouble() * 2.5 : 5 + r.nextDouble() * 3, r1 = r0 * (0.7 + r.nextDouble() * 0.25);
+        java.util.List<BlockPos> ledges = new java.util.ArrayList<>();
         double p1 = r.nextDouble() * 10, p2 = r.nextDouble() * 10;
         int bandSeed = r.nextInt(7);
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
@@ -59,6 +62,7 @@ public class StoneSpireFeature extends Feature<NoneFeatureConfiguration> {
                 boolean outer = fx * fx + fz * fz > (edge - 1.2) * (edge - 1.2);
                 BlockState s = outer && r.nextFloat() < 0.12F ? Blocks.MOSSY_COBBLESTONE.defaultBlockState() : band;
                 level.setBlock(p, s, 2);
+                if (outer && y > 10 && y < height - 8 && r.nextFloat() < (rad < 4 ? 0.006F : 0.004F)) ledges.add(p.immutable());
                 topY[(dx + REACH) * (REACH * 2 + 1) + dz + REACH] = Math.max(topY[(dx + REACH) * (REACH * 2 + 1) + dz + REACH], y);
             }
         }
@@ -75,7 +79,7 @@ public class StoneSpireFeature extends Feature<NoneFeatureConfiguration> {
             for (Direction d : Direction.Plane.HORIZONTAL) {
                 BlockPos side = p.relative(d);
                 if (!level.getBlockState(side).isAir() || r.nextFloat() > 0.45F) continue;
-                int len = 4 + r.nextInt(18);
+                int len = 6 + r.nextInt(26);
                 BlockState vine = Blocks.VINE.defaultBlockState().setValue(VineBlock.getPropertyForFace(d.getOpposite()), true);
                 BlockPos.MutableBlockPos v = side.mutable();
                 for (int k = 0; k < len && level.getBlockState(v).isAir() && !level.getBlockState(v.relative(d.getOpposite())).isAir(); k++) {
@@ -84,16 +88,49 @@ public class StoneSpireFeature extends Feature<NoneFeatureConfiguration> {
                 }
             }
         }
-        // One to three wind-bent pines on top.
+        // A crowded cap: wind-bent pines with leafy shrubs between them.
         double cx = Math.sin(3 + p1) * 1.2, cz = Math.cos(2.6 + p2) * 1.2;
-        int pines = 1 + r.nextInt(3);
-        for (int i = 0; i < pines; i++) {
-            int dx = (int) Math.round(cx + (r.nextDouble() - 0.5) * r1 * 1.2), dz = (int) Math.round(cz + (r.nextDouble() - 0.5) * r1 * 1.2);
+        int plants = 2 + (int) (r1 * r1 * 0.5) + r.nextInt(3);
+        for (int i = 0; i < plants; i++) {
+            int dx = (int) Math.round(cx + (r.nextDouble() - 0.5) * r1 * 1.6), dz = (int) Math.round(cz + (r.nextDouble() - 0.5) * r1 * 1.6);
+            if (Math.abs(dx) > REACH - 3 || Math.abs(dz) > REACH - 3) continue;
             int ty = topY[(dx + REACH) * (REACH * 2 + 1) + dz + REACH];
             if (ty < height - 6) continue;
-            pine(level, base.offset(dx, ty + 1, dz), r);
+            if (i % 3 == 2) shrub(level, base.offset(dx, ty + 1, dz), r);
+            else pine(level, base.offset(dx, ty + 1, dz), r);
+        }
+        // Pines and shrubs growing straight out of cracks in the cliff.
+        for (BlockPos l : ledges) {
+            int dx = l.getX() - base.getX(), dz = l.getZ() - base.getZ();
+            Direction out = Math.abs(dx) > Math.abs(dz) ? (dx > 0 ? Direction.EAST : Direction.WEST) : (dz > 0 ? Direction.SOUTH : Direction.NORTH);
+            BlockPos at = l.relative(out);
+            if (Math.abs(at.getX() - base.getX()) > REACH - 3 || Math.abs(at.getZ() - base.getZ()) > REACH - 3) continue;
+            if (!level.getBlockState(at).isAir()) continue;
+            if (r.nextFloat() < 0.55F) cliffPine(level, at, out, r);
+            else shrub(level, at, r);
         }
         return true;
+    }
+
+    /** A small pine that starts sideways out of the rock and turns up toward the light. */
+    private static void cliffPine(WorldGenLevel level, BlockPos at, Direction out, RandomSource r) {
+        BlockState side = Blocks.SPRUCE_LOG.defaultBlockState().setValue(net.minecraft.world.level.block.RotatedPillarBlock.AXIS, out.getAxis());
+        level.setBlock(at, side, 2);
+        BlockPos next = at.relative(out);
+        if (r.nextBoolean() && level.getBlockState(next).isAir()) { level.setBlock(next, side, 2); at = next; }
+        pine(level, at.above(), r);
+    }
+
+    /** A low clump of leaves around a stub of trunk. */
+    private static void shrub(WorldGenLevel level, BlockPos at, RandomSource r) {
+        BlockState leaves = (r.nextFloat() < 0.3F ? Blocks.AZALEA_LEAVES : Blocks.OAK_LEAVES).defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+        if (level.getBlockState(at).isAir() || level.getBlockState(at).canBeReplaced()) level.setBlock(at, Blocks.OAK_LOG.defaultBlockState(), 2);
+        int rad = 1 + r.nextInt(2);
+        for (int dx = -rad; dx <= rad; dx++) for (int dy = 0; dy <= rad; dy++) for (int dz = -rad; dz <= rad; dz++) {
+            if (dx * dx + dy * dy * 2 + dz * dz > rad * rad + 1 || r.nextFloat() < 0.15F) continue;
+            BlockPos lp = at.offset(dx, dy, dz);
+            if (level.getBlockState(lp).isAir()) level.setBlock(lp, leaves, 2);
+        }
     }
 
     private static BlockState band(int y) {
