@@ -32,4 +32,6 @@ public final class ModParticles {
     public static final RegistryObject<ManaParticleType> STREAK = PARTICLES.register("streak", ManaParticleType::new);
     /** A lit (not glowing) droplet that falls, lands and lingers: blood, ichor, bone dust. */
     public static final RegistryObject<ManaParticleType> DROP = PARTICLES.register("blood_drop", ManaParticleType::new);
+    /** A lit leaf that drifts down from trees, swaying and tumbling; near an open gate some get pulled in. */
+    public static final RegistryObject<ManaParticleType> LEAF = PARTICLES.register("falling_leaf", ManaParticleType::new);
 }

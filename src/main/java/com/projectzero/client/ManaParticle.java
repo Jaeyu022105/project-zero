@@ -16,13 +16,16 @@ import net.minecraft.util.Mth;
  * the options color; each family moves and fades in its own way.
  */
 public class ManaParticle extends TextureSheetParticle {
-    private enum Style { GLOW, SPARK, RUNE, SHARD, MOTE, STREAK, INFLOW, DROP }
+    private enum Style { GLOW, SPARK, RUNE, SHARD, MOTE, STREAK, INFLOW, DROP, LEAF }
 
     private final Style style;
     private final SpriteSet sprites;
     private final float baseSize;
     private final float spin;
     private final double originX, originZ;
+    /** Leaves: sway phase, and whether this one can be caught by a nearby gate. */
+    private final float phase;
+    private final boolean catchable;
 
     protected ManaParticle(ClientLevel level, double x, double y, double z, double vx, double vy, double vz,
                            ManaParticleOptions opt, SpriteSet sprites) {
@@ -41,6 +44,8 @@ public class ManaParticle extends TextureSheetParticle {
         this.yd = vy;
         this.zd = vz;
         this.spin = (random.nextFloat() - 0.5F) * 0.3F;
+        this.phase = random.nextFloat() * Mth.TWO_PI;
+        this.catchable = random.nextFloat() < 0.45F;
         float size = Math.max(0.1F, opt.size());
         switch (style) {
             case GLOW -> { lifetime = 14 + random.nextInt(8); baseSize = 0.11F * size; yd += 0.01; }
@@ -53,10 +58,12 @@ public class ManaParticle extends TextureSheetParticle {
             case INFLOW -> { lifetime = com.projectzero.fx.Fx.INFLOW_TICKS; baseSize = 0.08F * size; friction = 1F; }
             case DROP -> { lifetime = 30 + random.nextInt(25); baseSize = 0.06F * size * (0.7F + random.nextFloat() * 0.6F);
                            gravity = 1.0F; hasPhysics = true; friction = 0.98F; }
+            case LEAF -> { lifetime = 140 + random.nextInt(80); baseSize = 0.09F * size * (0.8F + random.nextFloat() * 0.4F);
+                           gravity = 0.012F; hasPhysics = true; friction = 0.96F; roll = random.nextFloat() * Mth.TWO_PI; }
             default -> { lifetime = 6 + random.nextInt(3); baseSize = 0.13F * size; friction = 0.7F; }
         }
         this.quadSize = baseSize;
-        if (style == Style.RUNE || style == Style.SHARD || style == Style.DROP) setSprite(sprites.get(random));
+        if (style == Style.RUNE || style == Style.SHARD || style == Style.DROP || style == Style.LEAF) setSprite(sprites.get(random));
         else setSpriteFromAge(sprites);
     }
 
@@ -68,6 +75,7 @@ public class ManaParticle extends TextureSheetParticle {
         if (type == ModParticles.STREAK.get()) return Style.STREAK;
         if (type == ModParticles.INFLOW.get()) return Style.INFLOW;
         if (type == ModParticles.DROP.get()) return Style.DROP;
+        if (type == ModParticles.LEAF.get()) return Style.LEAF;
         return Style.GLOW;
     }
 
@@ -99,10 +107,47 @@ public class ManaParticle extends TextureSheetParticle {
                 if (onGround) { xd = 0; zd = 0; quadSize = Math.min(baseSize * 1.6F, quadSize * 1.08F); }
                 alpha = life < 0.75F ? 1F : (1F - life) / 0.25F;
             }
+            case LEAF -> tickLeaf(life);
             default -> { quadSize = baseSize * (1F - life); alpha = 1F - life; }
         }
-        if (style != Style.RUNE && style != Style.SHARD && style != Style.DROP) setSpriteFromAge(sprites);
+        if (style != Style.RUNE && style != Style.SHARD && style != Style.DROP && style != Style.LEAF) setSpriteFromAge(sprites);
     }
+
+    /**
+     * A falling leaf: drifts side to side and tumbles as it sinks, rests on the ground, then fades.
+     * Near an open gate some leaves are caught: they curve toward the rift, speed up, spin faster
+     * and shrink away into it.
+     */
+    private void tickLeaf(float life) {
+        oRoll = roll;
+        net.minecraft.world.phys.Vec3 rift = catchable ? GateRiftRenderer.nearestRift(x, y, z, PULL_RANGE) : null;
+        if (rift != null && !onGround) {
+            double dx = rift.x - x, dy = rift.y - y, dz = rift.z - z;
+            double d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            if (d < 0.5) { remove(); return; }
+            double pull = 0.012 * (1.0 - d / PULL_RANGE) + 0.002;
+            xd += dx / d * pull + -dz / d * pull * 0.6;   // a little swirl, not a straight line
+            yd += dy / d * pull + gravity * 0.04;          // cancel most of the fall
+            zd += dz / d * pull + dx / d * pull * 0.6;
+            roll += spin * 3F;
+            quadSize = baseSize * (float) Math.min(1.0, d / 2.0 + 0.2);
+            if (age > lifetime - 20) age = lifetime - 20;  // don't fade out mid-flight
+            alpha = 1F;
+            return;
+        }
+        if (onGround) {
+            xd = 0; zd = 0;
+            if (age < lifetime - 40) age = lifetime - 40;  // rest a couple of seconds, then fade
+        } else {
+            float sway = Mth.sin(age * 0.12F + phase);
+            xd += sway * 0.0025;
+            zd += Mth.cos(age * 0.09F + phase) * 0.0018;
+            roll += spin * (0.4F + Math.abs(sway));
+        }
+        alpha = life < 0.85F ? Math.min(1F, age / 6F) : (1F - life) / 0.15F;
+    }
+
+    private static final double PULL_RANGE = 9.0;
 
     @Override
     public ParticleRenderType getRenderType() {
@@ -111,7 +156,7 @@ public class ManaParticle extends TextureSheetParticle {
 
     @Override
     protected int getLightColor(float partialTick) {
-        return style == Style.DROP ? super.getLightColor(partialTick) : 0xF000F0;
+        return style == Style.DROP || style == Style.LEAF ? super.getLightColor(partialTick) : 0xF000F0;
     }
 
     public static final class Provider implements ParticleProvider<ManaParticleOptions> {

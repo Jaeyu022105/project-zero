@@ -42,6 +42,28 @@ public class GateRiftRenderer implements BlockEntityRenderer<GateBlockEntity> {
     /** Last game tick each rift spawned its inflow motes (one batch per tick, not per frame). */
     private static final Map<GateBlockEntity, Long> LAST_SPAWN = new WeakHashMap<>();
 
+    /** Centres of open rifts drawn recently (pos -> {x, y, z, gameTime}), so falling leaves can find them. */
+    private static final Map<net.minecraft.core.BlockPos, double[]> RIFTS = new java.util.HashMap<>();
+    /** A rift counts as present for this long after it was last drawn (covers glancing away). */
+    private static final long RIFT_MEMORY_TICKS = 200;
+
+    /** The closest open rift centre within {@code range} of the point, or null. */
+    public static @org.jetbrains.annotations.Nullable Vec3 nearestRift(double x, double y, double z, double range) {
+        net.minecraft.client.multiplayer.ClientLevel level = net.minecraft.client.Minecraft.getInstance().level;
+        if (level == null || RIFTS.isEmpty()) return null;
+        long now = level.getGameTime();
+        double best = range * range;
+        Vec3 out = null;
+        var it = RIFTS.values().iterator();
+        while (it.hasNext()) {
+            double[] r = it.next();
+            if (now - (long) r[3] > RIFT_MEMORY_TICKS || now < (long) r[3]) { it.remove(); continue; }
+            double dx = r[0] - x, dy = r[1] - y, dz = r[2] - z, d = dx * dx + dy * dy + dz * dz;
+            if (d < best) { best = d; out = new Vec3(r[0], r[1], r[2]); }
+        }
+        return out;
+    }
+
     public GateRiftRenderer(BlockEntityRendererProvider.Context ctx) {}
 
     @Override
@@ -76,6 +98,7 @@ public class GateRiftRenderer implements BlockEntityRenderer<GateBlockEntity> {
         }
 
         spawnInflow(level, be, shape, gameTime, sea ? SEA_COLOR : broken ? BROKEN_COLOR : rgb, broken);
+        if (!exit) RIFTS.put(be.getBlockPos().immutable(), new double[]{shape.center().x, shape.center().y, shape.center().z, gameTime});
 
         pose.pushPose();
         Vec3 c = shape.center();

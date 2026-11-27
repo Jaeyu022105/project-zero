@@ -270,8 +270,8 @@ Our own mechanic, not in Solo Leveling.
 
 These are for when we make our own biomes.
 
-- **[Planned] Falling leaves:** trees with leaves shed slow, drifting leaves. They're tinted to the leaf block and biome, and sway as they fall.
-- **[Planned] Leaves pulled into gates:** near an open gate portal, some falling leaves curve toward the rift and get sucked in. This shows the pull of the gate without needing a warning overlay.
+- **[Built] Falling leaves** (`client/FallingLeaves`, `ManaParticle` LEAF): any leaf block with air under it sheds leaves, in every biome, so dense forests shed more than a lone tree. Each leaf takes the color the game draws that leaf block with, so it follows the biome's foliage tint, and cherry or azalea keep their own color. Leaves sway, tumble, rest on the ground for a moment, then fade. Rain shakes more loose. Client option `ambience.fallingLeaves`, and it respects the Particles video setting.
+- **[Built] Leaves pulled into gates:** about half the leaves that drift within 9 blocks of an open rift get caught. They curve in with a little swirl, spin faster and shrink away into the core.
 
 ## 16. Progression and the main path
 
