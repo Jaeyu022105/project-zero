@@ -3,6 +3,7 @@ package com.projectzero.skills;
 import com.google.gson.JsonObject;
 import com.projectzero.ProjectZero;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -35,8 +36,8 @@ import java.util.Set;
 
 /**
  * Registry of Java {@link SkillBehavior} implementations referenced by JSON skill files.
- * Numbers come from each skill's JSON {@code params}; visuals use vanilla particles/sounds
- * (TODO(claude-art): custom VFX/animations per skill).
+ * Numbers come from each skill's JSON {@code params}; visuals use vanilla particles and sounds.
+ * Each skill layers its own shapes on top (sigils, shockwaves, arcs, domes; see {@link SkillFx}).
  */
 public final class SkillBehaviors {
     private SkillBehaviors() {}
@@ -95,6 +96,8 @@ public final class SkillBehaviors {
                 12, 0.25, 0.15, 0.25, 0.04);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 0.8F, 1.3F);
+        SkillFx.shockwave(level, player.position().add(0, 0.1, 0), 0.3, 1.6, 4, SkillFx.dust(SkillFx.WIND, 0.8F));
+        SkillFx.trail(level, player, 6, SkillFx.dust(SkillFx.WIND, 1.0F));
         return true;
     }
 
@@ -108,6 +111,8 @@ public final class SkillBehaviors {
                 6, 0.35, 0.35, 0.35, 0.02);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 0.7F, 1.5F);
+        SkillFx.sigil(level, player.position(), 1.4, SkillFx.LIFE);
+        SkillFx.spiral(level, player.position(), 2.2, 0.8, 3, duration, SkillFx.dust(SkillFx.LIFE, 0.9F));
         return true;
     }
 
@@ -122,6 +127,9 @@ public final class SkillBehaviors {
                 8, 0.4, 0.4, 0.4, 0.02);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.RAVAGER_ROAR, SoundSource.PLAYERS, 0.7F, 1.2F);
+        SkillFx.sigil(level, player.position(), 1.6, SkillFx.BLOOD);
+        SkillFx.column(level, player.position(), 2.4, 0.7, 40, SkillFx.dust(SkillFx.BLOOD, 1.3F));
+        SkillFx.shockwave(level, player.position().add(0, 0.1, 0), 0.5, 3.5, 6, SkillFx.dust(0x801018, 1.2F));
         return true;
     }
 
@@ -148,6 +156,8 @@ public final class SkillBehaviors {
         level.sendParticles(ParticleTypes.CRIT, impact.x, impact.y, impact.z, 18, 0.4, 0.4, 0.4, 0.2);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 0.6F, 1.4F);
+        SkillFx.shockwave(level, impact, 0.3, range, 5, SkillFx.dust(SkillFx.EMBER, 1.4F));
+        SkillFx.crescent(level, impact, look, 1.4, SkillFx.dust(0xFFE0B0, 1.0F));
         return true;
     }
 
@@ -205,6 +215,15 @@ public final class SkillBehaviors {
                 1, 0.0, 0.0, 0.0, 0.0);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.IRON_GOLEM_ATTACK, SoundSource.PLAYERS, 0.8F, 1.6F);
+        {
+            Vec3 f = Vec3.directionFromRotation(0, player.getYRot());
+            Vec3 side = new Vec3(-f.z, 0, f.x);
+            Vec3 c = player.position().add(0, 1.1, 0).add(f.scale(0.9));
+            DustParticleOptions blade = SkillFx.dust(SkillFx.STEEL, 0.8F);
+            SkillFx.line(level, c.add(side.scale(-0.7)).add(0, 0.7, 0), c.add(side.scale(0.7)).add(0, -0.7, 0), 0.1, blade);
+            SkillFx.line(level, c.add(side.scale(0.7)).add(0, 0.7, 0), c.add(side.scale(-0.7)).add(0, -0.7, 0), 0.1, blade);
+            SkillFx.ring(level, player.position().add(0, 0.1, 0), 1.2, blade);
+        }
         return true;
     }
 
@@ -228,6 +247,12 @@ public final class SkillBehaviors {
                 24, 0.5, 0.6, 0.5, 0.2);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F);
+        SkillFx.sigil(level, player.position(), 1.8, SkillFx.AEGIS);
+        DustParticleOptions shell = SkillFx.dust(SkillFx.AEGIS, 1.1F);
+        Vec3 at = player.position();
+        SkillFx.dome(level, at, 1.8, 90, shell);
+        SkillFx.later(6, () -> SkillFx.dome(level, at, 1.9, 70, shell));
+        SkillFx.shockwave(level, at.add(0, 0.1, 0), 1.0, tauntRadius, 8, SkillFx.dust(0xFF5050, 0.8F));
         return true;
     }
 
@@ -259,6 +284,16 @@ public final class SkillBehaviors {
         }
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 0.7F, 1.3F);
+        DustParticleOptions hex = SkillFx.dust(SkillFx.HEX, 1.3F);
+        DustParticleOptions dark = SkillFx.dust(0x2A1040, 1.5F);
+        for (int i = 0; i < (int) range; i += 2) {
+            Vec3 c = start.add(look.scale(1.0 + i)).add(0, -0.3, 0);
+            double r = 1.2 + i * 0.08;
+            SkillFx.later(1 + i / 2, () -> {
+                SkillFx.crescent(level, c, look, r, hex);
+                SkillFx.crescent(level, c.add(look.scale(-0.2)), look, r * 0.9, dark);
+            });
+        }
         return true;
     }
 
@@ -289,6 +324,8 @@ public final class SkillBehaviors {
             level.addFreshEntity(hound);
             level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, hound.getX(), hound.getY() + 0.5, hound.getZ(),
                     14, 0.3, 0.3, 0.3, 0.03);
+            SkillFx.sigil(level, hound.position(), 0.9, SkillFx.SPIRIT);
+            SkillFx.column(level, hound.position(), 1.6, 0.4, 24, SkillFx.dust(SkillFx.SPIRIT, 0.9F));
         }
 
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -318,6 +355,8 @@ public final class SkillBehaviors {
                 30, 0.8, 0.8, 0.8, 0.25);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.TRIDENT_THUNDER.value(), SoundSource.PLAYERS, 0.9F, 1.1F);
+        SkillFx.sigil(level, player.position(), 2.2, SkillFx.STORM);
+        SkillFx.spiral(level, player.position(), 3.0, 1.2, 2, 10, SkillFx.dust(SkillFx.STORM, 1.0F));
         return true;
     }
 
@@ -337,6 +376,7 @@ public final class SkillBehaviors {
         float backstabBonus = GsonHelper.getAsFloat(params, "backstab_multiplier", 0.50F);
 
         ServerLevel level = player.serverLevel();
+        Vec3 origin = player.position();
         level.sendParticles(ParticleTypes.REVERSE_PORTAL, player.getX(), player.getY() + 1.0, player.getZ(),
                 24, 0.3, 0.6, 0.3, 0.08);
 
@@ -357,6 +397,10 @@ public final class SkillBehaviors {
                 20, 0.3, 0.5, 0.3, 0.03);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.9F, 1.2F);
+        DustParticleOptions shade = SkillFx.dust(SkillFx.SHADOW, 1.6F);
+        SkillFx.column(level, origin, 1.9, 0.45, 40, shade);
+        SkillFx.line(level, origin.add(0, 1.0, 0), player.position().add(0, 1.0, 0), 0.3, SkillFx.dust(0x1A1028, 1.2F));
+        SkillFx.column(level, player.position(), 1.9, 0.45, 30, shade);
         return true;
     }
 
@@ -375,6 +419,13 @@ public final class SkillBehaviors {
             totalDealt += damage;
             level.sendParticles(ParticleTypes.SOUL, target.getX(), target.getY() + 0.8, target.getZ(),
                     10, 0.3, 0.4, 0.3, 0.03);
+            Vec3 t = target.position();
+            DustParticleOptions chain = SkillFx.dust(SkillFx.SOUL, 0.8F);
+            for (int k = 0; k < 3; k++) {
+                double a = k * Math.PI * 2 / 3;
+                Vec3 anchor = t.add(Math.cos(a) * 1.4, 0, Math.sin(a) * 1.4);
+                SkillFx.line(level, anchor, t.add(0, target.getBbHeight() * 0.6, 0), 0.15, chain);
+            }
         }
         if (totalDealt > 0) {
             player.heal(totalDealt * siphonFraction);
@@ -384,6 +435,8 @@ public final class SkillBehaviors {
                 32, radius * 0.4, 0.2, radius * 0.4, 0.04);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.WARDEN_SONIC_CHARGE, SoundSource.PLAYERS, 0.8F, 1.3F);
+        SkillFx.sigil(level, player.position(), radius * 0.6, SkillFx.SOUL);
+        SkillFx.ring(level, player.position().add(0, 0.1, 0), radius, SkillFx.dust(SkillFx.SOUL, 1.0F));
         return true;
     }
 
@@ -417,6 +470,11 @@ public final class SkillBehaviors {
                 30, 0.6, 0.8, 0.6, 0.15);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.0F, 0.8F);
+        SkillFx.sigil(level, player.position(), 2.4, SkillFx.SUN);
+        SkillFx.column(level, player.position(), 6.0, 0.6, 70, SkillFx.dust(0xFFF4C0, 1.4F));
+        SkillFx.shockwave(level, player.position().add(0, 0.2, 0), 0.8, radius, 8, SkillFx.dust(SkillFx.SUN, 1.6F));
+        SkillFx.later(3, () -> SkillFx.shockwave(level, player.position().add(0, 0.6, 0), 0.8, radius * 0.8, 6,
+                SkillFx.dust(SkillFx.EMBER, 1.3F)));
         return true;
     }
 
@@ -453,6 +511,14 @@ public final class SkillBehaviors {
         level.sendParticles(ParticleTypes.ENCHANTED_HIT, center.x, center.y + 0.8, center.z, 24, 0.5, 0.5, 0.5, 0.25);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.7F, 0.75F);
+        DustParticleOptions crack = SkillFx.dust(SkillFx.EMBER, 1.2F);
+        Vec3 ground = new Vec3(center.x, center.y + 0.1, center.z);
+        for (int k = 0; k < 8; k++) {
+            double a = k * Math.PI / 4 + level.random.nextDouble() * 0.3;
+            double len = 2.5 + level.random.nextDouble() * 1.5;
+            SkillFx.line(level, ground, ground.add(Math.cos(a) * len, 0, Math.sin(a) * len), 0.2, crack);
+        }
+        SkillFx.shockwave(level, ground, 0.5, 4.0, 5, SkillFx.dust(0xFFE0B0, 1.0F));
         return true;
     }
 
@@ -500,5 +566,8 @@ public final class SkillBehaviors {
             cur = cur.add(step);
             level.sendParticles(ParticleTypes.CRIT, cur.x, cur.y, cur.z, 1, 0.02, 0.02, 0.02, 0.0);
         }
+        // Glowing tracer and a spark burst where it lands.
+        SkillFx.line(level, from, to, 0.25, SkillFx.dust(SkillFx.GOLD, 0.7F));
+        level.sendParticles(ParticleTypes.ELECTRIC_SPARK, to.x, to.y, to.z, 8, 0.15, 0.15, 0.15, 0.2);
     }
 }

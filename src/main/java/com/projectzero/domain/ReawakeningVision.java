@@ -239,7 +239,7 @@ public final class ReawakeningVision {
         }
 
         tickChosen(session, player, level, age, center);
-        tickAmbience(player, level, age, center);
+        tickAmbience(player, level, age, center, session.result.shardTier());
 
         if (age == T_CLOSE) overlay(player, 1F, T_HOME - T_CLOSE - 2, true);
     }
@@ -266,7 +266,8 @@ public final class ReawakeningVision {
                 level.playSound(null, card.blockPosition(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 2.0F, 0.5F);
             }
             send(player, level, ParticleTypes.END_ROD, pos.x, pos.y + 0.6, pos.z, 1, 0.2, 0.3, 0.2, 0.0);
-            if (age % 6 == 0) ripple(player, level, new Vec3(pos.x, center.y, pos.z), 1.0 + t, 0xB8E6FF);
+            if (age % 6 == 0) ripple(player, level, new Vec3(pos.x, center.y, pos.z), 1.0 + t,
+                    tierTint(0xB8E6FF, session.result.shardTier()));
             return;
         }
 
@@ -310,7 +311,7 @@ public final class ReawakeningVision {
         }
     }
 
-    private static void tickAmbience(ServerPlayer player, ServerLevel level, int age, Vec3 center) {
+    private static void tickAmbience(ServerPlayer player, ServerLevel level, int age, Vec3 center, int shardTier) {
         RandomSource random = level.random;
         // Specks drifting up from the water, far and near.
         for (int i = 0; i < 3; i++) {
@@ -321,7 +322,17 @@ public final class ReawakeningVision {
         }
         // Ripples spread from where you stand.
         int beat = (age - T_TELEPORT) % 40;
-        if (beat < 14 && beat % 2 == 0) ripple(player, level, center, 0.6 + beat * 0.35, 0x9FD8FF);
+        if (beat < 14 && beat % 2 == 0) ripple(player, level, center, 0.6 + beat * 0.35, tierTint(0x9FD8FF, shardTier));
+        // A charged shard warms the sea: golden motes drift over the water, more for higher tiers.
+        if (shardTier > 0) {
+            DustParticleOptions gold = new DustParticleOptions(rgb(tierTint(0x9FD8FF, shardTier)), 1.2F);
+            for (int i = 0; i < shardTier; i++) {
+                double a = random.nextDouble() * Math.PI * 2;
+                double r = 2 + random.nextDouble() * 30;
+                send(player, level, gold, center.x + Math.cos(a) * r, center.y + 0.1 + random.nextDouble() * 4,
+                        center.z + Math.sin(a) * r, 1, 0, 0, 0, 0);
+            }
+        }
     }
 
     private static void placeDrifting(JobCardEntity card, Vec3 center, double[] d, int age) {
@@ -458,6 +469,16 @@ public final class ReawakeningVision {
 
     private static void sound(ServerLevel level, ServerPlayer player, SoundEvent sound, float volume, float pitch) {
         level.playSound(null, player.getX(), player.getY(), player.getZ(), sound, SoundSource.PLAYERS, volume, pitch);
+    }
+
+    /** Blends a cool sea color toward gold by Shard Vessel charge tier (0 = untouched, 5 = full gold). */
+    private static int tierTint(int cool, int shardTier) {
+        float t = Math.max(0, Math.min(5, shardTier)) / 5F;
+        int gold = 0xFFD060;
+        int r = (int) (((cool >> 16) & 0xFF) * (1 - t) + ((gold >> 16) & 0xFF) * t);
+        int g = (int) (((cool >> 8) & 0xFF) * (1 - t) + ((gold >> 8) & 0xFF) * t);
+        int b = (int) ((cool & 0xFF) * (1 - t) + (gold & 0xFF) * t);
+        return (r << 16) | (g << 8) | b;
     }
 
     private static Vector3f rgb(JobRarity rarity) {
