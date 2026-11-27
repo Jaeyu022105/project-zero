@@ -48,6 +48,8 @@ public class ProjectZeroRegion extends Region {
             builder.replaceBiome(Biomes.WARM_OCEAN, ModBiomes.KARST_BAY);
             builder.replaceBiome(Biomes.LUKEWARM_OCEAN, ModBiomes.KARST_BAY);
             builder.replaceBiome(Biomes.DESERT, ModBiomes.SALT_FLATS);
+            // Real salt flats sit on cool, dry plateaus too, so they're not tied to the (far apart) hot zones.
+            builder.replaceBiome(Biomes.SUNFLOWER_PLAINS, ModBiomes.SALT_FLATS);
             builder.replaceBiome(Biomes.OLD_GROWTH_PINE_TAIGA, ModBiomes.GEYSER_BASIN);
             builder.replaceBiome(Biomes.ICE_SPIKES, ModBiomes.ICE_CATHEDRAL);
             builder.replaceBiome(Biomes.SNOWY_PLAINS, ModBiomes.CRYSTAL_TUNDRA);
