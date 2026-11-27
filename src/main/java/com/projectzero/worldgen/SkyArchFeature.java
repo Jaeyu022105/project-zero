@@ -26,7 +26,7 @@ public class SkyArchFeature extends Feature<NoneFeatureConfiguration> {
         BlockPos origin = ctx.origin();
         int width = 10 + r.nextInt(15);
         int height = 30 + r.nextInt(51);
-        if (origin.getY() + height + 9 >= level.getMaxBuildHeight()) return false;
+        if (origin.getY() + height + 12 >= level.getMaxBuildHeight()) return false;
         int direction = r.nextBoolean() ? 0 : 1;
         int half = width / 2;
         int springY = height - 9;
