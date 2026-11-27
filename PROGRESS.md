@@ -73,3 +73,4 @@ Additions and changes to the plan, newest last. One line each, with the design d
   - Realtors (land, apartments), builder schematics with a hologram preview and worker NPCs (§16e).
   - Transport: costly trains between tiers (wait for all ticket holders, seats, skippable ride), continuous Japanese-style subways with escalators, planes between continents unlocked at the highest civilization; craftable waypoint stones that can't go in dungeons (§16f).
   - Continents, each its own dimension with its own biome set, spawn continent is the player's choice; 5 hidden mythical bosses per continent (§16g).
+- 2026-11-27: Rope bridges that sag between anchors and sway and shake as you walk; players can build them (§15).
