@@ -2,5 +2,37 @@
   "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "projectzero:item/awakening_shard"
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "projectzero:tier": 0.05
+      },
+      "model": "projectzero:item/awakening_shard_t1"
+    },
+    {
+      "predicate": {
+        "projectzero:tier": 0.15000000000000002
+      },
+      "model": "projectzero:item/awakening_shard_t2"
+    },
+    {
+      "predicate": {
+        "projectzero:tier": 0.25
+      },
+      "model": "projectzero:item/awakening_shard_t3"
+    },
+    {
+      "predicate": {
+        "projectzero:tier": 0.35000000000000003
+      },
+      "model": "projectzero:item/awakening_shard_t4"
+    },
+    {
+      "predicate": {
+        "projectzero:tier": 0.45
+      },
+      "model": "projectzero:item/awakening_shard_t5"
+    }
+  ]
 }

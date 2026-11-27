@@ -93,21 +93,23 @@ public final class EquipmentRules {
             case LEGENDARY -> 3 + random.nextInt(2);
         };
 
+        // Rebalanced 2026-11-27 (owner OK'd the cut): a full set of 8 S-rank Legendary pieces
+        // (~60 points each) is worth about as much as levels 1-100 (495 points), not ~3x more.
         int minBase = switch (rank) {
             case E -> 1;
-            case D -> 2;
-            case C -> 4;
-            case B -> 7;
-            case A -> 11;
-            case S -> 16;
+            case D -> 1;
+            case C -> 2;
+            case B -> 3;
+            case A -> 4;
+            case S -> 6;
         };
         int maxBase = switch (rank) {
-            case E -> 2;
-            case D -> 4;
-            case C -> 7;
-            case B -> 11;
-            case A -> 16;
-            case S -> 24;
+            case E -> 1;
+            case D -> 2;
+            case C -> 3;
+            case B -> 5;
+            case A -> 7;
+            case S -> 9;
         };
         double rarityScale = switch (rarity) {
             case COMMON -> 1.0;

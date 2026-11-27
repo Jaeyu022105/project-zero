@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "projectzero:item/awakening_shard_t3"
+  }
+}

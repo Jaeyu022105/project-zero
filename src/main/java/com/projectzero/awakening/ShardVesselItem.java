@@ -24,7 +24,7 @@ import java.util.List;
  * five tiers (DESIGN-DOCUMENT.md §6).
  *
  * Right-click with an Awakening Shard in the other hand to insert; sneak + right-click to extract.
- * TODO(claude-art): shard_vessel uses a flat 16x16 placeholder texture; add tier glow visuals later.
+ * Textures: shard_vessel (empty) and shard_vessel_t0..t5, picked by the projectzero:fill item property (ClientModEvents).
  */
 public class ShardVesselItem extends Item {
     public ShardVesselItem(Properties properties) {

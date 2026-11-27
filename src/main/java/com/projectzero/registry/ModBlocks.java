@@ -89,6 +89,7 @@ public final class ModBlocks {
                     .noCollission()
                     .noOcclusion()
                     .lightLevel(state -> 13)
+                    .emissiveRendering((state, level, pos) -> true)
                     .sound(SoundType.GLASS)
                     .pushReaction(PushReaction.BLOCK)));
 

@@ -11,17 +11,26 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import com.projectzero.jobs.Job;
+import com.projectzero.jobs.JobRarity;
+import com.projectzero.jobs.PlayerJob;
+import com.projectzero.leveling.PlayerStats;
+import com.projectzero.network.SyncSkillsPacket;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Placeholder bottom-left HUD showing plain text {@code HP x/y  MP x/y} and active skill slot
- * cooldowns.
- * TODO(claude-art): replace plain-text placeholder HUD with styled System HP/MP bars & skill slot icons.
+ * The System HUD, bottom left: four skill slots (icon, key, cooldown sweep, out-of-mana tint)
+ * above a small panel with level, job, HP, MP and XP bars. Follows the System look
+ * ({@code .agents/skills/system-ui-style}). Hidden with F1 and during the Reawakening vision.
  */
 @Mod.EventBusSubscriber(modid = ProjectZero.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public final class SkillHudOverlay {
@@ -52,39 +61,177 @@ public final class SkillHudOverlay {
         }
     }
 
+    // ---- palette (system-ui-style) ----
+    private static final int PANEL = 0xD00A1220;
+    private static final int GLOW = 0x403FD0FF;
+    private static final int BORDER = 0xFF3FD0FF;
+    private static final int BORDER_DIM = 0x803FD0FF;
+    private static final int LABEL = 0xFF7FE8FF;
+    private static final int VALUE = 0xFFFFFFFF;
+    private static final int MUTED = 0xFF8090A0;
+    private static final int BAR_BG = 0xFF1A2A3A;
+    private static final int HP_FILL = 0xFFE0404A;
+    private static final int HP_HI = 0xFFFF7A80;
+    private static final int MP_FILL = 0xFF3A7CFF;
+    private static final int MP_HI = 0xFF8AB8FF;
+    private static final int XP_FILL = 0xFF3FD0FF;
+    private static final int LAG = 0xFFFFE0A0;
+
+    private static final int SLOT = 20;
+    private static final int PANEL_W = 104;
+    private static final int PANEL_H = 44;
+
+    /** Bars ease toward their value; the HP bar leaves a pale "lag" trail when you take damage. */
+    private static float hpShown = 1F, hpLag = 1F, mpShown = 1F, xpShown = 0F;
+    /** Longest cooldown seen per skill since it started, for the sweep. */
+    private static final Map<ResourceLocation, Integer> COOLDOWN_TOTAL = new HashMap<>();
+    private static final Map<ResourceLocation, Boolean> ICON_EXISTS = new HashMap<>();
+
     private static void render(GuiGraphics g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null || mc.options.hideGui || VisionOverlayState.coverage() > 0.5F) return;
+        if (mc.player.isSpectator()) return;
 
         int h = g.guiHeight();
-        int hp = Math.round(player.getHealth());
-        int maxHp = Math.round(player.getMaxHealth());
-        int mp = ClientSkillsCache.currentMana();
-        int maxMp = ClientSkillsCache.maxMana();
-
-        String vitals = "HP " + hp + "/" + maxHp + "  MP " + mp + "/" + maxMp;
-        g.drawString(mc.font, vitals, 8, h - 24, 0xFF7FE8FF, true);
+        int x = 6;
+        int panelY = h - 6 - PANEL_H;
+        int slotY = panelY - 5 - SLOT;
 
         PlayerSkills skills = ClientSkillsCache.get();
-        StringBuilder slotsLine = new StringBuilder();
         for (int i = 0; i < SkillRules.ACTIVE_SLOTS; i++) {
-            if (i > 0) slotsLine.append("  ");
-            String keyLabel = ModKeyBindings.SKILL_KEYS[i].getTranslatedKeyMessage().getString().toUpperCase();
-            slotsLine.append('[').append(keyLabel).append("] ");
-            ResourceLocation id = skills.slot(i);
-            if (id == null) {
-                slotsLine.append('-');
+            drawSlot(g, mc, x + i * (SLOT + 4), slotY, i, skills);
+        }
+
+        frame(g, x, panelY, PANEL_W, PANEL_H, BORDER);
+
+        // Level + job
+        PlayerStats stats = ClientStatsCache.get();
+        g.drawString(mc.font, "LV", x + 4, panelY + 4, LABEL, false);
+        g.drawString(mc.font, String.valueOf(stats.level()), x + 17, panelY + 4, VALUE, false);
+        PlayerJob job = ClientJobCache.get();
+        if (job.hasJob()) {
+            JobRarity rarity = ClientJobCache.rarity();
+            int color = rarity != null ? rarity.argb() : VALUE;
+            Component name = Job.displayName(job.jobId());
+            int w = mc.font.width(name);
+            g.drawString(mc.font, name, x + PANEL_W - 4 - w, panelY + 4, color, false);
+        } else {
+            String none = "NO JOB";
+            g.drawString(mc.font, none, x + PANEL_W - 4 - mc.font.width(none), panelY + 4, MUTED, false);
+        }
+
+        // HP
+        float hp = player.getHealth();
+        float maxHp = Math.max(1F, player.getMaxHealth());
+        float hpFrac = Mth.clamp(hp / maxHp, 0F, 1F);
+        hpShown += (hpFrac - hpShown) * 0.35F;
+        hpLag = hpFrac > hpLag ? hpFrac : hpLag + (hpFrac - hpLag) * 0.06F;
+        barRow(g, mc, x + 4, panelY + 15, "HP", Math.round(hp), Math.round(maxHp), hpShown, hpLag, HP_FILL, HP_HI);
+
+        // MP
+        int mp = ClientSkillsCache.currentMana();
+        int maxMp = Math.max(0, ClientSkillsCache.maxMana());
+        float mpFrac = maxMp <= 0 ? 0F : Mth.clamp(mp / (float) maxMp, 0F, 1F);
+        mpShown += (mpFrac - mpShown) * 0.35F;
+        barRow(g, mc, x + 4, panelY + 27, "MP", mp, maxMp, mpShown, mpShown, MP_FILL, MP_HI);
+
+        // XP, thin line along the bottom of the panel
+        float xpFrac = stats.isMaxLevel() ? 1F : Mth.clamp(stats.xp() / (float) Math.max(1L, stats.xpToNext()), 0F, 1F);
+        xpShown += (xpFrac - xpShown) * 0.2F;
+        int xpY = panelY + PANEL_H - 4;
+        g.fill(x + 4, xpY, x + PANEL_W - 4, xpY + 2, BAR_BG);
+        g.fill(x + 4, xpY, x + 4 + Math.round((PANEL_W - 8) * xpShown), xpY + 2, XP_FILL);
+    }
+
+    private static void barRow(GuiGraphics g, Minecraft mc, int x, int y, String label, int value, int max,
+                               float shown, float lag, int fill, int hi) {
+        int w = PANEL_W - 8;
+        g.drawString(mc.font, label, x, y, LABEL, false);
+        String nums = value + " / " + max;
+        g.pose().pushPose();
+        g.pose().translate(x + w, y + 1, 0);
+        g.pose().scale(0.75F, 0.75F, 1F);
+        g.drawString(mc.font, nums, -mc.font.width(nums), 0, VALUE, false);
+        g.pose().popPose();
+        int by = y + 9;
+        g.fill(x, by, x + w, by + 3, BAR_BG);
+        if (lag > shown) g.fill(x, by, x + Math.round(w * lag), by + 3, LAG);
+        int fw = Math.round(w * shown);
+        g.fill(x, by, x + fw, by + 3, fill);
+        g.fill(x, by, x + fw, by + 1, hi);
+    }
+
+    private static void drawSlot(GuiGraphics g, Minecraft mc, int x, int y, int index, PlayerSkills skills) {
+        ResourceLocation id = skills.slot(index);
+        frame(g, x, y, SLOT, SLOT, id == null ? BORDER_DIM : BORDER);
+
+        if (id != null) {
+            if (hasIcon(mc, id)) {
+                g.blit(iconOf(id), x + 2, y + 2, 0, 0, 16, 16, 16, 16);
             } else {
-                String name = Skill.displayName(id).getString();
-                int cd = skills.cooldownRemaining(id);
-                if (cd > 0) {
-                    slotsLine.append(name).append(String.format(" (%.1fs)", cd / 20.0));
-                } else {
-                    slotsLine.append(name);
-                }
+                String initials = initials(Skill.displayName(id).getString());
+                g.drawString(mc.font, initials, x + (SLOT - mc.font.width(initials)) / 2, y + 6, LABEL, false);
+            }
+
+            // Not enough mana: blue wash.
+            SyncSkillsPacket.SkillMeta meta = ClientSkillsCache.meta(id);
+            if (meta != null && meta.manaCost() > ClientSkillsCache.currentMana()) {
+                g.fill(x + 2, y + 2, x + SLOT - 2, y + SLOT - 2, 0x902040A0);
+            }
+
+            // Cooldown: dark sweep shrinking from the top, seconds on top.
+            int cd = skills.cooldownRemaining(id);
+            if (cd > 0) {
+                int total = Math.max(cd, COOLDOWN_TOTAL.getOrDefault(id, cd));
+                COOLDOWN_TOTAL.put(id, total);
+                int inner = SLOT - 4;
+                int covered = Math.round(inner * (cd / (float) total));
+                g.fill(x + 2, y + 2 + (inner - covered), x + SLOT - 2, y + SLOT - 2, 0xB0000000);
+                String secs = cd >= 200 ? String.valueOf(cd / 20) : String.format("%.1f", cd / 20F);
+                g.pose().pushPose();
+                g.pose().translate(0, 0, 200);
+                g.drawString(mc.font, secs, x + (SLOT - mc.font.width(secs)) / 2 + 1, y + 6, VALUE, true);
+                g.pose().popPose();
+            } else {
+                COOLDOWN_TOTAL.remove(id);
             }
         }
-        g.drawString(mc.font, slotsLine.toString(), 8, h - 12, 0xFFE0E0E0, true);
+
+        // Key label in the corner.
+        String key = ModKeyBindings.SKILL_KEYS[index].getTranslatedKeyMessage().getString().toUpperCase();
+        if (key.length() > 2) key = key.substring(0, 2);
+        g.pose().pushPose();
+        g.pose().translate(x + SLOT - 1, y + SLOT - 6, 300);
+        g.pose().scale(0.6F, 0.6F, 1F);
+        g.drawString(mc.font, key, -mc.font.width(key), 0, LABEL, true);
+        g.pose().popPose();
+    }
+
+    /** Navy panel, 1px border, soft outer glow. */
+    private static void frame(GuiGraphics g, int x, int y, int w, int h, int border) {
+        g.fill(x - 1, y - 1, x + w + 1, y + h + 1, GLOW);
+        g.fill(x, y, x + w, y + h, PANEL);
+        g.fill(x, y, x + w, y + 1, border);
+        g.fill(x, y + h - 1, x + w, y + h, border);
+        g.fill(x, y, x + 1, y + h, border);
+        g.fill(x + w - 1, y, x + w, y + h, border);
+    }
+
+    private static ResourceLocation iconOf(ResourceLocation skill) {
+        return ResourceLocation.fromNamespaceAndPath(skill.getNamespace(), "textures/gui/skills/" + skill.getPath() + ".png");
+    }
+
+    private static boolean hasIcon(Minecraft mc, ResourceLocation skill) {
+        return ICON_EXISTS.computeIfAbsent(skill, id -> mc.getResourceManager().getResource(iconOf(id)).isPresent());
+    }
+
+    private static String initials(String name) {
+        StringBuilder out = new StringBuilder();
+        for (String part : name.split(" ")) {
+            if (!part.isEmpty()) out.append(Character.toUpperCase(part.charAt(0)));
+            if (out.length() == 2) break;
+        }
+        return out.isEmpty() ? "?" : out.toString();
     }
 }

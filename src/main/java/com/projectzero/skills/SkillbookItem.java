@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Consumable dungeon book that teaches the skill stored in {@link ModDataComponents#SKILL_ID}.
  * Can teach a skill from any job so players can mix builds (DESIGN-DOCUMENT.md §4).
- * TODO(claude-art): skillbook uses a flat 16x16 placeholder texture.
+ * Texture: System tome with a glowing sigil (art pass 2026-11-27).
  */
 public class SkillbookItem extends Item {
     public SkillbookItem(Properties properties) {

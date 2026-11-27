@@ -2,5 +2,43 @@
   "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "projectzero:item/shard_vessel"
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "projectzero:fill": 0.05
+      },
+      "model": "projectzero:item/shard_vessel_t0"
+    },
+    {
+      "predicate": {
+        "projectzero:fill": 0.15000000000000002
+      },
+      "model": "projectzero:item/shard_vessel_t1"
+    },
+    {
+      "predicate": {
+        "projectzero:fill": 0.25
+      },
+      "model": "projectzero:item/shard_vessel_t2"
+    },
+    {
+      "predicate": {
+        "projectzero:fill": 0.35000000000000003
+      },
+      "model": "projectzero:item/shard_vessel_t3"
+    },
+    {
+      "predicate": {
+        "projectzero:fill": 0.45
+      },
+      "model": "projectzero:item/shard_vessel_t4"
+    },
+    {
+      "predicate": {
+        "projectzero:fill": 0.5499999999999999
+      },
+      "model": "projectzero:item/shard_vessel_t5"
+    }
+  ]
 }

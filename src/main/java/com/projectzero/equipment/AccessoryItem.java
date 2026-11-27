@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * Equippable accessory item for one of the 8 custom {@link AccessorySlotType} slots.
- * Visuals use 16x16 placeholder icons (TODO(claude-art): custom item icons and worn gauntlet model).
+ * Visuals use 16x16 placeholder icons (item icons done 2026-11-27; TODO(claude-art): worn gauntlet model).
  */
 public class AccessoryItem extends Item {
     private final AccessorySlotType slotType;
