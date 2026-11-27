@@ -81,6 +81,10 @@ public final class ModFeatures {
             FEATURES.register("kopje", com.projectzero.worldgen.KopjeFeature::new);
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> SALT_MOUND =
             FEATURES.register("salt_mound", com.projectzero.worldgen.SaltMoundFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> TRAVERTINE_TERRACE =
+            FEATURES.register("travertine_terrace", com.projectzero.worldgen.TravertineTerraceFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> FROZEN_POND =
+            FEATURES.register("frozen_pond", com.projectzero.worldgen.FrozenPondFeature::new);
 
     public static final DeferredRegister<net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType<?>> TREE_DECORATORS =
             DeferredRegister.create(net.minecraft.core.registries.Registries.TREE_DECORATOR_TYPE, ProjectZero.MOD_ID);
