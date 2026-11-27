@@ -1,0 +1,28 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "projectzero:block/waypoint_stone",
+    "stone": "projectzero:block/waypoint_stone",
+    "rune": "projectzero:block/waypoint_stone_rune"
+  },
+  "elements": [
+    { "from": [0, 0, 0], "to": [16, 3, 16], "faces": {
+      "down": { "texture": "#stone", "cullface": "down" }, "up": { "texture": "#stone" },
+      "north": { "texture": "#stone" }, "south": { "texture": "#stone" },
+      "west": { "texture": "#stone" }, "east": { "texture": "#stone" }
+    }},
+    { "from": [2, 3, 2], "to": [14, 12, 14], "faces": {
+      "down": { "texture": "#stone" }, "up": { "texture": "#stone" },
+      "north": { "texture": "#stone" }, "south": { "texture": "#stone" },
+      "west": { "texture": "#stone" }, "east": { "texture": "#stone" }
+    }},
+    { "from": [1, 12, 1], "to": [15, 14, 15], "faces": {
+      "down": { "texture": "#stone" }, "up": { "texture": "#stone" },
+      "north": { "texture": "#stone" }, "south": { "texture": "#stone" },
+      "west": { "texture": "#stone" }, "east": { "texture": "#stone" }
+    }},
+    { "from": [4, 4, 1.98], "to": [12, 11, 2.02], "faces": {
+      "north": { "texture": "#rune" }
+    }}
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "projectzero:block/waypoint_stone" },
+    "facing=east": { "model": "projectzero:block/waypoint_stone", "y": 90 },
+    "facing=south": { "model": "projectzero:block/waypoint_stone", "y": 180 },
+    "facing=west": { "model": "projectzero:block/waypoint_stone", "y": 270 }
+  }
+}

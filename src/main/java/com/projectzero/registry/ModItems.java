@@ -55,6 +55,9 @@ public final class ModItems {
     public static final RegistryObject<Item> MANA_CRYSTAL_SHARD = ITEMS.register("mana_crystal_shard",
             () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
 
+    public static final RegistryObject<Item> WAYPOINT_STONE = ITEMS.register("waypoint_stone",
+            () -> new com.projectzero.waypoints.WaypointStoneItem(ModBlocks.WAYPOINT_STONE.get(), new Item.Properties()));
+
     // ---- Starter Accessories (icons + worn gauntlet layer done; see client/GauntletLayer) ----
     public static final RegistryObject<Item> IRON_GAUNTLETS = ITEMS.register("iron_gauntlets",
             () -> new AccessoryItem(AccessorySlotType.GAUNTLETS, new Item.Properties().stacksTo(1)));

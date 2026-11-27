@@ -120,6 +120,16 @@ public final class ModBlocks {
                     .lightLevel(com.projectzero.gates.AncientGateStoneBlock::lightLevel)
                     .pushReaction(PushReaction.BLOCK)));
 
+    public static final RegistryObject<Block> WAYPOINT_STONE = BLOCKS.register("waypoint_stone",
+            () -> new com.projectzero.waypoints.WaypointStoneBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_LIGHT_BLUE)
+                    .strength(3.0F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.DEEPSLATE_BRICKS)
+                    .lightLevel(state -> 7)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.BLOCK)));
+
     private static BlockBehaviour.Properties crystalProperties(int light) {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_LIGHT_BLUE)

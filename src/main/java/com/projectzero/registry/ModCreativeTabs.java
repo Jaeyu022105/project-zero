@@ -20,6 +20,7 @@ public final class ModCreativeTabs {
                     .icon(() -> new ItemStack(ModItems.AWAKENING_SHARD.get()))
                     .displayItems((params, output) -> {
                         output.accept(ModItems.AWAKENING_STONE.get());
+                        output.accept(ModItems.WAYPOINT_STONE.get());
                         output.accept(ModMaterials.BEAST_FANG.get());
                         output.accept(ModMaterials.BEAST_CLAW.get());
                         output.accept(ModMaterials.BEAST_PELT.get());
