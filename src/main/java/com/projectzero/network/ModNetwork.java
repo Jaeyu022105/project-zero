@@ -12,8 +12,9 @@ public final class ModNetwork {
 
     // 2: SyncJobPacket. 3: VisionOverlayPacket. 4: SyncSkillsPacket + CastSkillPacket.
     // 5: SyncTitlesPacket + CycleTitlePacket. 6: SyncStatBonusesPacket + OpenAccessoriesPacket.
+    // 7: SyncWornGearPacket.
     // Bump whenever the packet list or a packet's format changes.
-    private static final int PROTOCOL_VERSION = 6;
+    private static final int PROTOCOL_VERSION = 7;
 
     public static final SimpleChannel CHANNEL = ChannelBuilder
             .named(ProjectZero.id("main"))
@@ -80,10 +81,21 @@ public final class ModNetwork {
                 .decoder(OpenAccessoriesPacket::decode)
                 .consumerMainThread(OpenAccessoriesPacket::handle)
                 .add();
+
+        CHANNEL.messageBuilder(SyncWornGearPacket.class, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(SyncWornGearPacket::encode)
+                .decoder(SyncWornGearPacket::decode)
+                .consumerMainThread(SyncWornGearPacket::handle)
+                .add();
     }
 
     public static void sendToPlayer(ServerPlayer player, Object message) {
         CHANNEL.send(message, PacketDistributor.PLAYER.with(player));
+    }
+
+    /** Sends to {@code player} and every client tracking them. */
+    public static void sendToTrackingAndSelf(ServerPlayer player, Object message) {
+        CHANNEL.send(message, PacketDistributor.TRACKING_ENTITY_AND_SELF.with(player));
     }
 
     public static void sendToServer(Object message) {

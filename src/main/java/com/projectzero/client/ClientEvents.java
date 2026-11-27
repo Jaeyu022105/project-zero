@@ -5,6 +5,7 @@ import com.projectzero.jobs.PlayerJob;
 import com.projectzero.leveling.PlayerStats;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.client.event.RenderArmEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -21,5 +22,14 @@ public final class ClientEvents {
         ClientTitlesCache.reset();
         ClientBonusCache.reset();
         VisionOverlayState.reset();
+        ClientWornGear.clear();
+        GauntletLayer.clearCache();
+    }
+
+    /** Gauntlets on the first-person arm (empty hand). Vanilla draws the arm right after. */
+    @SubscribeEvent
+    public static void onRenderArm(RenderArmEvent event) {
+        GauntletLayer.renderFirstPerson(event.getPoseStack(), event.getMultiBufferSource(),
+                event.getPackedLight(), event.getPlayer(), event.getArm());
     }
 }

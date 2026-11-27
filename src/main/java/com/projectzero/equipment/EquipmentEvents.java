@@ -1,6 +1,7 @@
 package com.projectzero.equipment;
 
 import com.projectzero.ProjectZero;
+import com.projectzero.network.ModNetwork;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.EntityTypeTags;
@@ -47,6 +48,15 @@ public final class EquipmentEvents {
     public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             EquipmentService.refreshEffects(player);
+        }
+    }
+
+    /** A client starts seeing another player: send what that player wears. */
+    @SubscribeEvent
+    public static void onStartTracking(PlayerEvent.StartTracking event) {
+        if (event.getEntity() instanceof ServerPlayer viewer
+                && event.getTarget() instanceof ServerPlayer target) {
+            ModNetwork.sendToPlayer(viewer, EquipmentService.wornGearPacket(target));
         }
     }
 

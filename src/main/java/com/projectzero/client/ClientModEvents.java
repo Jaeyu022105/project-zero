@@ -7,7 +7,9 @@ import com.projectzero.registry.ModEntities;
 import com.projectzero.registry.ModItems;
 import com.projectzero.registry.ModMenus;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,6 +24,21 @@ public final class ClientModEvents {
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.JOB_CARD.get(), JobCardRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void onRegisterLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(GauntletLayer.WIDE, () -> GauntletLayer.create(false));
+        event.registerLayerDefinition(GauntletLayer.SLIM, () -> GauntletLayer.create(true));
+    }
+
+    @SubscribeEvent
+    public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
+        for (PlayerSkin.Model skin : event.getSkins()) {
+            if (event.getSkin(skin) instanceof PlayerRenderer renderer) {
+                renderer.addLayer(new GauntletLayer(renderer, event.getEntityModels(), skin == PlayerSkin.Model.SLIM));
+            }
+        }
     }
 
     @SubscribeEvent

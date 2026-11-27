@@ -5,6 +5,9 @@ import com.projectzero.leveling.LevelingService;
 import com.projectzero.leveling.Stat;
 import com.projectzero.leveling.StatEffects;
 import com.projectzero.skills.SkillService;
+import com.projectzero.network.ModNetwork;
+import com.projectzero.network.SyncWornGearPacket;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,6 +38,22 @@ public final class EquipmentService {
     public static void refreshEffects(ServerPlayer player) {
         StatEffects.apply(player, LevelingService.get(player));
         SkillService.sync(player);
+        ModNetwork.sendToTrackingAndSelf(player, wornGearPacket(player));
+    }
+
+    /** What {@code player} visibly wears (gauntlets for now), for the worn-gear render layer. */
+    public static SyncWornGearPacket wornGearPacket(Player player) {
+        PlayerAccessories acc = get(player);
+        for (int i = 0; i < PlayerAccessories.ACTIVE_SLOTS; i++) {
+            if (PlayerAccessories.SLOT_LAYOUT[i] != AccessorySlotType.GAUNTLETS) continue;
+            ItemStack s = acc.get(i);
+            if (s.isEmpty()) continue;
+            AccessoryData data = AccessoryData.get(s);
+            return new SyncWornGearPacket(player.getId(),
+                    BuiltInRegistries.ITEM.getKey(s.getItem()),
+                    data == null ? -1 : data.rarity().ordinal());
+        }
+        return new SyncWornGearPacket(player.getId(), null, -1);
     }
 
     public static void clearAll(ServerPlayer player) {

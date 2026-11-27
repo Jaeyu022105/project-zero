@@ -26,11 +26,11 @@ public final class ModItems {
     public static final RegistryObject<Item> AWAKENING_SHARD = ITEMS.register("awakening_shard",
             () -> new AwakeningShardItem(new Item.Properties().rarity(Rarity.EPIC)));
 
-    /** Holds one Awakening Shard and diverts half of kill XP into charging it. TODO(claude-art): placeholder icon. */
+    /** Holds one Awakening Shard and diverts half of kill XP into charging it. Icon fills by tier. */
     public static final RegistryObject<Item> SHARD_VESSEL = ITEMS.register("shard_vessel",
             () -> new ShardVesselItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
 
-    /** Teaches the skill stored in {@code projectzero:skill_id} when used. TODO(claude-art): placeholder icon. */
+    /** Teaches the skill stored in {@code projectzero:skill_id} when used. */
     public static final RegistryObject<Item> SKILLBOOK = ITEMS.register("skillbook",
             () -> new SkillbookItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
 
@@ -49,7 +49,7 @@ public final class ModItems {
     public static final RegistryObject<Item> GATE_PORTAL = ITEMS.register("gate_portal",
             () -> new BlockItem(ModBlocks.GATE_PORTAL.get(), new Item.Properties().rarity(Rarity.EPIC)));
 
-    // ---- Starter Accessories (TODO(claude-art): placeholder 16x16 icons & worn gauntlet model) ----
+    // ---- Starter Accessories (icons + worn gauntlet layer done; see client/GauntletLayer) ----
     public static final RegistryObject<Item> IRON_GAUNTLETS = ITEMS.register("iron_gauntlets",
             () -> new AccessoryItem(AccessorySlotType.GAUNTLETS, new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> COPPER_RING = ITEMS.register("copper_ring",
