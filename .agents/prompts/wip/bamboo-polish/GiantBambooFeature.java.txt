@@ -1,0 +1,397 @@
+package com.projectzero.worldgen;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.QuartPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LanternBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.levelgen.synth.SimplexNoise;
+
+/**
+ * Spirit Bamboo Sea. Runs once per chunk and does two things:
+ * <ol>
+ * <li>Ground pass over the origin chunk: narrow lanes wind through the biome along world-wide noise
+ * (so they run on from chunk to chunk), paved with dirt path and flagstones and lined with stone
+ * lanterns; the grove floor between them is patched with moss.</li>
+ * <li>A dense grove of giant culms (2x2 and 3x3, a few young 1x1) of varied height, all leaning
+ * roughly the same way, with pale node rings every 4 to 6 blocks, side branches ending in drooping
+ * leaf sprays, and a crown at the top. Culms stay off the lanes and off slopes.</li>
+ * </ol>
+ * Everything is written within {@link #REACH} blocks of the origin, inside the 3x3 chunks a feature
+ * may touch. Biomes are asked from the biome source, never the level.
+ */
+public class GiantBambooFeature extends Feature<NoneFeatureConfiguration> {
+    /** Furthest any block is written from the origin; the origin chunk's neighbours end at 16. */
+    private static final int REACH = 15;
+    /** Culm bases sit within this many blocks of the origin, leaving room for lean and sprays. */
+    private static final int BASE_SPREAD = 7;
+    /** Lane value below 1 is lane; culms keep clear up to this value so the lanes stay walkable. */
+    private static final double LANE_CLEAR = 1.7;
+
+    private static SimplexNoise laneA, laneB, mossNoise;
+    private static long noiseSeed = Long.MIN_VALUE;
+
+    private static final BlockState CULM = Blocks.BAMBOO_BLOCK.defaultBlockState();
+    private static final BlockState NODE = Blocks.STRIPPED_BAMBOO_BLOCK.defaultBlockState();
+    private static final BlockState LEAF = Blocks.JUNGLE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+    private static final BlockState LEAF_PALE = Blocks.AZALEA_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+
+    public GiantBambooFeature() { super(NoneFeatureConfiguration.CODEC); }
+
+    private static synchronized void init(long seed) {
+        if (laneA != null && seed == noiseSeed) return;
+        laneA = new SimplexNoise(new LegacyRandomSource(seed ^ 0xBA3B00L));
+        laneB = new SimplexNoise(new LegacyRandomSource(seed ^ 0x1A7E5L));
+        mossNoise = new SimplexNoise(new LegacyRandomSource(seed ^ 0x3055L));
+        noiseSeed = seed;
+    }
+
+    /** Below 1 on a lane (0 on its centre line), rising away from it. Pure function of position. */
+    private static double lane(int x, int z) {
+        double a = Math.abs(laneA.getValue(x / 56.0, z / 56.0)) / 0.04;
+        double b = Math.abs(laneB.getValue(x / 90.0 + 31.7, z / 90.0 - 12.3)) / 0.028;
+        return Math.min(a, b);
+    }
+
+    private static long hash(int x, int z, long seed) {
+        long h = x * 0x9E3779B97F4A7C15L ^ z * 0xC2B2AE3D27D4EB4FL ^ seed;
+        h ^= h >>> 31; h *= 0xBF58476D1CE4E5B9L; h ^= h >>> 29;
+        return h;
+    }
+
+    private static boolean laneEdge(int x, int z) {
+        double l = lane(x, z);
+        return l >= 1.0 && l < 1.6;
+    }
+
+    /** A lantern stands on a lane edge cell whose hash is the lowest of all edge cells around it. */
+    private static boolean lanternAt(int x, int z, long seed) {
+        if (!laneEdge(x, z)) return false;
+        long mine = hash(x, z, seed);
+        for (int dx = -6; dx <= 6; dx++) for (int dz = -6; dz <= 6; dz++) {
+            if ((dx == 0 && dz == 0) || !laneEdge(x + dx, z + dz)) continue;
+            if (hash(x + dx, z + dz, seed) < mine) return false;
+        }
+        return true;
+    }
+
+    /** Small per-feature cache over the biome source, one lookup per quart column. */
+    private static final class BiomeCheck {
+        private final FeaturePlaceContext<?> ctx;
+        private final Climate.Sampler sampler;
+        private final Map<Long, Boolean> cache = new HashMap<>();
+        BiomeCheck(FeaturePlaceContext<?> ctx) {
+            this.ctx = ctx;
+            this.sampler = ctx.level().getLevel().getChunkSource().randomState().sampler();
+        }
+        boolean at(int x, int y, int z) {
+            int qx = QuartPos.fromBlock(x), qz = QuartPos.fromBlock(z), qy = QuartPos.fromBlock(y);
+            return cache.computeIfAbsent(((long) qx << 32) ^ (qz & 0xFFFFFFFFL), k -> ctx.chunkGenerator().getBiomeSource()
+                    .getNoiseBiome(qx, qy, qz, sampler).is(ModBiomes.SPIRIT_BAMBOO));
+        }
+    }
+
+    @Override
+    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> ctx) {
+        WorldGenLevel level = ctx.level();
+        init(level.getSeed());
+        BiomeCheck biome = new BiomeCheck(ctx);
+        paintGround(ctx, biome);
+        grove(ctx, biome);
+        return true;
+    }
+
+    // ---------------------------------------------------------------- ground, lanes, lanterns
+
+    private static boolean plant(BlockState s) {
+        return (!s.isAir() && s.canBeReplaced() && s.getFluidState().isEmpty()) || s.is(Blocks.BAMBOO) || s.is(Blocks.BAMBOO_SAPLING);
+    }
+
+    private static boolean freeOrPlant(BlockState s) { return s.isAir() || plant(s); }
+
+    private void paintGround(FeaturePlaceContext<NoneFeatureConfiguration> ctx, BiomeCheck biome) {
+        WorldGenLevel level = ctx.level();
+        RandomSource r = ctx.random();
+        long seed = level.getSeed();
+        int cx = ctx.origin().getX() & ~15, cz = ctx.origin().getZ() & ~15;
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        for (int dx = 0; dx < 16; dx++) for (int dz = 0; dz < 16; dz++) {
+            int x = cx + dx, z = cz + dz;
+            int top = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
+            p.set(x, top - 1, z);
+            BlockState ground = level.getBlockState(p);
+            if (!ground.is(BlockTags.DIRT) || !biome.at(x, top, z)) continue;
+            p.set(x, top, z);
+            if (!level.getFluidState(p).isEmpty()) continue;
+            double l = lane(x, z);
+            if (l < 1.0) {
+                // Clear the lane of grass, flowers and shoots, then pave it.
+                for (int y = top; y < top + 4; y++) {
+                    p.set(x, y, z);
+                    if (plant(level.getBlockState(p))) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                }
+                p.set(x, top - 1, z);
+                BlockState pave;
+                if (l < 0.45) {
+                    long h = hash(x, z, seed ^ 0x51AB);
+                    int k = (int) Math.floorMod(h, 20L);
+                    pave = k < 4 ? Blocks.MOSSY_STONE_BRICKS.defaultBlockState()
+                            : k < 6 ? Blocks.STONE_BRICKS.defaultBlockState()
+                            : k < 7 ? Blocks.CRACKED_STONE_BRICKS.defaultBlockState()
+                            : Blocks.DIRT_PATH.defaultBlockState();
+                } else {
+                    float f = r.nextFloat();
+                    pave = f < 0.45F ? Blocks.MOSS_BLOCK.defaultBlockState()
+                            : f < 0.6F ? Blocks.COARSE_DIRT.defaultBlockState()
+                            : Blocks.DIRT_PATH.defaultBlockState();
+                }
+                level.setBlock(p, pave, 2);
+                continue;
+            }
+            if (l < 1.6 && lanternAt(x, z, seed)) {
+                stoneLantern(level, r, x, top, z);
+                continue;
+            }
+            // Grove floor: broad moss patches with carpet over them, a little podzol.
+            double m = mossNoise.getValue(x / 14.0, z / 14.0);
+            if (ground.is(Blocks.GRASS_BLOCK) || ground.is(Blocks.DIRT)) {
+                p.set(x, top - 1, z);
+                if (m > 0.05) {
+                    level.setBlock(p, Blocks.MOSS_BLOCK.defaultBlockState(), 2);
+                    p.set(x, top, z);
+                    if (level.getBlockState(p).isAir() && r.nextFloat() < 0.3F) level.setBlock(p, Blocks.MOSS_CARPET.defaultBlockState(), 2);
+                } else if (m < -0.6) {
+                    level.setBlock(p, Blocks.PODZOL.defaultBlockState(), 2);
+                }
+            }
+        }
+    }
+
+    /** A squat stone lantern beside the lane: a post of walls, the lamp, a slab roof. */
+    private static void stoneLantern(WorldGenLevel level, RandomSource r, int x, int top, int z) {
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        for (int y = top; y < top + 4; y++) {
+            p.set(x, y, z);
+            if (!freeOrPlant(level.getBlockState(p))) return;
+        }
+        p.set(x, top - 1, z);
+        level.setBlock(p, Blocks.MOSSY_COBBLESTONE.defaultBlockState(), 2);
+        p.set(x, top, z);
+        level.setBlock(p, Blocks.MOSSY_STONE_BRICK_WALL.defaultBlockState(), 2);
+        p.set(x, top + 1, z);
+        level.setBlock(p, (r.nextBoolean() ? Blocks.STONE_BRICK_WALL : Blocks.MOSSY_STONE_BRICK_WALL).defaultBlockState(), 2);
+        p.set(x, top + 2, z);
+        level.setBlock(p, (r.nextFloat() < 0.3F ? Blocks.SOUL_LANTERN : Blocks.LANTERN).defaultBlockState(), 2);
+        p.set(x, top + 3, z);
+        level.setBlock(p, (r.nextFloat() < 0.4F ? Blocks.MOSSY_STONE_BRICK_SLAB : Blocks.STONE_BRICK_SLAB).defaultBlockState(), 2);
+    }
+
+    // ---------------------------------------------------------------- the grove
+
+    private record Node(int k, int ox, int oz) {}
+
+    private void grove(FeaturePlaceContext<NoneFeatureConfiguration> ctx, BiomeCheck biome) {
+        WorldGenLevel level = ctx.level();
+        RandomSource r = ctx.random();
+        BlockPos o = ctx.origin();
+        // One look per grove: base height, spread, and the way the wind leans it.
+        int baseH = 20 + r.nextInt(14);
+        int spread = 4 + r.nextInt(9);
+        double leanAngle = r.nextDouble() * Math.PI * 2;
+        double groveLean = r.nextDouble() * 3.0;
+        int attempts = 45 + r.nextInt(20);
+        for (int i = 0; i < attempts; i++) {
+            int bx = o.getX() + r.nextInt(BASE_SPREAD * 2 + 1) - BASE_SPREAD;
+            int bz = o.getZ() + r.nextInt(BASE_SPREAD * 2 + 1) - BASE_SPREAD;
+            float roll = r.nextFloat();
+            int size = roll < 0.12F ? 1 : roll < 0.6F ? 2 : 3;
+            int h = baseH + (int) Math.round(r.nextGaussian() * spread * 0.5) + (size == 3 ? 5 : 0);
+            if (size == 1) h = h * 3 / 5;
+            h = Mth.clamp(h, 10, 46);
+            double a = leanAngle + (r.nextDouble() - 0.5) * 0.9;
+            double lean = Math.min(3.0, groveLean * (0.6 + r.nextDouble() * 0.7));
+            culm(ctx, biome, bx, bz, size, h, Math.cos(a) * lean, Math.sin(a) * lean);
+        }
+    }
+
+    private static boolean inReach(BlockPos o, int x, int z) {
+        return Math.abs(x - o.getX()) <= REACH && Math.abs(z - o.getZ()) <= REACH;
+    }
+
+    private static void put(WorldGenLevel level, BlockPos o, BlockPos at, BlockState s, boolean onlyFree) {
+        if (!inReach(o, at.getX(), at.getZ())) return;
+        if (onlyFree && !freeOrPlant(level.getBlockState(at))) return;
+        level.setBlock(at, s, 2);
+    }
+
+    private static boolean culmCell(int size, int dx, int dz, boolean node) {
+        // 3x3 culms are rounded (no corners) between nodes; the node fills out to a full ring.
+        return node || size < 3 || !((dx == 0 || dx == 2) && (dz == 0 || dz == 2));
+    }
+
+    private static boolean solid(BlockState s) {
+        return !freeOrPlant(s) && !s.is(BlockTags.LEAVES);
+    }
+
+    private void culm(FeaturePlaceContext<NoneFeatureConfiguration> ctx, BiomeCheck biome, int bx, int bz, int size, int h,
+                      double leanX, double leanZ) {
+        WorldGenLevel level = ctx.level();
+        RandomSource r = ctx.random();
+        BlockPos o = ctx.origin();
+        // Footprint must be flat-ish, in the biome, off the lanes, on soil, and not touching another culm.
+        int minTop = Integer.MAX_VALUE, maxTop = Integer.MIN_VALUE;
+        int[] tops = new int[size * size];
+        for (int dx = 0; dx < size; dx++) for (int dz = 0; dz < size; dz++) {
+            int x = bx + dx, z = bz + dz;
+            int top = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
+            BlockPos base = new BlockPos(x, top, z);
+            if (!level.getBlockState(base.below()).is(BlockTags.DIRT) || !freeOrPlant(level.getBlockState(base))
+                    || !level.getFluidState(base).isEmpty() || lane(x, z) < LANE_CLEAR || !biome.at(x, top, z)) return;
+            tops[dx * size + dz] = top;
+            minTop = Math.min(minTop, top); maxTop = Math.max(maxTop, top);
+        }
+        if (maxTop - minTop > 1) return;
+        int y0 = maxTop;
+        for (int dx = -1; dx <= size; dx++) for (int dz = -1; dz <= size; dz++) {
+            BlockState s = level.getBlockState(new BlockPos(bx + dx, y0, bz + dz));
+            if (s.is(Blocks.BAMBOO_BLOCK) || s.is(Blocks.STRIPPED_BAMBOO_BLOCK)) return;
+        }
+        // Columns one lower get a root block so the culm sits on the ground everywhere.
+        for (int dx = 0; dx < size; dx++) for (int dz = 0; dz < size; dz++)
+            if (tops[dx * size + dz] < y0) put(level, o, new BlockPos(bx + dx, y0 - 1, bz + dz), CULM, true);
+
+        int interval = 4 + r.nextInt(3);
+        int phase = 2 + r.nextInt(interval);
+        List<Node> nodes = new ArrayList<>();
+        int prevOx = 0, prevOz = 0, built = 0;
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        for (int k = 0; k < h; k++) {
+            double t = Math.pow((double) k / h, 1.7);
+            int ox = (int) Math.round(leanX * t), oz = (int) Math.round(leanZ * t);
+            boolean blocked = false;
+            for (int dx = 0; dx < size && !blocked; dx++) for (int dz = 0; dz < size; dz++) {
+                p.set(bx + ox + dx, y0 + k, bz + oz + dz);
+                if (solid(level.getBlockState(p)) && !level.getBlockState(p).is(Blocks.BAMBOO_BLOCK)) { blocked = true; break; }
+            }
+            if (blocked || y0 + k >= level.getMaxBuildHeight() - 6) break;
+            boolean node = k >= phase && (k - phase) % interval == 0;
+            for (int dx = 0; dx < size; dx++) for (int dz = 0; dz < size; dz++) {
+                if (!culmCell(size, dx, dz, node)) continue;
+                BlockPos at = new BlockPos(bx + ox + dx, y0 + k, bz + oz + dz);
+                put(level, o, at, node ? NODE : CULM, false);
+                // Where the lean steps sideways, a joint block below keeps the culm in one piece.
+                if (k > 0 && (ox != prevOx || oz != prevOz)) put(level, o, at.below(), CULM, true);
+            }
+            if (node) nodes.add(new Node(k, ox, oz));
+            prevOx = ox; prevOz = oz; built = k + 1;
+        }
+        if (built < 8) return;
+        // Tapering tip above thick culms, then the crown.
+        int tipX = bx + prevOx + (size - 1) / 2, tipZ = bz + prevOz + (size - 1) / 2;
+        int tipY = y0 + built;
+        int taper = size == 1 ? 0 : 1 + r.nextInt(size);
+        for (int k = 0; k < taper; k++) put(level, o, new BlockPos(tipX, tipY + k, tipZ), k == taper - 1 ? NODE : CULM, true);
+        BlockPos crown = new BlockPos(tipX, tipY + taper, tipZ);
+        crown(level, r, o, crown, size);
+        // Side branches with leaf sprays from the upper nodes.
+        for (Node n : nodes) {
+            if (n.k() < built * 0.45 || n.k() > built - 2) continue;
+            int branches = size == 3 ? 2 : 1;
+            Direction first = Direction.Plane.HORIZONTAL.getRandomDirection(r);
+            for (int b = 0; b < branches; b++) {
+                if (r.nextFloat() > 0.75F) continue;
+                Direction d = b == 0 ? first : (r.nextBoolean() ? first.getOpposite() : first.getClockWise());
+                branch(level, r, o, bx + n.ox(), y0 + n.k(), bz + n.oz(), size, d);
+            }
+        }
+    }
+
+    private static BooleanProperty side(Direction d) {
+        return switch (d) {
+            case NORTH -> BlockStateProperties.NORTH;
+            case SOUTH -> BlockStateProperties.SOUTH;
+            case EAST -> BlockStateProperties.EAST;
+            default -> BlockStateProperties.WEST;
+        };
+    }
+
+    /** A short bamboo-fence branch from the node ring, rising one block at its tip, ending in a spray. */
+    private static void branch(WorldGenLevel level, RandomSource r, BlockPos o, int cx0, int y, int cz0, int size, Direction d) {
+        int mid = (size - 1) / 2;
+        int sx = d.getStepX() > 0 ? cx0 + size : d.getStepX() < 0 ? cx0 - 1 : cx0 + mid;
+        int sz = d.getStepZ() > 0 ? cz0 + size : d.getStepZ() < 0 ? cz0 - 1 : cz0 + mid;
+        int len = 1 + r.nextInt(2) + (size == 3 ? 1 : 0);
+        BlockPos at = new BlockPos(sx, y, sz);
+        for (int i = 0; i < len; i++) {
+            if (!inReach(o, at.getX(), at.getZ()) || !level.getBlockState(at).isAir()) return;
+            BlockState fence = Blocks.BAMBOO_FENCE.defaultBlockState().setValue(side(d.getOpposite()), true);
+            if (i < len - 1) fence = fence.setValue(side(d), true);
+            level.setBlock(at, fence, 2);
+            if (i < len - 1) at = at.relative(d);
+        }
+        BlockPos up = at.above();
+        if (level.getBlockState(up).isAir()) put(level, o, up, Blocks.BAMBOO_FENCE.defaultBlockState(), true);
+        spray(level, r, o, up.relative(d), d, 3 + r.nextInt(2));
+    }
+
+    private static BlockState leaf(RandomSource r) { return r.nextFloat() < 0.8F ? LEAF : LEAF_PALE; }
+
+    /** A drooping fan of leaves running out along {@code d}: arched near the branch, hanging at the end. */
+    private static void spray(WorldGenLevel level, RandomSource r, BlockPos o, BlockPos start, Direction d, int len) {
+        Direction across = d.getClockWise();
+        for (int f = 0; f < len; f++) {
+            int half = f == 0 || f == len - 1 ? 1 : 2;
+            int dy = f == 0 ? 0 : f < len - 1 ? (f == 1 ? 0 : -1) : -2;
+            for (int l = -half; l <= half; l++) {
+                if (Math.abs(l) == half && r.nextFloat() < 0.35F) continue;
+                BlockPos at = start.relative(d, f).relative(across, l).above(dy);
+                put(level, o, at, leaf(r), true);
+                // Fluff on top close to the branch, tassels hanging under the far end.
+                if (f <= 1 && Math.abs(l) <= 1 && r.nextFloat() < 0.6F) put(level, o, at.above(), leaf(r), true);
+                if (f >= len - 2 && r.nextFloat() < 0.4F) put(level, o, at.below(), leaf(r), true);
+            }
+        }
+        if (r.nextFloat() < 0.14F) {
+            BlockPos lantern = start.relative(d, 1).below();
+            if (level.getBlockState(lantern).isAir() && level.getBlockState(lantern.above()).is(BlockTags.LEAVES))
+                put(level, o, lantern, Blocks.SOUL_LANTERN.defaultBlockState().setValue(LanternBlock.HANGING, true), true);
+        }
+    }
+
+    /** Top of the culm: a leafy cap with sprays falling away on most sides. */
+    private static void crown(WorldGenLevel level, RandomSource r, BlockPos o, BlockPos c, int size) {
+        int rad = size == 1 ? 1 : 2;
+        for (int dx = -rad; dx <= rad; dx++) for (int dz = -rad; dz <= rad; dz++) for (int dy = -1; dy <= 1; dy++) {
+            int d = Math.abs(dx) + Math.abs(dz) + Math.abs(dy) * 2;
+            if (d > rad + 1 || (d == rad + 1 && r.nextFloat() < 0.5F)) continue;
+            put(level, o, c.offset(dx, dy, dz), leaf(r), true);
+        }
+        for (Direction d : Direction.Plane.HORIZONTAL) {
+            if (r.nextFloat() < 0.3F) continue;
+            spray(level, r, o, c.relative(d, rad).above(r.nextInt(2)), d, 2 + r.nextInt(size == 1 ? 2 : 3));
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static Block unused() { return Blocks.AIR; }
+}
