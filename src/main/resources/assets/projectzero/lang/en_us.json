@@ -147,5 +147,12 @@
   "biome.projectzero.skyfall_isles": "Skyfall Isles",
   "block.projectzero.skywood_log": "Skywood Log",
   "block.projectzero.skywood_planks": "Skywood Planks",
-  "block.projectzero.skywood_leaves": "Skywood Leaves"
+  "block.projectzero.skywood_leaves": "Skywood Leaves",
+  "block.projectzero.limestone": "Limestone",
+  "block.projectzero.baobab_log": "Baobab Log",
+  "block.projectzero.baobab_planks": "Baobab Planks",
+  "biome.projectzero.cloud_forest": "Cloud Forest",
+  "biome.projectzero.baobab_savanna": "Baobab Savanna",
+  "biome.projectzero.tsingy": "Tsingy Blade Forest",
+  "biome.projectzero.karst_bay": "Karst Tower Bay"
 }

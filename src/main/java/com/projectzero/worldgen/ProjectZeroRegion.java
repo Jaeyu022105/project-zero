@@ -43,6 +43,13 @@ public class ProjectZeroRegion extends Region {
             builder.replaceBiome(Biomes.FLOWER_FOREST, ModBiomes.SKYFALL_ISLES);
             builder.replaceBiome(Biomes.PLAINS, ModBiomes.SKYFALL_ISLES);
             builder.replaceBiome(Biomes.SUNFLOWER_PLAINS, ModBiomes.SKYFALL_ISLES);
+            builder.replaceBiome(Biomes.TAIGA, ModBiomes.CLOUD_FOREST);
+            builder.replaceBiome(Biomes.SAVANNA, ModBiomes.BAOBAB_SAVANNA);
+            builder.replaceBiome(Biomes.SAVANNA_PLATEAU, ModBiomes.BAOBAB_SAVANNA);
+            builder.replaceBiome(Biomes.BADLANDS, ModBiomes.TSINGY);
+            builder.replaceBiome(Biomes.ERODED_BADLANDS, ModBiomes.TSINGY);
+            builder.replaceBiome(Biomes.WARM_OCEAN, ModBiomes.KARST_BAY);
+            builder.replaceBiome(Biomes.LUKEWARM_OCEAN, ModBiomes.KARST_BAY);
         });
     }
 }

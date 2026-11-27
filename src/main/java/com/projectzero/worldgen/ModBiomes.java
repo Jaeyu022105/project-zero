@@ -22,6 +22,15 @@ public final class ModBiomes {
     /** Floating islands with waterfalls over lush flowered land. */
     public static final ResourceKey<Biome> SKYFALL_ISLES = key("skyfall_isles");
 
+    /** Moss-draped giant trees in constant fog, hanging roots, waterfalls off every slope. */
+    public static final ResourceKey<Biome> CLOUD_FOREST = key("cloud_forest");
+    /** Dry golden grass under fat bottle-trunk baobabs, termite mounds and red earth. */
+    public static final ResourceKey<Biome> BAOBAB_SAVANNA = key("baobab_savanna");
+    /** Fields of razor-thin limestone needles with narrow slots between them. */
+    public static final ResourceKey<Biome> TSINGY = key("tsingy");
+    /** Jungle-topped limestone towers standing in emerald water. */
+    public static final ResourceKey<Biome> KARST_BAY = key("karst_bay");
+
     private static ResourceKey<Biome> key(String name) {
         return ResourceKey.create(Registries.BIOME, ProjectZero.id(name));
     }

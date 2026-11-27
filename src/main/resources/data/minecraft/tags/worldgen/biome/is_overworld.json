@@ -1,9 +1,13 @@
 {
   "replace": false,
   "values": [
+    "projectzero:baobab_savanna",
     "projectzero:capwood",
+    "projectzero:cloud_forest",
     "projectzero:elderwood",
+    "projectzero:karst_bay",
     "projectzero:sky_pillars",
-    "projectzero:skyfall_isles"
+    "projectzero:skyfall_isles",
+    "projectzero:tsingy"
   ]
 }

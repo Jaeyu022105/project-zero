@@ -25,6 +25,9 @@ public final class ModCreativeTabs {
                         output.accept(ModNature.SKYWOOD_LOG.get());
                         output.accept(ModNature.SKYWOOD_PLANKS.get());
                         output.accept(ModNature.SKYWOOD_LEAVES.get());
+                        output.accept(ModNature.LIMESTONE.get());
+                        output.accept(ModNature.BAOBAB_LOG.get());
+                        output.accept(ModNature.BAOBAB_PLANKS.get());
                         output.accept(ModItems.AWAKENING_SHARD.get());
                         output.accept(ModItems.SHARD_VESSEL.get());
                         output.accept(ModItems.SKILLBOOK.get());

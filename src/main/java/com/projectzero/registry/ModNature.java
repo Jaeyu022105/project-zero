@@ -41,6 +41,19 @@ public final class ModNature {
             () -> new net.minecraft.world.level.block.LeavesBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.CHERRY_LEAVES)
                     .mapColor(MapColor.COLOR_LIGHT_BLUE)));
 
+    // ---- Round 3 ----
+    /** Pale grey-cream limestone: Tsingy needles and karst towers. */
+    public static final RegistryObject<Block> LIMESTONE = block("limestone",
+            () -> new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.CALCITE)
+                    .mapColor(MapColor.TERRACOTTA_WHITE).strength(1.2F, 4F)));
+    /** Baobab: thick grey-brown bottle trunks of the Baobab Savanna. */
+    public static final RegistryObject<Block> BAOBAB_LOG = block("baobab_log",
+            () -> new net.minecraft.world.level.block.RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.ACACIA_LOG)
+                    .mapColor(MapColor.TERRACOTTA_GRAY)));
+    public static final RegistryObject<Block> BAOBAB_PLANKS = block("baobab_planks",
+            () -> new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.ACACIA_PLANKS)
+                    .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)));
+
     private static RegistryObject<Block> block(String name, Supplier<Block> make) {
         RegistryObject<Block> b = ModBlocks.BLOCKS.register(name, make);
         ModItems.ITEMS.register(name, () -> new BlockItem(b.get(), new Item.Properties()));

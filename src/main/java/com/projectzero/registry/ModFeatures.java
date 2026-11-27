@@ -40,6 +40,16 @@ public final class ModFeatures {
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> FLOATING_ISLAND =
             FEATURES.register("floating_island", com.projectzero.worldgen.FloatingIslandFeature::new);
 
+    // Round 3 biomes.
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> BAOBAB =
+            FEATURES.register("baobab", com.projectzero.worldgen.BaobabFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> TERMITE_MOUND =
+            FEATURES.register("termite_mound", com.projectzero.worldgen.TermiteMoundFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> TSINGY =
+            FEATURES.register("tsingy", com.projectzero.worldgen.TsingyFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> KARST_TOWER =
+            FEATURES.register("karst_tower", com.projectzero.worldgen.KarstTowerFeature::new);
+
     public static final DeferredRegister<net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType<?>> TREE_DECORATORS =
             DeferredRegister.create(net.minecraft.core.registries.Registries.TREE_DECORATOR_TYPE, ProjectZero.MOD_ID);
     /** Buttress roots at the base of a tree (see worldgen/RootsDecorator). */
