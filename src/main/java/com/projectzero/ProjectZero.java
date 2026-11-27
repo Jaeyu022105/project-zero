@@ -39,6 +39,7 @@ public final class ProjectZero {
         IEventBus modBus = context.getModEventBus();
         ModDataComponents.DATA_COMPONENTS.register(modBus);
         com.projectzero.registry.ModNature.init();
+        com.projectzero.registry.ModMaterials.init();
         ModBlocks.BLOCKS.register(modBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modBus);
         ModItems.ITEMS.register(modBus);

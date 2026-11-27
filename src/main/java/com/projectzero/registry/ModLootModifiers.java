@@ -3,6 +3,7 @@ package com.projectzero.registry;
 import com.mojang.serialization.MapCodec;
 import com.projectzero.ProjectZero;
 import com.projectzero.equipment.AccessoryLootModifier;
+import com.projectzero.materials.MaterialLootModifier;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -17,4 +18,6 @@ public final class ModLootModifiers {
 
     public static final RegistryObject<MapCodec<AccessoryLootModifier>> ACCESSORY_DROPS =
             LOOT_MODIFIERS.register("accessory_drops", () -> AccessoryLootModifier.CODEC);
+    public static final RegistryObject<MapCodec<MaterialLootModifier>> MATERIAL_DROPS =
+            LOOT_MODIFIERS.register("material_drops", () -> MaterialLootModifier.CODEC);
 }

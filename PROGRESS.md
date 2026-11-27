@@ -19,6 +19,7 @@ Last updated: **2026-11-28**
 - Top-right minimap (first version): north-up terrain, rank-colored nearby gates, player dots, objective-marker hook, biome tint, coordinates, and cave layer.
 - Equipment: 8 accessory slots with rolled stats, mob drops, GEAR screen.
 - Awakening Stones and crystal formations, Awakening Shards, Shard Vessel charging, Reawakening vision, reroll that keeps 3 random skills.
+- Monster parts and monster crystals: player-kill drops from vanilla mobs, rank-scaled part rolls, rank-matched gate crystals, cooking recipes, original textures, sell values and tooltips (§18).
 - Player animations for every movement and held item; enemy blood and skill marks; boss weakness table.
 
 **Gates and dungeons**
@@ -42,7 +43,7 @@ Last updated: **2026-11-28**
 In roughly this order (see `ROADMAP.md` for the full list):
 
 1. Finish polishing every biome, then crater basins and unique blocks, plants, trees and foliage per biome (§15).
-2. First gate monsters with full animation sets, dropping body parts and monster crystals (§18, roadmap 8).
+2. First gate monsters with full animation sets, using the built material drop and crystal system (§18, roadmap 8).
 3. First Souls-style boss (§10, roadmap 12).
 4. Civilizations: lowest-tier town first, with the shabby-shed spawn, house waypoint stones, an Awakening Stone in the center, the Hunter's Association, currency and basic NPC roles (§16a to 16d).
 5. Connect Association quests to the minimap objective hook; add waypoint/civilization discovery and a full-screen map (§11).

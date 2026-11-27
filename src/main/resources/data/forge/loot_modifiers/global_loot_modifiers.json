@@ -1,6 +1,7 @@
 {
   "replace": false,
   "entries": [
-    "projectzero:accessory_drops"
+    "projectzero:accessory_drops",
+    "projectzero:material_drops"
   ]
 }
