@@ -99,7 +99,8 @@
       "projectzero:undergrowth",
       "projectzero:dry_grass",
       "projectzero:dead_tree",
-      "projectzero:bloodmoon_brush"
+      "projectzero:bloodmoon_brush",
+      "projectzero:bone_remains"
     ],
     [
       "minecraft:freeze_top_layer"

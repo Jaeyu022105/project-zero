@@ -41,14 +41,22 @@ public class DeadTreeFeature extends Feature<NoneFeatureConfiguration> {
     private static void plain(WorldGenLevel level, BlockPos o, BlockState log, RandomSource r) {
         int h = 6 + r.nextInt(7);
         BlockPos.MutableBlockPos p = o.mutable();
+        BlockPos[] trunk = new BlockPos[h];
         for (int y = 0; y < h; y++) {
-            if (y > 2 && r.nextFloat() < 0.2F) p.move(Direction.Plane.HORIZONTAL.getRandomDirection(r));
+            if (y > 2 && r.nextFloat() < 0.2F) {
+                // A crooked step: fill the corner so the trunk stays connected face to face.
+                Direction step = Direction.Plane.HORIZONTAL.getRandomDirection(r);
+                p.move(step);
+                set(level, p.below(), log);
+            }
             set(level, p, log);
+            trunk[y] = p.immutable();
             p.move(Direction.UP);
         }
         int branches = 3 + r.nextInt(3);
         for (int b = 0; b < branches; b++) {
-            BlockPos start = o.above(h / 2 + r.nextInt(Math.max(1, h / 2)));
+            // Branches grow out of the trunk where it actually is, not out of the original column.
+            BlockPos start = trunk[h / 2 + r.nextInt(Math.max(1, h - h / 2))];
             branch(level, start, r.nextDouble() * Math.PI * 2, 2 + r.nextInt(4), log, r, 0);
         }
         roots(level, o, log, 2 + r.nextInt(2), 2, r);
@@ -87,11 +95,12 @@ public class DeadTreeFeature extends Feature<NoneFeatureConfiguration> {
                 else set(level, p, log);
             }
         }
-        BlockPos top = o.offset((int) Math.round(lx * h), h - 1, (int) Math.round(lz * h));
         int branches = 4 + r.nextInt(3);
         for (int b = 0; b < branches; b++) {
             double ang = b * (Math.PI * 2 / branches) + r.nextDouble() * 0.7;
-            BlockPos start = top.below(r.nextInt(Math.max(1, h / 3)));
+            // Start on the leaning trunk's centre at that height, so the branch joins the trunk.
+            int sy = h - 1 - r.nextInt(Math.max(1, h / 3));
+            BlockPos start = o.offset((int) Math.round(lx * sy), sy, (int) Math.round(lz * sy));
             branch(level, start, ang, 3 + r.nextInt(4), log, r, 2);
         }
         roots(level, o, log, 4 + r.nextInt(3), 4, r);

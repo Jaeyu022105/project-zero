@@ -2,6 +2,7 @@ package com.projectzero.worldgen;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
@@ -35,12 +36,27 @@ public class BoneRemainsFeature extends Feature<NoneFeatureConfiguration> {
         double span = 3.5 + r.nextDouble() * 2.5;   // half width of the rib cage
         double height = span * (1.1 + r.nextDouble() * 0.4);
         int sink = 1 + r.nextInt(2);                // how deep the skeleton lies
-        for (int i = -half - 2; i <= half + 3; i++) {
-            BlockPos s = o.relative(along, i).below(sink);
-            if (level.getBlockState(s.above()).isAir() || r.nextFloat() < 0.85F) level.setBlock(s, spine, 2);
+        // The spine follows the ground. Find the ground under every spine column first, and give up
+        // on rough ground (a gully or a hillside) rather than leave bones floating or buried deep.
+        int from = -half - 2, to = half + 4;
+        int[] ground = new int[to - from + 1];
+        int lo = Integer.MAX_VALUE, hi = Integer.MIN_VALUE;
+        for (int i = from; i <= to; i++) {
+            int g = groundY(level, o.relative(along, i));
+            if (g == Integer.MIN_VALUE) return false;
+            ground[i - from] = g;
+            lo = Math.min(lo, g); hi = Math.max(hi, g);
+        }
+        if (hi - lo > 4) return false;
+        for (int i = from; i <= half + 3; i++) {
+            BlockPos col = o.relative(along, i);
+            BlockPos s = new BlockPos(col.getX(), ground[i - from] - sink, col.getZ());
+            if (r.nextFloat() < 0.85F) level.setBlock(s, spine, 2);
         }
         for (int k = 0; k < ribs; k++) {
-            BlockPos root = o.relative(along, -half + k * gap).below(sink);
+            int i = -half + k * gap;
+            BlockPos col = o.relative(along, i);
+            BlockPos root = new BlockPos(col.getX(), ground[i - from] - sink, col.getZ());
             double scale = 1 - Math.abs(k - (ribs - 1) / 2.0) / ribs * 0.6; // middle ribs are the biggest
             for (int sgn = -1; sgn <= 1; sgn += 2) {
                 boolean broken = r.nextFloat() < 0.3F;
@@ -58,14 +74,26 @@ public class BoneRemainsFeature extends Feature<NoneFeatureConfiguration> {
             }
         }
         // The skull lies at the front end of the spine.
-        BlockPos head = o.relative(along, half + 4);
-        for (int dy = 2; dy >= -2; dy--) {
-            BlockPos q = head.above(dy);
-            if (level.getBlockState(q).isAir() && level.getBlockState(q.below()).isSolid()) {
-                level.setBlock(q, Blocks.SKELETON_SKULL.defaultBlockState().setValue(SkullBlock.ROTATION, r.nextInt(16)), 2);
-                break;
-            }
-        }
+        BlockPos headCol = o.relative(along, half + 4);
+        BlockPos q = new BlockPos(headCol.getX(), ground[half + 4 - from] + 1, headCol.getZ());
+        if (level.getBlockState(q).isAir())
+            level.setBlock(q, Blocks.SKELETON_SKULL.defaultBlockState().setValue(SkullBlock.ROTATION, r.nextInt(16)), 2);
         return true;
+    }
+
+    /**
+     * The Y of the top natural ground block in this column (dirt, sand, stone, terracotta), searching
+     * from a little above the origin down; MIN_VALUE if there is none close by. Ignores logs, leaves and
+     * plants that other features have already put here.
+     */
+    private static int groundY(WorldGenLevel level, BlockPos col) {
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        for (int y = col.getY() + 5; y >= col.getY() - 8; y--) {
+            p.set(col.getX(), y, col.getZ());
+            BlockState s = level.getBlockState(p);
+            if (s.is(BlockTags.DIRT) || s.is(BlockTags.SAND) || s.is(BlockTags.BASE_STONE_OVERWORLD)
+                    || s.is(BlockTags.TERRACOTTA) || s.is(Blocks.GRAVEL) || s.is(Blocks.COARSE_DIRT)) return y;
+        }
+        return Integer.MIN_VALUE;
     }
 }
