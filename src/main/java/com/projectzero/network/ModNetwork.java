@@ -17,7 +17,8 @@ public final class ModNetwork {
     // 8: skill presets (AssignSkillSlotPacket preset field, SwitchPresetPacket, preset sync).
     // 9: SystemNoticePacket.
     // 10: level ceiling sync (PlayerStats.ceilingBroken + SyncJobPacket.noCeiling).
-    private static final int PROTOCOL_VERSION = 10;
+    // 11: waypoint list sync, travel and rename.
+    private static final int PROTOCOL_VERSION = 11;
 
     public static final SimpleChannel CHANNEL = ChannelBuilder
             .named(ProjectZero.id("main"))
@@ -112,6 +113,22 @@ public final class ModNetwork {
                 .encoder(SystemNoticePacket::encode)
                 .decoder(SystemNoticePacket::decode)
                 .consumerMainThread(SystemNoticePacket::handle)
+                .add();
+
+        CHANNEL.messageBuilder(SyncWaypointsPacket.class, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(SyncWaypointsPacket::encode)
+                .decoder(SyncWaypointsPacket::decode)
+                .consumerMainThread(SyncWaypointsPacket::handle)
+                .add();
+        CHANNEL.messageBuilder(WaypointTravelPacket.class, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(WaypointTravelPacket::encode)
+                .decoder(WaypointTravelPacket::decode)
+                .consumerMainThread(WaypointTravelPacket::handle)
+                .add();
+        CHANNEL.messageBuilder(RenameWaypointPacket.class, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(RenameWaypointPacket::encode)
+                .decoder(RenameWaypointPacket::decode)
+                .consumerMainThread(RenameWaypointPacket::handle)
                 .add();
     }
 

@@ -2,7 +2,6 @@ package com.projectzero.waypoints;
 
 import com.projectzero.ProjectZero;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.dimension.DimensionType;
 
@@ -29,6 +28,7 @@ public final class WaypointRules {
     }
 
     public static boolean isOverworldLike(net.minecraft.server.level.ServerLevel level) {
-        return !isForbidden(level) && !level.dimensionType().hasCeiling();
+        return !isForbidden(level) && level.dimensionType().natural() && level.dimensionType().hasSkyLight()
+                && !level.dimensionType().hasCeiling() && !level.dimensionType().ultraWarm();
     }
 }
