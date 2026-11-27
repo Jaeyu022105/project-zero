@@ -138,5 +138,6 @@
   "item.projectzero.mana_crystal_shard": "Mana Crystal Shard",
   "key.projectzero.skills": "Open Skills Window",
   "key.projectzero.cycle_preset": "Next Skill Preset",
-  "screen.projectzero.skills": "Skills"
+  "screen.projectzero.skills": "Skills",
+  "biome.projectzero.capwood": "Capwood"
 }

@@ -28,6 +28,7 @@ import org.slf4j.Logger;
  *   registry/  blocks, items, creative tab
  *   awakening/ Awakening Stones (job rerolls)
  *   domain/    the Library domain (job choice ceremony)
+ *   worldgen/  our biomes (TerraBlender region, surface rules)
  */
 @Mod(ProjectZero.MOD_ID)
 public final class ProjectZero {
@@ -46,6 +47,7 @@ public final class ProjectZero {
         ModLootModifiers.LOOT_MODIFIERS.register(modBus);
         com.projectzero.fx.ModParticles.PARTICLES.register(modBus);
         com.projectzero.registry.ModFeatures.FEATURES.register(modBus);
+        modBus.addListener(com.projectzero.worldgen.ModWorldgen::onCommonSetup);
 
         GateRules.init();
         context.registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT, com.projectzero.config.ClientConfig.SPEC);
