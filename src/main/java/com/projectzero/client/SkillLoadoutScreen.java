@@ -344,7 +344,7 @@ public class SkillLoadoutScreen extends Screen {
 
     private void click() {
         if (minecraft != null) {
-            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.6F, 0.35F));
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK.value(), 1.6F, 0.35F));
         }
     }
 }
