@@ -1,4 +1,5 @@
-"""Builds our round-3 biomes (Cloud Forest, Baobab Savanna, Tsingy, Karst Tower Bay) from vanilla templates.
+"""Builds our round-3 and round-4 biomes from vanilla templates (Cloud Forest, Baobab Savanna, Tsingy,
+Karst Tower Bay, Salt Mirror Flats, Geyser Basin, Ice Cathedral, Crystal Tundra).
 
 Usage: python3 tools/biomes/ours.py <folder with vanilla 1.21.1 biome jsons>; then run gen.py, which
 checks every biome for feature order cycles.
@@ -56,11 +57,18 @@ def features():
     placed("termite_mound", "projectzero:termite_mound", rarity=3)
     # Tsingy.
     configured("tsingy", {"type": "projectzero:tsingy", "config": {}})
-    placed("tsingy", "projectzero:tsingy", count=1)
+    placed("tsingy", "projectzero:tsingy", rarity=2)
     # Karst Tower Bay: towers stand on the sea floor.
     configured("karst_tower", {"type": "projectzero:karst_tower", "config": {}})
-    placed("karst_tower", "projectzero:karst_tower", count={"type": "minecraft:uniform", "min_inclusive": 0, "max_inclusive": 2},
-           heightmap="OCEAN_FLOOR_WG", water=False)
+    placed("karst_tower", "projectzero:karst_tower", rarity=3, heightmap="OCEAN_FLOOR_WG", water=False)
+
+    # Round 4.
+    for n in ["salt_pool", "geyser", "ice_arch", "crystal_outcrop"]:
+        configured(n, {"type": "projectzero:" + n, "config": {}})
+    placed("salt_pool", "projectzero:salt_pool", count=3)
+    placed("geyser", "projectzero:geyser", count=1)
+    placed("ice_arch", "projectzero:ice_arch", rarity=2)
+    placed("crystal_outcrop", "projectzero:crystal_outcrop", rarity=2)
 
 def placed_plain(name):
     gen.write(os.path.join(MOD, 'placed_feature', name + '.json'), {"feature": "projectzero:" + name, "placement": []})
@@ -87,6 +95,24 @@ BIOMES = {
         {VEG: ["projectzero:karst_tower"]},
         {"temperature": 0.8, "downfall": 0.85, "effects": {"fog_color": 13952736, "sky_color": 9224424, "water_color": 3126682,
          "water_fog_color": 1797978, "grass_color": 6074954, "foliage_color": 4169802}}),
+    # Round 4.
+    "salt_flats": ("desert", ["minecraft:patch_cactus_desert", "minecraft:patch_dead_bush_2"],
+        ["boulder_stone_rare"],
+        {VEG: ["projectzero:salt_pool"]},
+        {"effects": {"fog_color": 15791352, "sky_color": 11063551, "water_color": 10475760, "water_fog_color": 12642552}}),
+    "geyser_basin": ("old_growth_pine_taiga", [],
+        ["boulder_stone_rare", "fallen_spruce_rare", "fern_carpet"],
+        {VEG: ["projectzero:geyser"]},
+        {"effects": {"fog_color": 14212304, "sky_color": 8364543, "water_color": 4245728, "water_fog_color": 2140320,
+         "grass_color": 9084000, "foliage_color": 7311436}}),
+    "ice_cathedral": ("ice_spikes", [],
+        ["boulder_stone_rare"],
+        {VEG: ["projectzero:ice_arch"]},
+        {"effects": {"fog_color": 13697279, "sky_color": 8364543, "water_color": 4020182, "water_fog_color": 329011}}),
+    "crystal_tundra": ("snowy_plains", [],
+        ["boulder_stone_rare", "snow_scrub"],
+        {VEG: ["projectzero:crystal_outcrop"]},
+        {"effects": {"fog_color": 13690111, "sky_color": 10273023, "water_color": 4159204, "water_fog_color": 329011}}),
 }
 
 def build(vanilla_dir):

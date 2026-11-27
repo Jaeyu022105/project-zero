@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "projectzero:limestone"
+    "projectzero:limestone",
+    "projectzero:mana_crystal_block",
+    "projectzero:salt_crust"
   ]
 }

@@ -15,7 +15,7 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 /**
- * A stand of Tsingy: dozens of razor-thin limestone needles packed together, 5 to 26 blocks tall,
+ * A stand of Tsingy: 14 to 28 razor-thin limestone needles packed together, up to about 35 blocks tall,
  * with narrow slots between them. Tips end in a stone point. Vines and the odd shrub hide in the gaps.
  */
 public class TsingyFeature extends Feature<NoneFeatureConfiguration> {
@@ -28,11 +28,11 @@ public class TsingyFeature extends Feature<NoneFeatureConfiguration> {
         WorldGenLevel level = ctx.level();
         RandomSource r = ctx.random();
         BlockPos o = ctx.origin();
-        int needles = 22 + r.nextInt(22);
-        int tall = 10 + r.nextInt(14);   // this stand's typical height
+        int needles = 14 + r.nextInt(14);
+        int tall = 14 + r.nextInt(18);   // this stand's typical height
         for (int i = 0; i < needles; i++) {
             int dx = r.nextInt(REACH * 2 - 3) - REACH + 2, dz = r.nextInt(REACH * 2 - 3) - REACH + 2;
-            double rad = 0.8 + r.nextDouble() * 1.6;
+            double rad = 1.0 + r.nextDouble() * 1.5;
             double edgeFall = 1 - (dx * dx + dz * dz) / (double) (REACH * REACH);   // shorter toward the edge of the stand
             int h = (int) (Math.max(0.25, edgeFall) * (tall * (0.6 + r.nextDouble() * 0.7))) + 3;
             needle(level, o.offset(dx, 0, dz), rad, h, r);

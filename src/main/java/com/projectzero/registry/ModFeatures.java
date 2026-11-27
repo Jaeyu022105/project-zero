@@ -50,6 +50,16 @@ public final class ModFeatures {
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> KARST_TOWER =
             FEATURES.register("karst_tower", com.projectzero.worldgen.KarstTowerFeature::new);
 
+    // Round 4 biomes.
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> SALT_POOL =
+            FEATURES.register("salt_pool", com.projectzero.worldgen.SaltPoolFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> GEYSER =
+            FEATURES.register("geyser", com.projectzero.worldgen.GeyserFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> ICE_ARCH =
+            FEATURES.register("ice_arch", com.projectzero.worldgen.IceArchFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> CRYSTAL_OUTCROP =
+            FEATURES.register("crystal_outcrop", com.projectzero.worldgen.CrystalOutcropFeature::new);
+
     public static final DeferredRegister<net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType<?>> TREE_DECORATORS =
             DeferredRegister.create(net.minecraft.core.registries.Registries.TREE_DECORATOR_TYPE, ProjectZero.MOD_ID);
     /** Buttress roots at the base of a tree (see worldgen/RootsDecorator). */

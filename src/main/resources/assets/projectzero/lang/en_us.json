@@ -154,5 +154,11 @@
   "biome.projectzero.cloud_forest": "Cloud Forest",
   "biome.projectzero.baobab_savanna": "Baobab Savanna",
   "biome.projectzero.tsingy": "Tsingy Blade Forest",
-  "biome.projectzero.karst_bay": "Karst Tower Bay"
+  "biome.projectzero.karst_bay": "Karst Tower Bay",
+  "block.projectzero.salt_crust": "Salt Crust",
+  "block.projectzero.mana_crystal_block": "Block of Raw Mana Crystal",
+  "biome.projectzero.salt_flats": "Salt Mirror Flats",
+  "biome.projectzero.geyser_basin": "Geyser Basin",
+  "biome.projectzero.ice_cathedral": "Ice Cathedral",
+  "biome.projectzero.crystal_tundra": "Crystal Tundra"
 }

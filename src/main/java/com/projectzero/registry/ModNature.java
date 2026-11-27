@@ -54,6 +54,16 @@ public final class ModNature {
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.ACACIA_PLANKS)
                     .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)));
 
+    // ---- Round 4 ----
+    /** White salt crust with hexagon cracks: Salt Mirror Flats ground. */
+    public static final RegistryObject<Block> SALT_CRUST = block("salt_crust",
+            () -> new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.CALCITE)
+                    .mapColor(MapColor.SNOW).strength(0.6F).sound(SoundType.TUFF)));
+    /** Solid glowing mana crystal: Crystal Tundra outcrops. */
+    public static final RegistryObject<Block> MANA_CRYSTAL_BLOCK = block("mana_crystal_block",
+            () -> new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.AMETHYST_BLOCK)
+                    .mapColor(MapColor.COLOR_LIGHT_BLUE).lightLevel(s -> 10).emissiveRendering((s, l, p) -> true)));
+
     private static RegistryObject<Block> block(String name, Supplier<Block> make) {
         RegistryObject<Block> b = ModBlocks.BLOCKS.register(name, make);
         ModItems.ITEMS.register(name, () -> new BlockItem(b.get(), new Item.Properties()));

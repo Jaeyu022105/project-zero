@@ -15,6 +15,10 @@ public final class ModSurfaceRules {
     // Built lazily (blocks registered by then): surface rules are created during common setup.
     private static SurfaceRules.RuleSource LIMESTONE;
 
+    private static SurfaceRules.RuleSource state(net.minecraft.world.level.block.Block b) {
+        return SurfaceRules.state(b.defaultBlockState());
+    }
+
     public static SurfaceRules.RuleSource rules() {
         LIMESTONE = SurfaceRules.state(com.projectzero.registry.ModNature.LIMESTONE.get().defaultBlockState());
         // Capwood: mostly mycelium, with podzol and coarse dirt where the surface noise dips.
@@ -40,6 +44,23 @@ public final class ModSurfaceRules {
                                 SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.1D), LIMESTONE),
                                 COARSE_DIRT)),
                         SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, LIMESTONE))));
-        return SurfaceRules.sequence(capwood, baobab, tsingy);
+        SurfaceRules.RuleSource salt = SurfaceRules.state(com.projectzero.registry.ModNature.SALT_CRUST.get().defaultBlockState());
+        // Salt Mirror Flats: salt crust all the way down through the surface layers.
+        SurfaceRules.RuleSource saltFlats = SurfaceRules.ifTrue(SurfaceRules.isBiome(ModBiomes.SALT_FLATS),
+                SurfaceRules.ifTrue(SurfaceRules.abovePreliminarySurface(), SurfaceRules.sequence(
+                        SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, salt),
+                        SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, salt))));
+        // Geyser Basin: white sinter crust with yellow sulfur patches between the pines.
+        SurfaceRules.RuleSource geyser = SurfaceRules.ifTrue(SurfaceRules.isBiome(ModBiomes.GEYSER_BASIN),
+                SurfaceRules.ifTrue(SurfaceRules.abovePreliminarySurface(),
+                        SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.ifTrue(SurfaceRules.waterBlockCheck(-1, 0), SurfaceRules.sequence(
+                                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.5D), state(Blocks.YELLOW_TERRACOTTA)),
+                                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.05D), state(Blocks.CALCITE)))))));
+        // Ice Cathedral: packed snow over packed ice.
+        SurfaceRules.RuleSource ice = SurfaceRules.ifTrue(SurfaceRules.isBiome(ModBiomes.ICE_CATHEDRAL),
+                SurfaceRules.ifTrue(SurfaceRules.abovePreliminarySurface(), SurfaceRules.sequence(
+                        SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, state(Blocks.SNOW_BLOCK)),
+                        SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, state(Blocks.PACKED_ICE)))));
+        return SurfaceRules.sequence(capwood, baobab, tsingy, saltFlats, geyser, ice);
     }
 }

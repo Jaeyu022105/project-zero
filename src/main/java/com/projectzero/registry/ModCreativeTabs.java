@@ -28,6 +28,8 @@ public final class ModCreativeTabs {
                         output.accept(ModNature.LIMESTONE.get());
                         output.accept(ModNature.BAOBAB_LOG.get());
                         output.accept(ModNature.BAOBAB_PLANKS.get());
+                        output.accept(ModNature.SALT_CRUST.get());
+                        output.accept(ModNature.MANA_CRYSTAL_BLOCK.get());
                         output.accept(ModItems.AWAKENING_SHARD.get());
                         output.accept(ModItems.SHARD_VESSEL.get());
                         output.accept(ModItems.SKILLBOOK.get());

@@ -36,6 +36,8 @@ public final class BiomeMist {
             target = 1F - Mth.clamp((at.getY() - 90F) / 170F, 0F, 1F);
         } else if (biome.is(ModBiomes.CLOUD_FOREST)) {
             target = 1.25F;   // the forest lives inside the cloud
+        } else if (biome.is(ModBiomes.GEYSER_BASIN)) {
+            target = 0.45F;   // steam hangs over the basin
         } else if (biome.is(ModBiomes.KARST_BAY)) {
             target = 0.55F;   // sea haze between the towers
         }

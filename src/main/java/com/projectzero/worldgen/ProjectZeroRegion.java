@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * and the world still feels like Minecraft. Weight sets how much of the world uses this region.
  */
 public class ProjectZeroRegion extends Region {
-    public static final int WEIGHT = 30;   // vanilla's own region is 10: ours covers about three quarters of the world
+    public static final int WEIGHT = 15;   // vanilla's own region is 10: ours covers about 60% of the world, so vanilla structures stay easy to find early on
 
     public ProjectZeroRegion(ResourceLocation name) {
         super(name, RegionType.OVERWORLD, WEIGHT);
@@ -27,7 +27,7 @@ public class ProjectZeroRegion extends Region {
     @Override
     public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper) {
         this.addModifiedVanillaOverworldBiomes(mapper, builder -> {
-            // Common biomes on purpose: our share has to read as most of the world, not rare patches.
+            // Common biomes on purpose so ours aren't rare patches, but Plains stay vanilla everywhere (villages early on).
             builder.replaceBiome(Biomes.DARK_FOREST, ModBiomes.CAPWOOD);
             builder.replaceBiome(Biomes.SWAMP, ModBiomes.CAPWOOD);
             builder.replaceBiome(Biomes.FOREST, ModBiomes.ELDERWOOD);
@@ -41,8 +41,6 @@ public class ProjectZeroRegion extends Region {
             builder.replaceBiome(Biomes.BAMBOO_JUNGLE, ModBiomes.SKY_PILLARS);
             builder.replaceBiome(Biomes.MEADOW, ModBiomes.SKYFALL_ISLES);
             builder.replaceBiome(Biomes.FLOWER_FOREST, ModBiomes.SKYFALL_ISLES);
-            builder.replaceBiome(Biomes.PLAINS, ModBiomes.SKYFALL_ISLES);
-            builder.replaceBiome(Biomes.SUNFLOWER_PLAINS, ModBiomes.SKYFALL_ISLES);
             builder.replaceBiome(Biomes.TAIGA, ModBiomes.CLOUD_FOREST);
             builder.replaceBiome(Biomes.SAVANNA, ModBiomes.BAOBAB_SAVANNA);
             builder.replaceBiome(Biomes.SAVANNA_PLATEAU, ModBiomes.BAOBAB_SAVANNA);
@@ -50,6 +48,10 @@ public class ProjectZeroRegion extends Region {
             builder.replaceBiome(Biomes.ERODED_BADLANDS, ModBiomes.TSINGY);
             builder.replaceBiome(Biomes.WARM_OCEAN, ModBiomes.KARST_BAY);
             builder.replaceBiome(Biomes.LUKEWARM_OCEAN, ModBiomes.KARST_BAY);
+            builder.replaceBiome(Biomes.DESERT, ModBiomes.SALT_FLATS);
+            builder.replaceBiome(Biomes.OLD_GROWTH_PINE_TAIGA, ModBiomes.GEYSER_BASIN);
+            builder.replaceBiome(Biomes.ICE_SPIKES, ModBiomes.ICE_CATHEDRAL);
+            builder.replaceBiome(Biomes.SNOWY_PLAINS, ModBiomes.CRYSTAL_TUNDRA);
         });
     }
 }

@@ -114,7 +114,7 @@ def baobab_log():
         fold = 1 if x % 5 in (0, 1) else 0
         for y in range(16):
             n = r.randint(-7, 7)
-            c = (138, 122, 110) if not fold else (116, 101, 92)
+            c = (152, 126, 102) if not fold else (128, 104, 84)
             if (y + x * 2) % 13 == 0: c = (156, 140, 126)
             im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
     im.save(OUT + "baobab_log.png")
@@ -145,7 +145,37 @@ def baobab_planks():
             im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
     im.save(OUT + "baobab_planks.png")
 
+def salt_crust():
+    """White salt with raised hexagon ridges."""
+    r = random.Random(41)
+    im = Image.new("RGBA", (16, 16))
+    for x in range(16):
+        for y in range(16):
+            n = r.randint(-6, 6)
+            # Hex-ish cell edges: rows offset every other band.
+            row = y // 8
+            cx = (x + (4 if row % 2 else 0)) % 8
+            edge = cx == 0 or y % 8 == 0 or (y % 8 in (1, 7) and cx in (1, 7))
+            c = (206, 204, 198) if edge else (238, 238, 234)
+            im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
+    im.save(OUT + "salt_crust.png")
+
+def mana_crystal_block():
+    """Faceted pale-blue crystal with bright cores."""
+    r = random.Random(42)
+    im = Image.new("RGBA", (16, 16))
+    for x in range(16):
+        for y in range(16):
+            facet = ((x + y) // 4 + (x - y) // 5) % 3
+            c = [(92, 170, 230), (130, 205, 245), (70, 140, 214)][facet]
+            n = r.randint(-8, 8)
+            im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
+    for _ in range(8):
+        im.putpixel((r.randrange(16), r.randrange(16)), (224, 248, 255, 255))
+    im.save(OUT + "mana_crystal_block.png")
+
 if __name__ == "__main__":
     glowcap_gills(); violet_cap()
     skywood_log(); skywood_log_top(); skywood_planks(); skywood_leaves()
     limestone(); baobab_log(); baobab_log_top(); baobab_planks()
+    salt_crust(); mana_crystal_block()

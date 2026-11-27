@@ -31,6 +31,15 @@ public final class ModBiomes {
     /** Jungle-topped limestone towers standing in emerald water. */
     public static final ResourceKey<Biome> KARST_BAY = key("karst_bay");
 
+    /** White salt crust under a still sheet of water that mirrors the sky. */
+    public static final ResourceKey<Biome> SALT_FLATS = key("salt_flats");
+    /** Rainbow hot springs, steam and launching vents among old pines. */
+    public static final ResourceKey<Biome> GEYSER_BASIN = key("geyser_basin");
+    /** Blue-ice arches and frozen waterfalls among the ice spikes. */
+    public static final ResourceKey<Biome> ICE_CATHEDRAL = key("ice_cathedral");
+    /** Snow fields broken by glowing mana-crystal outcrops. */
+    public static final ResourceKey<Biome> CRYSTAL_TUNDRA = key("crystal_tundra");
+
     private static ResourceKey<Biome> key(String name) {
         return ResourceKey.create(Registries.BIOME, ProjectZero.id(name));
     }
