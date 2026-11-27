@@ -39,7 +39,51 @@ public final class BladeTrail {
     /** Hilt end and tip of a sword-shaped item, in item model space (0..1, y up). */
     private static final Vector3f HILT = new Vector3f(0.40F, 0.40F, 0.5F), TIP = new Vector3f(0.95F, 0.95F, 0.5F);
 
-    private record Sample(Vec3 base, Vec3 tip, long t) {}
+    private record Sample(Vec3 base, Vec3 tip, long t, int rgb, long life) {}
+
+    /**
+     * How a weapon's trail looks, from its material and enchantments: color, how far past the tip
+     * the arc reaches (Sweeping Edge), how long it lingers (Knockback), and what it sheds from the tip
+     * in third person (Fire Aspect embers, Smite and Bane sparks, Sharpness glints).
+     */
+    public record Style(int rgb, float reach, long life, int shed) {
+        static final int SHED_NONE = 0, SHED_EMBER = 1, SHED_HOLY = 2, SHED_VENOM = 3, SHED_GLINT = 4;
+    }
+
+    public static Style styleOf(ItemStack stack) {
+        int rgb = RGB;
+        if (stack.getItem() instanceof net.minecraft.world.item.TieredItem tiered) {
+            net.minecraft.world.item.Tier tier = tiered.getTier();
+            if (tier == net.minecraft.world.item.Tiers.NETHERITE) rgb = 0x9A6BFF;
+            else if (tier == net.minecraft.world.item.Tiers.DIAMOND) rgb = 0x7FF0FF;
+            else if (tier == net.minecraft.world.item.Tiers.GOLD) rgb = 0xFFD24A;
+            else if (tier == net.minecraft.world.item.Tiers.IRON) rgb = 0xE0E8F0;
+            else if (tier == net.minecraft.world.item.Tiers.STONE) rgb = 0xA8A8A8;
+            else if (tier == net.minecraft.world.item.Tiers.WOOD) rgb = 0xC8A070;
+        }
+        float reach = 1F;
+        long life = LIFE_NS;
+        int shed = Style.SHED_NONE;
+        int sharp = 0;
+        for (var e : stack.getEnchantments().entrySet()) {
+            var h = e.getKey();
+            int lvl = e.getIntValue();
+            if (h.is(net.minecraft.world.item.enchantment.Enchantments.FIRE_ASPECT)) { rgb = 0xFF7A20; shed = Style.SHED_EMBER; }
+            else if (h.is(net.minecraft.world.item.enchantment.Enchantments.SMITE)) { if (shed == 0) { rgb = 0xFFE070; shed = Style.SHED_HOLY; } }
+            else if (h.is(net.minecraft.world.item.enchantment.Enchantments.BANE_OF_ARTHROPODS)) { if (shed == 0) { rgb = 0x9AD84A; shed = Style.SHED_VENOM; } }
+            else if (h.is(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS)) sharp = lvl;
+            else if (h.is(net.minecraft.world.item.enchantment.Enchantments.SWEEPING_EDGE)) reach += 0.15F * lvl;
+            else if (h.is(net.minecraft.world.item.enchantment.Enchantments.KNOCKBACK)) life += 35_000_000L * lvl;
+        }
+        if (sharp > 0) {
+            // Sharper = whiter, hotter edge.
+            float k = Math.min(0.6F, sharp * 0.12F);
+            int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+            rgb = ((int) Mth.lerp(k, r, 255) << 16) | ((int) Mth.lerp(k, g, 255) << 8) | (int) Mth.lerp(k, b, 255);
+            if (shed == 0) shed = Style.SHED_GLINT;
+        }
+        return new Style(rgb, reach, life, shed);
+    }
 
     private static final Map<AbstractClientPlayer, ArrayDeque<Sample>> WORLD = new WeakHashMap<>();
     private static final ArrayDeque<Sample> HAND = new ArrayDeque<>();
@@ -67,7 +111,10 @@ public final class BladeTrail {
         itemTransform(pose, stack, p, left ? ItemDisplayContext.THIRD_PERSON_LEFT_HAND : ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, left);
         Vec3 at = p.getPosition(partial);
         Matrix4f m = pose.last().pose();
-        add(WORLD.computeIfAbsent(p, k -> new ArrayDeque<>()), at.add(point(m, HILT)), at.add(point(m, TIP)));
+        Style style = styleOf(stack);
+        Vec3 hilt = at.add(point(m, HILT)), tip = at.add(point(m, reach(style)));
+        add(WORLD.computeIfAbsent(p, k -> new ArrayDeque<>()), hilt, tip, style);
+        shed(p, tip, style);
     }
 
     /** First person: called with the pose already set up to draw the held item. */
@@ -75,7 +122,8 @@ public final class BladeTrail {
         pose.pushPose();
         itemTransform(pose, stack, p, leftHand ? ItemDisplayContext.FIRST_PERSON_LEFT_HAND : ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, leftHand);
         Matrix4f m = pose.last().pose();
-        add(HAND, point(m, HILT), point(m, TIP));
+        Style style = styleOf(stack);
+        add(HAND, point(m, HILT), point(m, reach(style)), style);
         pose.popPose();
     }
 
@@ -91,14 +139,34 @@ public final class BladeTrail {
         return new Vec3(v.x, v.y, v.z);
     }
 
-    private static void add(ArrayDeque<Sample> trail, Vec3 base, Vec3 tip) {
+    /** The tip pushed out along the blade by Sweeping Edge. */
+    private static Vector3f reach(Style style) {
+        return new Vector3f(TIP).sub(HILT).mul(style.reach()).add(HILT);
+    }
+
+    private static void add(ArrayDeque<Sample> trail, Vec3 base, Vec3 tip, Style style) {
         long now = System.nanoTime();
-        trail.addLast(new Sample(base, tip, now));
+        trail.addLast(new Sample(base, tip, now, style.rgb(), style.life()));
         prune(trail, now);
     }
 
     private static void prune(ArrayDeque<Sample> trail, long now) {
-        while (!trail.isEmpty() && now - trail.peekFirst().t() > LIFE_NS) trail.removeFirst();
+        while (!trail.isEmpty() && now - trail.peekFirst().t() > trail.peekFirst().life()) trail.removeFirst();
+    }
+
+    /** Enchanted blades shed a little from the tip as they cut (world trails only, a few per frame). */
+    private static void shed(AbstractClientPlayer p, Vec3 tip, Style style) {
+        if (style.shed() == Style.SHED_NONE || p.level().random.nextInt(3) != 0) return;
+        var level = p.level();
+        var r = level.random;
+        double vx = (r.nextDouble() - 0.5) * 0.04, vy = 0.02 + r.nextDouble() * 0.03, vz = (r.nextDouble() - 0.5) * 0.04;
+        switch (style.shed()) {
+            case Style.SHED_EMBER -> level.addParticle(com.projectzero.fx.Fx.glow(0xFF7A20, 0.6F), tip.x, tip.y, tip.z, vx, vy, vz);
+            case Style.SHED_HOLY -> level.addParticle(com.projectzero.fx.Fx.spark(0xFFE070, 0.7F), tip.x, tip.y, tip.z, vx, vy, vz);
+            case Style.SHED_VENOM -> level.addParticle(com.projectzero.fx.Fx.drop(0x9AD84A, 0.8F), tip.x, tip.y, tip.z, vx, 0, vz);
+            case Style.SHED_GLINT -> { if (r.nextInt(3) == 0) level.addParticle(com.projectzero.fx.Fx.spark(0xFFFFFF, 0.6F), tip.x, tip.y, tip.z, 0, 0, 0); }
+            default -> {}
+        }
     }
 
     // ---- drawing ----
@@ -125,9 +193,9 @@ public final class BladeTrail {
     }
 
     private static void ribbon(VertexConsumer vc, PoseStack.Pose p, ArrayDeque<Sample> trail, Vec3 off, long now) {
-        float r = ((RGB >> 16) & 0xFF) / 255F, g = ((RGB >> 8) & 0xFF) / 255F, b = (RGB & 0xFF) / 255F;
         Sample prev = null;
         for (Sample s : trail) {
+            float r = ((s.rgb() >> 16) & 0xFF) / 255F, g = ((s.rgb() >> 8) & 0xFF) / 255F, b = (s.rgb() & 0xFF) / 255F;
             if (prev != null) {
                 float k0 = fade(prev, now), k1 = fade(s, now);
                 Vec3 b0 = prev.base().subtract(off), t0 = prev.tip().subtract(off);
@@ -144,7 +212,7 @@ public final class BladeTrail {
 
     /** Newest samples full bright, the tail fades to nothing. */
     private static float fade(Sample s, long now) {
-        float f = 1F - (now - s.t()) / (float) LIFE_NS;
+        float f = 1F - (now - s.t()) / (float) s.life();
         return Math.max(0F, f * f);
     }
 

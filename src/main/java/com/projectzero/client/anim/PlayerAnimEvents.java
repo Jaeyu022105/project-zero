@@ -7,7 +7,6 @@ import com.projectzero.anim.PlayerAnim;
 import com.projectzero.client.ClientSkillVisuals;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
-import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -41,19 +40,36 @@ public final class PlayerAnimEvents {
     private static final float SPRINT_LEAN = 6F;
     private static final Map<Player, float[]> LEAN = new WeakHashMap<>();
 
-    /** Swaps each player renderer's model for {@link AnimatedPlayerModel}. Called from AddLayers. */
+    /**
+     * Swaps each player renderer's model for {@link AnimatedPlayerModel} (with elbows and knees),
+     * and its armor models for jointed ones. Called from AddLayers, after vanilla added its layers.
+     */
     public static void install(PlayerRenderer renderer, EntityModelSet models, boolean slim) {
         try {
             for (Field f : LivingEntityRenderer.class.getDeclaredFields()) {
                 if (EntityModel.class.isAssignableFrom(f.getType())) {
                     f.setAccessible(true);
-                    f.set(renderer, new AnimatedPlayerModel(models.bakeLayer(slim ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), slim));
-                    return;
+                    f.set(renderer, new AnimatedPlayerModel(models.bakeLayer(slim ? Joints.PLAYER_SLIM : Joints.PLAYER), slim));
+                } else if (java.util.List.class.isAssignableFrom(f.getType())) {
+                    f.setAccessible(true);
+                    for (Object layer : (java.util.List<?>) f.get(renderer)) {
+                        if (layer instanceof net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer<?, ?, ?>) jointArmor(layer, models);
+                    }
                 }
             }
-            ProjectZero.LOGGER.warn("Player animations off: no model field on LivingEntityRenderer");
         } catch (ReflectiveOperationException | RuntimeException e) {
             ProjectZero.LOGGER.warn("Player animations off: could not install model", e);
+        }
+    }
+
+    /** The armor layer holds its inner model first, then the outer one. */
+    private static void jointArmor(Object layer, EntityModelSet models) throws ReflectiveOperationException {
+        int n = 0;
+        for (Field f : net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer.class.getDeclaredFields()) {
+            if (!net.minecraft.client.model.HumanoidModel.class.isAssignableFrom(f.getType())) continue;
+            f.setAccessible(true);
+            f.set(layer, new JointedArmorModel(models.bakeLayer(n++ == 0 ? Joints.ARMOR_INNER : Joints.ARMOR_OUTER)));
+            if (n == 2) return;
         }
     }
 
@@ -93,8 +109,8 @@ public final class PlayerAnimEvents {
     private static final org.joml.Matrix3f SNAP_NORMAL = new org.joml.Matrix3f();
 
     @SubscribeEvent
-    public static void onRenderTick(TickEvent.RenderTickEvent.Pre event) {
-        frame++;
+    public static void onRenderLevel(net.minecraftforge.client.event.RenderLevelStageEvent event) {
+        if (event.getStage() == net.minecraftforge.client.event.RenderLevelStageEvent.Stage.AFTER_SKY) frame++;
     }
 
     /**
@@ -126,35 +142,73 @@ public final class PlayerAnimEvents {
         if (!mainHand) return;
         BladeTrail.renderHand(event.getMultiBufferSource());   // the fading tail, even after the swing ends
         ItemStack stack = event.getItemStack();
-        if (stack.isEmpty() || player.isUsingItem()) return;
-        PlayerPoses.Key[] keys;
-        float t;
+        // Vanilla keeps: empty hand (it draws the arm itself), using items (bows, shields, food), maps.
+        if (stack.isEmpty() || player.isUsingItem() || player.isInvisible()
+                || stack.getItem() instanceof net.minecraft.world.item.MapItem) return;
+        PlayerPoses.Key[] keys = null;
+        float t = 0F;
         ClientSkillVisuals.Visual v = ClientSkillVisuals.find(player.getId(), ClientSkillVisuals.Kind.ANIM);
+        float swing = event.getSwingProgress();
         if (v != null) {
             keys = PlayerPoses.keys(PlayerAnim.byId(v.rgb));
             t = v.progress(partial);
-        } else if (event.getSwingProgress() > 0F && AnimatedPlayerModel.isBlade(stack)) {
+        } else if (swing > 0F && AnimatedPlayerModel.isBlade(stack)) {
             keys = PlayerPoses.COMBO[MoveState.of(player).combo];
-            t = event.getSwingProgress();
-        } else {
-            return;
+            t = swing;
         }
         event.setCanceled(true);
-        float w = PlayerPoses.weight(t, keys);
-        float[] fp = PlayerPoses.sample(keys, t).fp();
         pose.pushPose();
-        // Vanilla's resting item-in-hand spot, then our offset on top.
-        pose.translate(i * 0.56F, -0.52F + event.getEquipProgress() * -0.6F, -0.72F);
-        pose.translate(i * fp[0] * w, fp[1] * w, fp[2] * w);
-        pose.mulPose(Axis.YP.rotationDegrees(i * fp[4] * w));
-        pose.mulPose(Axis.ZP.rotationDegrees(i * fp[5] * w));
-        pose.mulPose(Axis.XP.rotationDegrees(fp[3] * w));
+        if (keys == null) {
+            // Vanilla's item swing, unchanged (so tools, blocks and food feel the same).
+            float sq = Mth.sqrt(swing);
+            pose.translate(i * -0.4F * Mth.sin(sq * Mth.PI), 0.2F * Mth.sin(sq * Mth.TWO_PI), -0.2F * Mth.sin(swing * Mth.PI));
+            pose.translate(i * 0.56F, -0.52F + event.getEquipProgress() * -0.6F, -0.72F);
+            float f = Mth.sin(swing * swing * Mth.PI), f1 = Mth.sin(sq * Mth.PI);
+            pose.mulPose(Axis.YP.rotationDegrees(i * (45F + f * -20F)));
+            pose.mulPose(Axis.ZP.rotationDegrees(i * f1 * -20F));
+            pose.mulPose(Axis.XP.rotationDegrees(f1 * -80F));
+            pose.mulPose(Axis.YP.rotationDegrees(i * -45F));
+        } else {
+            // Our swing. The cooldown dip (equip progress) is ignored so spam-slashing never sinks the blade.
+            float w = PlayerPoses.weight(t, keys);
+            float[] fp = PlayerPoses.sample(keys, t).fp();
+            pose.translate(i * 0.56F, -0.52F, -0.72F);
+            pose.translate(i * fp[0] * w, fp[1] * w, fp[2] * w);
+            pose.mulPose(Axis.YP.rotationDegrees(i * fp[4] * w));
+            pose.mulPose(Axis.ZP.rotationDegrees(i * fp[5] * w));
+            pose.mulPose(Axis.XP.rotationDegrees(fp[3] * w));
+        }
+        renderGripArm(pose, event.getMultiBufferSource(), event.getPackedLight(), player, arm, i);
         mc.getEntityRenderDispatcher().getItemInHandRenderer().renderItem(player, stack,
                 i > 0 ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
                 i < 0, pose, event.getMultiBufferSource(), event.getPackedLight());
-        if (AnimatedPlayerModel.isBlade(stack)) BladeTrail.recordHand(pose, player, stack, i < 0);
+        if (keys != null && AnimatedPlayerModel.isBlade(stack)) BladeTrail.recordHand(pose, player, stack, i < 0);
         pose.popPose();
     }
+
+    /**
+     * Your arm, holding the item: vanilla's empty-hand arm, moved so the fist sits on the item's
+     * grip (worked out from both vanilla transforms), and carried by the same pose as the item.
+     */
+    private static void renderGripArm(PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers, int light,
+                                      AbstractClientPlayer player, HumanoidArm arm, float i) {
+        if (!(Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(player) instanceof PlayerRenderer renderer)) return;
+        pose.pushPose();
+        pose.translate(i * GRIP_X, GRIP_Y, GRIP_Z);
+        pose.mulPose(Axis.YP.rotationDegrees(i * 45F));
+        pose.translate(i * -1F, 3.6F, 3.5F);
+        pose.mulPose(Axis.ZP.rotationDegrees(i * 120F));
+        pose.mulPose(Axis.XP.rotationDegrees(200F));
+        pose.mulPose(Axis.YP.rotationDegrees(i * -135F));
+        pose.translate(i * 5.6F, 0F, 0F);
+        com.projectzero.client.GauntletLayer.renderFirstPerson(pose, buffers, light, player, arm);
+        if (arm == HumanoidArm.RIGHT) renderer.renderRightHand(pose, buffers, light, player);
+        else renderer.renderLeftHand(pose, buffers, light, player);
+        pose.popPose();
+    }
+
+    /** Vanilla's empty-arm spot relative to the held-item spot, plus the shift that puts the fist on the grip. */
+    private static final float GRIP_X = 0.64F - 0.56F - 0.125F, GRIP_Y = -0.60F + 0.52F - 0.126F, GRIP_Z = 0.325F;
 
     /** First-person body motion for one hand (i = +1 right, -1 left). Small: Minecraft already bobs the view. */
     private static void locomotion(PoseStack pose, LocalPlayer p, float pt, float i, boolean main) {

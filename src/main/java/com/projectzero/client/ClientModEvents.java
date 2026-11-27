@@ -46,6 +46,12 @@ public final class ClientModEvents {
     public static void onRegisterLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(GauntletLayer.WIDE, () -> GauntletLayer.create(false));
         event.registerLayerDefinition(GauntletLayer.SLIM, () -> GauntletLayer.create(true));
+        event.registerLayerDefinition(com.projectzero.client.anim.Joints.PLAYER, () -> com.projectzero.client.anim.Joints.player(false));
+        event.registerLayerDefinition(com.projectzero.client.anim.Joints.PLAYER_SLIM, () -> com.projectzero.client.anim.Joints.player(true));
+        event.registerLayerDefinition(com.projectzero.client.anim.Joints.ARMOR_INNER,
+                () -> com.projectzero.client.anim.Joints.armor(com.projectzero.client.anim.Joints.INNER, true));
+        event.registerLayerDefinition(com.projectzero.client.anim.Joints.ARMOR_OUTER,
+                () -> com.projectzero.client.anim.Joints.armor(com.projectzero.client.anim.Joints.OUTER, false));
     }
 
     @SubscribeEvent

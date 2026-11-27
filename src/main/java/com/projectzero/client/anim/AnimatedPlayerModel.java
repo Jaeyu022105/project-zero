@@ -17,6 +17,8 @@ import net.minecraft.world.item.SwordItem;
  * {@link PlayerAnimEvents#install}. Blocky part rotations only, so it still reads as Minecraft.
  */
 public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
+    private Joints.Angles joints = Joints.Angles.ZERO;
+
     public AnimatedPlayerModel(ModelPart root, boolean slim) {
         super(root, slim);
     }
@@ -25,10 +27,18 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
     public void setupAnim(AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float ageInTicks,
                           float netHeadYaw, float headPitch) {
         super.setupAnim(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        float partial = ageInTicks - player.tickCount;
-        if (!player.isSwimming() && !player.isFallFlying() && !player.isSleeping()) {
-            locomotion(player, limbSwing, limbSwingAmount, ageInTicks, partial);
+        // The first-person arm calls this with all zeros: keep it plain and straight, or it flies off.
+        if (ageInTicks == 0F && limbSwing == 0F && limbSwingAmount == 0F) {
+            joints = Joints.Angles.ZERO;
+            applyJoints();
+            return;
         }
+        float partial = Mth.clamp(ageInTicks - player.tickCount, 0F, 1F);
+        float[] loco = {0F, 0F, 0F, 0F};    // right elbow, left elbow, right knee, left knee
+        if (!player.isSwimming() && !player.isFallFlying() && !player.isSleeping()) {
+            loco = locomotion(player, limbSwing, limbSwingAmount, ageInTicks, partial);
+        }
+        joints = new Joints.Angles(loco[0], loco[1], loco[2], loco[3]);
         PlayerPoses.Key[] keys = null;
         float t = 0F;
         ClientSkillVisuals.Visual v = ClientSkillVisuals.find(player.getId(), ClientSkillVisuals.Kind.ANIM);
@@ -39,13 +49,12 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
             keys = PlayerPoses.COMBO[MoveState.of(player).combo];
             t = attackTime;
         }
-        if (keys == null) {
+        float w = keys == null ? 0F : PlayerPoses.weight(t, keys);
+        if (keys == null || w <= 0F) {
             copySkins();
+            applyJoints();
             return;
         }
-        boolean trail = isBlade(player.getMainHandItem());
-        float w = PlayerPoses.weight(t, keys);
-        if (w <= 0F) return;
         PlayerPoses.Key p = PlayerPoses.sample(keys, t);
         // Mirror for left-handed players so the main hand leads.
         boolean left = player.getMainArm() == HumanoidArm.LEFT;
@@ -66,8 +75,39 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
         leftArm.x = Mth.cos(by) * 5F;
         rightArm.yRot += by;
         leftArm.yRot += by;
+        // Joints: the pose's elbows and knees, blended with the movement ones.
+        float[] j = PlayerPoses.sampleJoints(keys, t);
+        float mainElbow = left ? joints.leftElbow() : joints.rightElbow(), offElbow = left ? joints.rightElbow() : joints.leftElbow();
+        mainElbow = Mth.lerp(w, mainElbow, j[0]);
+        offElbow = Mth.lerp(w, offElbow, j[1]);
+        float rk = Mth.lerp(w, joints.rightKnee(), Math.max(joints.rightKnee(), j[2]));
+        float lk = Mth.lerp(w, joints.leftKnee(), Math.max(joints.leftKnee(), j[2]));
+        joints = left ? new Joints.Angles(offElbow, mainElbow, rk, lk) : new Joints.Angles(mainElbow, offElbow, rk, lk);
         copySkins();
-        if (trail) BladeTrail.recordWorld(this, player, partial);
+        applyJoints();
+        if (isBlade(player.getMainHandItem())) BladeTrail.recordWorld(this, player, partial);
+    }
+
+    private void applyJoints() {
+        Joints.apply(this, joints);
+        Joints.lower(rightSleeve).xRot = Joints.lower(rightArm).xRot;
+        Joints.lower(leftSleeve).xRot = Joints.lower(leftArm).xRot;
+        Joints.lower(rightPants).xRot = Joints.lower(rightLeg).xRot;
+        Joints.lower(leftPants).xRot = Joints.lower(leftLeg).xRot;
+    }
+
+    /** Armor layers copy our pose; give jointed armor our elbows and knees too. */
+    @Override
+    public void copyPropertiesTo(net.minecraft.client.model.HumanoidModel<AbstractClientPlayer> other) {
+        super.copyPropertiesTo(other);
+        if (other instanceof JointedArmorModel) Joints.apply(other, joints);
+    }
+
+    /** Held items ride the forearm: rotate about the elbow after the shoulder. */
+    @Override
+    public void translateToHand(HumanoidArm side, com.mojang.blaze3d.vertex.PoseStack pose) {
+        super.translateToHand(side, pose);
+        Joints.rotateLower(side == HumanoidArm.LEFT ? leftArm : rightArm, pose);
     }
 
     /**
@@ -75,7 +115,7 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
      * arm pump and forward arms when sprinting, idle breathing, jump/fall poses and a landing crouch.
      * Pixel offsets only (y + = down), so the blocky look stays.
      */
-    private void locomotion(AbstractClientPlayer player, float limbSwing, float amount, float age, float pt) {
+    private float[] locomotion(AbstractClientPlayer player, float limbSwing, float amount, float age, float pt) {
         MoveState st = MoveState.of(player);
         float sprint = st.sprint(pt), air = st.air(pt), land = st.land(pt) * st.landPower, crouch = st.crouch(pt);
         float phase = limbSwing * 0.6662F;
@@ -124,6 +164,18 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
         rightArm.yRot += twist;
         leftArm.yRot += twist;
         hat.copyFrom(head);
+
+        // Elbows: loose at rest, bent when walking, tucked when sprinting; a forward swing bends more.
+        float elbowBase = 0.12F * idle + move * (0.25F + sprint * 0.85F) + air * 0.4F + land * 0.3F;
+        float rElbow = elbowBase + Math.max(0F, -rightArm.xRot) * 0.3F;
+        float lElbow = elbowBase + Math.max(0F, -leftArm.xRot) * 0.3F;
+        // Knees: the leg swinging forward folds; jumping tucks; landing and crouching give.
+        float kneeK = move * (0.6F + sprint * 0.7F);
+        float rKnee = 0.08F * move + Math.max(0F, Mth.sin(phase)) * kneeK;
+        float lKnee = 0.08F * move + Math.max(0F, -Mth.sin(phase)) * kneeK;
+        rKnee += air * (1.1F * rise + 0.3F * fall) + land * 0.9F + crouch * 0.45F;
+        lKnee += air * (0.4F * rise + 0.3F * fall) + land * 0.9F + crouch * 0.45F;
+        return new float[] {rElbow, lElbow, rKnee, lKnee};
     }
 
     private void copySkins() {

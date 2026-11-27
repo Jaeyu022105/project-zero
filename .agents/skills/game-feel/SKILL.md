@@ -118,6 +118,17 @@ Every movement is animated, even ordinary ones, and players see it **in first pe
   - Third person records in world space; first person records in hand space.
   - New weapons only need to set their hilt and tip points if their shape differs from a sword.
 
+- `Joints`: the player has **elbows and knees**. Each arm, leg, sleeve, trouser leg and armor piece is split into an upper and a lower box, and the lower box hinges on the upper one. Joints bend, they never detach.
+  - Elbows coil on wind-ups and snap straight on strikes. Knees fold in the stride, tuck on jumps and give on landings.
+  - Held items and gauntlets ride the forearm.
+  - New mobs should use the same split. Give the lower box a 1 px overlap so the joint has no gap.
+- First person always shows your arm gripping the held item. Vanilla's item swing is kept for non-blades.
+- `BladeTrail.styleOf` picks the trail style from the weapon:
+  - Material sets the color: netherite violet, diamond cyan, gold yellow, iron white, stone grey, wood tan.
+  - Fire Aspect gives embers, Smite gives gold sparks, Bane of Arthropods gives green drips.
+  - Sharpness makes the edge whiter and adds glints.
+  - Sweeping Edge makes the arc longer, and Knockback makes the trail linger longer.
+
 **Every new mob must ship with:**
 - Idle: breathing or a weight shift, plus a look-around now and then.
 - Walk and run cycles with body bob (twice per cycle) and counter-twist. Running leans in.

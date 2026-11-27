@@ -89,11 +89,13 @@ public final class GauntletLayer extends RenderLayer<AbstractClientPlayer, Playe
 
         pose.pushPose();
         model.rightArm.translateAndRotate(pose);
+        com.projectzero.client.anim.Joints.rotateLower(model.rightArm, pose);   // gauntlets sit on the forearm
         draw(right, pose, buffers, light, overlay, worn);
         pose.popPose();
 
         pose.pushPose();
         model.leftArm.translateAndRotate(pose);
+        com.projectzero.client.anim.Joints.rotateLower(model.leftArm, pose);
         draw(left, pose, buffers, light, overlay, worn);
         pose.popPose();
     }

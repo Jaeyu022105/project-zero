@@ -62,26 +62,72 @@ public final class PlayerPoses {
     /** A plain sword or axe swing: a diagonal slice instead of the vanilla chop. t = attack progress. */
     public static final Key[] SWING = {
             k(0.10F, -2.2F, 0.9F, 0.4F, -0.3F, 0F, -0.1F, 0.35F, 0F, 0.25F, 0.12F, 0F, 10, 45, -30),
-            k(0.50F, -1.0F, -0.9F, 0.1F, 0.2F, 0F, -0.2F, -0.40F, 3F, -0.35F, -0.08F, -0.15F, -10, -55, 35),
-            k(0.85F, -0.9F, -0.9F, 0.1F, 0.2F, 0F, -0.2F, -0.40F, 2F, -0.35F, -0.08F, -0.15F, -10, -55, 35)};
+            k(0.50F, -1.0F, -0.9F, 0.1F, 0.2F, 0F, -0.2F, -0.40F, 3F, -0.35F, 0.04F, -0.15F, -5, -55, 35),
+            k(0.85F, -0.9F, -0.9F, 0.1F, 0.2F, 0F, -0.2F, -0.40F, 2F, -0.35F, 0.04F, -0.15F, -5, -55, 35)};
 
     /** Combo step 2: backhand, from low left rising to high right. */
     public static final Key[] SWING_BACK = {
-            k(0.10F, -1.2F, -1.0F, 0.1F, 0.2F, 0F, -0.2F, -0.40F, 0F, -0.30F, -0.08F, -0.05F, -10, -50, 35),
+            k(0.10F, -1.2F, -1.0F, 0.1F, 0.2F, 0F, -0.2F, -0.40F, 0F, -0.30F, 0.04F, -0.05F, -5, -50, 35),
             k(0.50F, -2.0F, 0.9F, 0.5F, -0.3F, 0F, -0.1F, 0.40F, 2F, 0.30F, 0.15F, -0.10F, 15, 50, -35),
             k(0.85F, -1.9F, 0.9F, 0.5F, -0.3F, 0F, -0.1F, 0.40F, 1F, 0.30F, 0.15F, -0.10F, 15, 50, -35)};
     /** Combo step 3: overhead chop straight down. */
     public static final Key[] SWING_CHOP = {
             k(0.12F, -3.0F, 0.1F, 0.1F, -0.6F, 0F, -0.2F, 0F, -3F, 0F, 0.28F, 0.10F, 50, 0, -10),
-            k(0.50F, -0.6F, -0.1F, 0F, 0.3F, 0F, -0.2F, 0F, 7F, -0.05F, -0.25F, -0.20F, -75, 0, 5),
-            k(0.85F, -0.5F, -0.1F, 0F, 0.3F, 0F, -0.2F, 0F, 6F, -0.05F, -0.25F, -0.20F, -75, 0, 5)};
+            k(0.50F, -0.6F, -0.1F, 0F, 0.3F, 0F, -0.2F, 0F, 7F, -0.05F, -0.05F, -0.25F, -40, 0, 5),
+            k(0.85F, -0.5F, -0.1F, 0F, 0.3F, 0F, -0.2F, 0F, 6F, -0.05F, -0.05F, -0.25F, -40, 0, 5)};
     /** Combo step 4: pull back and thrust. */
     public static final Key[] SWING_THRUST = {
-            k(0.15F, -1.3F, 0.2F, 0.1F, -0.4F, 0F, -0.2F, 0.45F, -2F, 0.05F, -0.02F, 0.15F, -50, 0, 0),
-            k(0.45F, -1.6F, -0.05F, 0F, 0.4F, 0F, -0.2F, -0.35F, 6F, -0.10F, 0.05F, -0.45F, -60, 0, 0),
-            k(0.85F, -1.55F, -0.05F, 0F, 0.4F, 0F, -0.2F, -0.35F, 5F, -0.10F, 0.05F, -0.45F, -60, 0, 0)};
+            k(0.15F, -1.3F, 0.2F, 0.1F, -0.4F, 0F, -0.2F, 0.45F, -2F, 0.05F, 0.08F, 0.15F, -30, 0, 0),
+            k(0.45F, -1.6F, -0.05F, 0F, 0.4F, 0F, -0.2F, -0.35F, 6F, -0.10F, 0.12F, -0.40F, -35, 0, 0),
+            k(0.85F, -1.55F, -0.05F, 0F, 0.4F, 0F, -0.2F, -0.35F, 5F, -0.10F, 0.12F, -0.40F, -35, 0, 0)};
     /** The blade combo, in order. Spamming walks through it; a pause resets to the first slash. */
     public static final Key[][] COMBO = {SWING, SWING_BACK, SWING_CHOP, SWING_THRUST};
+
+    /**
+     * Joint bends per key, as {main elbow, off elbow, knees} in radians (elbow + = forearm forward,
+     * knee + = shin back). Wind-ups coil the arm; strikes snap it straight; casts stay loose.
+     */
+    private static final java.util.Map<Key[], float[][]> JOINTS = new java.util.IdentityHashMap<>();
+
+    static {
+        joints(SWING, 1.0F, 0.6F, 0.15F, 0.15F, 0.6F, 0.2F, 0.2F, 0.6F, 0.2F);
+        joints(SWING_BACK, 1.3F, 0.6F, 0.15F, 0.2F, 0.6F, 0.2F, 0.25F, 0.6F, 0.2F);
+        joints(SWING_CHOP, 1.2F, 0.7F, 0.1F, 0.1F, 0.6F, 0.45F, 0.15F, 0.6F, 0.4F);
+        joints(SWING_THRUST, 1.6F, 0.7F, 0.25F, 0F, 0.6F, 0.3F, 0.05F, 0.6F, 0.3F);
+        joints(SLASH, 1.0F, 0.6F, 0.15F, 0.15F, 0.6F, 0.3F, 0.2F, 0.6F, 0.25F);
+        joints(SLAM, 1.2F, 1.2F, 0.1F, 0.1F, 0.1F, 0.6F, 0.2F, 0.2F, 0.5F);
+        joints(PUNCH, 1.8F, 1.2F, 0.3F, 0F, 1.0F, 0.3F, 0.05F, 1.0F, 0.25F);
+        joints(THROW, 1.4F, 0.5F, 0.15F, 0.1F, 0.5F, 0.2F, 0.15F, 0.5F, 0.2F);
+        joints(GUARD, 1.1F, 1.3F, 0.2F, 1.1F, 1.3F, 0.2F);
+        joints(CAST_UP, 0.2F, 0.5F, 0.1F, 0.2F, 0.5F, 0.1F);
+        joints(NOVA, 1.2F, 1.2F, 0.2F, 0.1F, 0.1F, 0.35F, 0.1F, 0.1F, 0.3F);
+        joints(PUSH, 1.4F, 1.4F, 0.2F, 0F, 0F, 0.3F, 0.05F, 0.05F, 0.25F);
+        joints(ROAR, 0.6F, 0.6F, 0.3F, 0.6F, 0.6F, 0.3F);
+        joints(DASH, 0.9F, 0.9F, 0.5F, 0.9F, 0.9F, 0.5F);
+    }
+
+    private static void joints(Key[] keys, float... v) {
+        float[][] rows = new float[keys.length][3];
+        for (int i = 0; i < keys.length; i++) System.arraycopy(v, i * 3, rows[i], 0, 3);
+        JOINTS.put(keys, rows);
+    }
+
+    /** {main elbow, off elbow, knees} at time t, eased between keys like {@link #sample}. */
+    public static float[] sampleJoints(Key[] keys, float t) {
+        float[][] rows = JOINTS.get(keys);
+        if (rows == null) return new float[3];
+        if (t <= keys[0].t()) return rows[0];
+        for (int i = 0; i < keys.length - 1; i++) {
+            if (t <= keys[i + 1].t()) {
+                float f = (t - keys[i].t()) / (keys[i + 1].t() - keys[i].t());
+                f = 1F - (1F - f) * (1F - f) * (1F - f);
+                float[] out = new float[3];
+                for (int j = 0; j < 3; j++) out[j] = Mth.lerp(f, rows[i][j], rows[i + 1][j]);
+                return out;
+            }
+        }
+        return rows[rows.length - 1];
+    }
 
     public static Key[] keys(PlayerAnim anim) {
         return switch (anim) {
