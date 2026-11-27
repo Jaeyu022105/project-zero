@@ -127,8 +127,8 @@ public final class GateDungeonArena {
                 int nz = (int) Math.round(prev.z + Math.cos(h) * dist);
                 int floor = sea ? o.getY() - 6 - random.nextInt(8)
                         : Math.max(o.getY() - 8, Math.min(o.getY() + 10, prev.floor + random.nextInt(9) - 4));
-                int h = sea ? (o.getY() - floor) + 5 + random.nextInt(6) : 9 + random.nextInt(8);
-                Cave c = new Cave(Kind.CHAMBER, nx, floor, nz, r + random.nextInt(3) - 1, r + random.nextInt(3) - 1, h);
+                int dome = sea ? (o.getY() - floor) + 5 + random.nextInt(6) : 9 + random.nextInt(8);
+                Cave c = new Cave(Kind.CHAMBER, nx, floor, nz, r + random.nextInt(3) - 1, r + random.nextInt(3) - 1, dome);
                 if (fits(caves, c, 6)) { next = c; heading = h * 0.6; }
             }
             if (next == null) continue;

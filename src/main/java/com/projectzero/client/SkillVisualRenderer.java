@@ -44,7 +44,9 @@ public final class SkillVisualRenderer {
         float partial = mc.getTimer().getGameTimeDeltaPartialTick(false);
         Camera camera = mc.gameRenderer.getMainCamera();
         Vec3 cam = camera.getPosition();
-        PoseStack pose = event.getPoseStack();
+        // Forge 52: getPoseStack() is the view Matrix4f.
+        PoseStack pose = new PoseStack();
+        pose.mulPose(event.getPoseStack());
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
 
         for (ClientSkillVisuals.Visual v : ClientSkillVisuals.active()) {
