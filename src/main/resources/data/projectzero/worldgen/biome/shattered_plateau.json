@@ -23,10 +23,14 @@
     "fog_color": 14213354,
     "sky_color": 9418992,
     "water_color": 4159204,
-    "water_fog_color": 329011
+    "water_fog_color": 329011,
+    "grass_color": 8166234,
+    "foliage_color": 6527568
   },
   "features": [
-    [],
+    [
+      "projectzero:shattered_plateau"
+    ],
     [
       "minecraft:lake_lava_underground",
       "minecraft:lake_lava_surface"
@@ -85,7 +89,7 @@
       "projectzero:boulder_andesite_rare",
       "projectzero:shrub_spruce_sparse",
       "projectzero:undergrowth",
-      "projectzero:shattered_plateau"
+      "projectzero:shattered_sky"
     ],
     [
       "minecraft:freeze_top_layer"
