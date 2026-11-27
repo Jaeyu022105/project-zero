@@ -2,7 +2,7 @@ package com.projectzero.gates;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
+import com.projectzero.fx.Fx;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Rank-colored Gate portal block (and Dungeon Exit portal when {@code EXIT=true}).
- * Placeholder flat translucent portal look (TODO(claude-art): swirling rift shader/model).
+ * Invisible blocks; the rift (ring + swirl) is drawn by client/GateRiftRenderer.
  */
 public class GateBlock extends Block implements EntityBlock {
     public static final MapCodec<GateBlock> CODEC = simpleCodec(GateBlock::new);
@@ -43,6 +44,12 @@ public class GateBlock extends Block implements EntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(RANK, EXIT);
+    }
+
+    /** Drawn by GateRiftRenderer as a swirling ring; the blocks themselves are invisible. */
+    @Override
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
     }
 
     @Override
@@ -71,7 +78,8 @@ public class GateBlock extends Block implements EntityBlock {
             double x = pos.getX() + random.nextDouble();
             double y = pos.getY() + random.nextDouble();
             double z = pos.getZ() + random.nextDouble();
-            level.addParticle(state.getValue(EXIT) ? ParticleTypes.END_ROD : ParticleTypes.PORTAL,
+            int rgb = state.getValue(EXIT) ? 0x9FF4FF : state.getValue(RANK).argb() & 0xFFFFFF;
+            level.addParticle(random.nextInt(4) == 0 ? Fx.spark(rgb, 1.2F) : Fx.mote(rgb, 1.4F),
                     x, y, z, (random.nextDouble() - 0.5) * 0.2, 0.03, (random.nextDouble() - 0.5) * 0.2);
         }
         if (random.nextInt(90) == 0) {

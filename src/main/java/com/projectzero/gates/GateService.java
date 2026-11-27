@@ -1,12 +1,12 @@
 package com.projectzero.gates;
 
 import com.projectzero.ProjectZero;
+import com.projectzero.fx.Fx;
 import com.projectzero.registry.ModBlocks;
 import com.projectzero.registry.ModItems;
 import com.projectzero.titles.MilestoneTracker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -65,24 +65,24 @@ public final class GateService {
         int ph = size.portalHeight();
         long now = originLevel.getGameTime();
 
-        BlockState frameState = rank == GateRank.S
-                ? Blocks.CRYING_OBSIDIAN.defaultBlockState()
-                : Blocks.OBSIDIAN.defaultBlockState();
         BlockState portalState = ModBlocks.GATE_PORTAL.get().defaultBlockState()
                 .setValue(GateBlock.RANK, rank)
                 .setValue(GateBlock.EXIT, false);
 
+        // No frame: a gate is a rift hanging in the air (drawn by GateRiftRenderer).
+        // Clear a little room around it so the ring is not buried in terrain.
         for (int w = -1; w <= pw; w++) {
-            for (int h = -1; h <= ph; h++) {
+            for (int h = 0; h <= ph; h++) {
                 BlockPos p = alongX ? basePos.offset(w, h, 0) : basePos.offset(0, h, w);
-                boolean frame = (w == -1 || w == pw || h == -1 || h == ph);
-                if (frame) {
-                    originLevel.setBlock(p, frameState, Block.UPDATE_ALL);
-                } else {
+                boolean inside = w >= 0 && w < pw && h < ph;
+                if (inside) {
                     originLevel.setBlock(p, portalState, Block.UPDATE_ALL);
                     if (originLevel.getBlockEntity(p) instanceof GateBlockEntity be) {
                         be.configure(rank, size, now, record.slot, basePos);
                     }
+                } else if (!originLevel.getBlockState(p).isAir()
+                        && originLevel.getBlockState(p).getDestroySpeed(originLevel, p) >= 0) {
+                    originLevel.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
                 }
             }
         }
@@ -199,7 +199,7 @@ public final class GateService {
                 }
             }
         }
-        originLevel.sendParticles(ParticleTypes.REVERSE_PORTAL,
+        originLevel.sendParticles(Fx.mote(rec.rank.argb() & 0xFFFFFF, 1.6F),
                 rec.gateAnchor.getX() + 1.0, rec.gateAnchor.getY() + 1.5, rec.gateAnchor.getZ() + 0.5,
                 40, 1.0, 1.2, 1.0, 0.08);
     }

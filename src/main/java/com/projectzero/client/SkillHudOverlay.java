@@ -218,15 +218,15 @@ public final class SkillHudOverlay {
         g.fill(x + w - 1, y, x + w, y + h, border);
     }
 
-    private static ResourceLocation iconOf(ResourceLocation skill) {
+    static ResourceLocation iconOf(ResourceLocation skill) {
         return ResourceLocation.fromNamespaceAndPath(skill.getNamespace(), "textures/gui/skills/" + skill.getPath() + ".png");
     }
 
-    private static boolean hasIcon(Minecraft mc, ResourceLocation skill) {
+    static boolean hasIcon(Minecraft mc, ResourceLocation skill) {
         return ICON_EXISTS.computeIfAbsent(skill, id -> mc.getResourceManager().getResource(iconOf(id)).isPresent());
     }
 
-    private static String initials(String name) {
+    static String initials(String name) {
         StringBuilder out = new StringBuilder();
         for (String part : name.split(" ")) {
             if (!part.isEmpty()) out.append(Character.toUpperCase(part.charAt(0)));

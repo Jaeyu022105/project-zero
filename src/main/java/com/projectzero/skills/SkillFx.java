@@ -1,7 +1,7 @@
 package com.projectzero.skills;
 
 import com.projectzero.ProjectZero;
-import net.minecraft.core.particles.DustParticleOptions;
+import com.projectzero.fx.Fx;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -10,7 +10,6 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -77,9 +76,9 @@ public final class SkillFx {
 
     // ---- particles ----
 
-    public static DustParticleOptions dust(int rgb, float size) {
-        return new DustParticleOptions(new Vector3f(((rgb >> 16) & 0xFF) / 255F, ((rgb >> 8) & 0xFF) / 255F,
-                (rgb & 0xFF) / 255F), size);
+    /** Our soft mana glow in {@code rgb} (textures/particle/mana_glow_*). */
+    public static ParticleOptions dust(int rgb, float size) {
+        return Fx.glow(rgb, size);
     }
 
     private static void point(ServerLevel level, ParticleOptions p, double x, double y, double z) {
@@ -109,7 +108,8 @@ public final class SkillFx {
      * a few times so it lingers for about half a second.
      */
     public static void sigil(ServerLevel level, Vec3 c, double radius, int rgb) {
-        DustParticleOptions d = dust(rgb, 0.9F);
+        ParticleOptions d = dust(rgb, 0.9F);
+        ParticleOptions glyph = Fx.rune(rgb, 1.3F);
         Runnable draw = () -> {
             Vec3 g = new Vec3(c.x, c.y + 0.05, c.z);
             ring(level, g, radius, d);
@@ -126,6 +126,11 @@ public final class SkillFx {
         draw.run();
         later(5, draw);
         later(10, draw);
+        // Six glyphs standing on the outer circle, rising as the sigil fades.
+        for (int i = 0; i < 6; i++) {
+            double a = i * Math.PI / 3 + Math.PI / 6;
+            point(level, glyph, c.x + Math.cos(a) * radius, c.y + 0.35, c.z + Math.sin(a) * radius);
+        }
     }
 
     /** Points along a straight line. */

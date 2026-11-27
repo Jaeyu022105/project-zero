@@ -12,7 +12,7 @@ public final class ModNetwork {
 
     // 2: SyncJobPacket. 3: VisionOverlayPacket. 4: SyncSkillsPacket + CastSkillPacket.
     // 5: SyncTitlesPacket + CycleTitlePacket. 6: SyncStatBonusesPacket + OpenAccessoriesPacket.
-    // 7: SyncWornGearPacket.
+    // 7: SyncWornGearPacket + AssignSkillSlotPacket.
     // Bump whenever the packet list or a packet's format changes.
     private static final int PROTOCOL_VERSION = 7;
 
@@ -86,6 +86,12 @@ public final class ModNetwork {
                 .encoder(SyncWornGearPacket::encode)
                 .decoder(SyncWornGearPacket::decode)
                 .consumerMainThread(SyncWornGearPacket::handle)
+                .add();
+
+        CHANNEL.messageBuilder(AssignSkillSlotPacket.class, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(AssignSkillSlotPacket::encode)
+                .decoder(AssignSkillSlotPacket::decode)
+                .consumerMainThread(AssignSkillSlotPacket::handle)
                 .add();
     }
 

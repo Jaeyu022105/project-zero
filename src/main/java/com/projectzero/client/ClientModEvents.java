@@ -2,6 +2,7 @@ package com.projectzero.client;
 
 import com.projectzero.ProjectZero;
 import com.projectzero.awakening.ShardCharge;
+import com.projectzero.registry.ModBlockEntities;
 import com.projectzero.registry.ModDataComponents;
 import com.projectzero.registry.ModEntities;
 import com.projectzero.registry.ModItems;
@@ -12,6 +13,8 @@ import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import com.projectzero.fx.ModParticles;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -24,6 +27,17 @@ public final class ClientModEvents {
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.JOB_CARD.get(), JobCardRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.GATE_PORTAL.get(), GateRiftRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void onRegisterParticles(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ModParticles.GLOW.get(), ManaParticle.Provider::new);
+        event.registerSpriteSet(ModParticles.SPARK.get(), ManaParticle.Provider::new);
+        event.registerSpriteSet(ModParticles.RUNE.get(), ManaParticle.Provider::new);
+        event.registerSpriteSet(ModParticles.SHARD.get(), ManaParticle.Provider::new);
+        event.registerSpriteSet(ModParticles.MOTE.get(), ManaParticle.Provider::new);
+        event.registerSpriteSet(ModParticles.STREAK.get(), ManaParticle.Provider::new);
     }
 
     @SubscribeEvent

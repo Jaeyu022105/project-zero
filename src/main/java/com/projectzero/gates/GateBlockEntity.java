@@ -1,5 +1,6 @@
 package com.projectzero.gates;
 
+import net.minecraft.world.phys.AABB;
 import com.projectzero.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -60,5 +61,11 @@ public class GateBlockEntity extends BlockEntity {
         if (tag.contains("AnchorPos")) {
             this.anchorPos = BlockPos.of(tag.getLong("AnchorPos"));
         }
+    }
+
+    /** The rift is drawn from one block but spans the whole portal, so widen the cull box. */
+    @Override
+    public AABB getRenderBoundingBox() {
+        return new AABB(worldPosition).inflate(5.0);
     }
 }

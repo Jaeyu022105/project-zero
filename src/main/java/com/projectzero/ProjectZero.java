@@ -44,6 +44,7 @@ public final class ProjectZero {
         ModEntities.ENTITIES.register(modBus);
         ModMenus.MENUS.register(modBus);
         ModLootModifiers.LOOT_MODIFIERS.register(modBus);
+        com.projectzero.fx.ModParticles.PARTICLES.register(modBus);
 
         GateRules.init();
         ModNetwork.register();

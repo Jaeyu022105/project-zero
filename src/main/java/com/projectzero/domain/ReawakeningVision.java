@@ -8,7 +8,7 @@ import com.projectzero.network.VisionOverlayPacket;
 import com.projectzero.registry.ModEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.DustParticleOptions;
+import com.projectzero.fx.Fx;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -25,7 +25,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -265,7 +264,7 @@ public final class ReawakeningVision {
             if (age == T_RISE) {
                 level.playSound(null, card.blockPosition(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 2.0F, 0.5F);
             }
-            send(player, level, ParticleTypes.END_ROD, pos.x, pos.y + 0.6, pos.z, 1, 0.2, 0.3, 0.2, 0.0);
+            send(player, level, Fx.glow(0xBFEFFF, 0.8F), pos.x, pos.y + 0.6, pos.z, 1, 0.2, 0.3, 0.2, 0.0);
             if (age % 6 == 0) ripple(player, level, new Vec3(pos.x, center.y, pos.z), 1.0 + t,
                     tierTint(0xB8E6FF, session.result.shardTier()));
             return;
@@ -284,7 +283,7 @@ public final class ReawakeningVision {
                 level.playSound(null, player.blockPosition(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS,
                         1.0F + (float) k, 0.9F + (float) k * 0.3F);
             }
-            if (age % 2 == 0) send(player, level, ParticleTypes.END_ROD, rest.x, rest.y + 0.6, rest.z, 1, 0.3, 0.4, 0.3, 0.01);
+            if (age % 2 == 0) send(player, level, Fx.glow(0xBFEFFF, 0.8F), rest.x, rest.y + 0.6, rest.z, 1, 0.3, 0.4, 0.3, 0.01);
             return;
         }
 
@@ -298,9 +297,9 @@ public final class ReawakeningVision {
         card.reveal(session.result.job().id().toString(), rarity.ordinal());
         for (JobCardEntity other : session.cards) if (other != card) other.startFading();
 
-        DustParticleOptions dust = new DustParticleOptions(rgb(rarity), 1.4F);
+        ParticleOptions dust = Fx.glow(rarity.argb() & 0xFFFFFF, 1.4F);
         send(player, level, dust, at.x, at.y + 0.6, at.z, 40 + rarity.ordinal() * 30, 0.5, 0.7, 0.5, 0.0);
-        send(player, level, ParticleTypes.END_ROD, at.x, at.y + 0.6, at.z,
+        send(player, level, Fx.spark(0xFFFFFF, 1.2F), at.x, at.y + 0.6, at.z,
                 20 + rarity.ordinal() * 25, 0.3, 0.5, 0.3, 0.05 + rarity.ordinal() * 0.03);
         ripple(player, level, new Vec3(at.x, session.center == null ? at.y : session.center.y, at.z), 2.5, rarity.argb());
         level.playSound(null, card.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1.2F, 0.8F);
@@ -317,7 +316,7 @@ public final class ReawakeningVision {
         for (int i = 0; i < 3; i++) {
             double a = random.nextDouble() * Math.PI * 2;
             double r = 3 + random.nextDouble() * 40;
-            send(player, level, ParticleTypes.END_ROD, center.x + Math.cos(a) * r, center.y + 0.1 + random.nextDouble() * 10,
+            send(player, level, Fx.mote(0xBFEFFF, 1.2F), center.x + Math.cos(a) * r, center.y + 0.1 + random.nextDouble() * 10,
                     center.z + Math.sin(a) * r, 0, 0, 0.01, 0, 1.0);
         }
         // Ripples spread from where you stand.
@@ -325,7 +324,7 @@ public final class ReawakeningVision {
         if (beat < 14 && beat % 2 == 0) ripple(player, level, center, 0.6 + beat * 0.35, tierTint(0x9FD8FF, shardTier));
         // A charged shard warms the sea: golden motes drift over the water, more for higher tiers.
         if (shardTier > 0) {
-            DustParticleOptions gold = new DustParticleOptions(rgb(tierTint(0x9FD8FF, shardTier)), 1.2F);
+            ParticleOptions gold = Fx.glow(tierTint(0x9FD8FF, shardTier), 1.2F);
             for (int i = 0; i < shardTier; i++) {
                 double a = random.nextDouble() * Math.PI * 2;
                 double r = 2 + random.nextDouble() * 30;
@@ -370,7 +369,7 @@ public final class ReawakeningVision {
         double x = player.getX();
         double y = player.getY();
         double z = player.getZ();
-        DustParticleOptions dust = new DustParticleOptions(rgb(rarity), 1.1F + r * 0.2F);
+        ParticleOptions dust = Fx.glow(rarity.argb() & 0xFFFFFF, 1.1F + r * 0.2F);
         RandomSource random = level.random;
 
         // Flame-like shell around the body, rising a little each step.
@@ -393,15 +392,15 @@ public final class ReawakeningVision {
         }
 
         if (step == 0) {
-            level.sendParticles(ParticleTypes.END_ROD, x, y + 1.0, z, 10 + r * 8, 0.3, 0.6, 0.3, 0.12 + r * 0.03);
+            level.sendParticles(Fx.spark(0xFFFFFF, 1.4F), x, y + 1.0, z, 10 + r * 8, 0.3, 0.6, 0.3, 0.12 + r * 0.03);
             if (r >= JobRarity.RARE.ordinal()) {
-                level.sendParticles(ParticleTypes.ELECTRIC_SPARK, x, y + 1.0, z, 12 + r * 6, 0.5, 0.8, 0.5, 0.3);
+                level.sendParticles(Fx.spark(0xBFEFFF, 1.6F), x, y + 1.0, z, 12 + r * 6, 0.5, 0.8, 0.5, 0.3);
             }
             if (r >= JobRarity.EPIC.ordinal()) {
                 level.sendParticles(ParticleTypes.FLASH, x, y + 1.0, z, 1, 0, 0, 0, 0);
             }
             if (r >= JobRarity.LEGENDARY.ordinal()) {
-                level.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, x, y + 1.0, z, 60, 0.4, 0.8, 0.4, 0.5);
+                level.sendParticles(Fx.shard(0xFFD060, 1.4F), x, y + 1.0, z, 60, 0.4, 0.8, 0.4, 0.5);
             }
             sound(level, player, SoundEvents.BEACON_POWER_SELECT, 1.0F, 0.8F + r * 0.15F);
             sound(level, player, SoundEvents.AMETHYST_BLOCK_CHIME, 1.5F, 0.6F + r * 0.2F);
@@ -453,7 +452,7 @@ public final class ReawakeningVision {
 
     /** An expanding ring of light on the water. */
     private static void ripple(ServerPlayer player, ServerLevel level, Vec3 at, double radius, int rgb) {
-        DustParticleOptions dust = new DustParticleOptions(rgb(rgb), 0.7F);
+        ParticleOptions dust = Fx.glow(rgb, 0.7F);
         int points = Math.max(12, (int) (radius * 10));
         for (int i = 0; i < points; i++) {
             double a = i * (Math.PI * 2 / points);
@@ -479,14 +478,6 @@ public final class ReawakeningVision {
         int g = (int) (((cool >> 8) & 0xFF) * (1 - t) + ((gold >> 8) & 0xFF) * t);
         int b = (int) ((cool & 0xFF) * (1 - t) + (gold & 0xFF) * t);
         return (r << 16) | (g << 8) | b;
-    }
-
-    private static Vector3f rgb(JobRarity rarity) {
-        return rgb(rarity.argb());
-    }
-
-    private static Vector3f rgb(int rgb) {
-        return new Vector3f(((rgb >> 16) & 0xFF) / 255F, ((rgb >> 8) & 0xFF) / 255F, (rgb & 0xFF) / 255F);
     }
 
     private static void overlay(ServerPlayer player, float coverage, int ticks, boolean eyelids) {
