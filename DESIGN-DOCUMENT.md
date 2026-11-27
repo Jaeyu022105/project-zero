@@ -305,6 +305,18 @@ Our biomes are placed with **TerraBlender** (`worldgen/ProjectZeroRegion`, weigh
     - **Shattered Sky Plateau** (replaces Stony Peaks): chasms 45 to 95 deep split the plateau, following world-wide noise so they run on across chunks (`ShatteredPlateauFeature`), with broken-off slabs hovering over them.
   - **Not biomes, built with their systems:** the **Corrupted Zone** is the dungeon-break spread (section 7), made at runtime around a break and healing once it's cleared. The **Monarch's Graveyard** (colossal bones and broken weapons where a monarch fell) is a rare story structure for the main path (section 16).
 
+- **[Next] Polish pass** (owner review 2026-11-27, overworld terraforming is otherwise done):
+  - **Spirit Bamboo Sea:** stalks read thin and uniform. Make them thicker (2x2 and 3x3 culms with a node ring every 4 to 6 blocks), vary the height and lean in each grove, add real bamboo leaf sprays on side branches, pack groves densely on flat ground with narrow walkable lanes, and add stone lantern paths and moss underfoot.
+  - **Shattered Sky Plateau:** the chasms read as a valley between pillars. Make it a flat, high table first (lift and level the ground in the biome), then cut narrower, sharper chasms with stepped ledges, fill them with low cloud and mist (`client/BiomeMist` by depth), and float more and bigger slabs, some linked by stone arches.
+- **[Planned] Underground biomes** (owner direction 2026-11-27). Placed as TerraBlender cave biomes (the same way as vanilla Lush Caves and Dripstone Caves), from the new deep layer at y -64 up to about y 0, plus a few placed by structure where they need to be huge. Each is a region to explore and the home or ruin of a people (section 16):
+  - **Glowroot Hollows:** huge caverns lit by hanging glowing roots from the surface trees above, moss lakes, the elven underground (below Elderwood).
+  - **Mycelial Deep:** cave-sized mushrooms, spore fog, the deep cousin of Capwood, home of a fungus folk.
+  - **Crystal Veins:** caverns lined with mana crystal growing out of the walls, the main source of mana ore. Gate rifts open more often here.
+  - **Magma Forges:** lava rivers and basalt halls, ruins of a dwarf-like forge people with great anvils and rail lines.
+  - **Drowned Halls:** flooded cave cities under the Sunken Ruins Marsh, air pockets, sunken treasure.
+  - **Bone Hollows:** colossal fossil ribs and skulls in the rock, the root of the Monarch's Graveyard story.
+  - **The Abyss:** a rare bottomless shaft into a dark level with its own monsters, end-game only.
+  Each needs its own blocks, ambient particles and sounds, and mobs with full animation sets.
 - **[Planned] Fireflies** (owner request 2026-11-27: dark biomes like Bloodmoon Steppe and dense woods needed night vision): a firefly bush block that gives soft light (about level 6) and sends glowing fireflies drifting around it at night, scattered through forests, marshes, the Spirit Bamboo Sea and the Bloodmoon Steppe. Swarms over water at dusk. Its own art and animated particles.
 - **[Built] Falling leaves** (`client/FallingLeaves`, `ManaParticle` LEAF): any leaf block with air under it sheds leaves, in every biome, so dense forests shed more than a lone tree. Each leaf takes the color the game draws that leaf block with, so it follows the biome's foliage tint, and cherry or azalea keep their own color. Leaves sway, tumble, rest on the ground for a moment, then fade. Rain shakes more loose. Client option `ambience.fallingLeaves`, and it respects the Particles video setting.
 - **[Built] Leaves pulled into gates:** about half the leaves that drift within 9 blocks of an open rift get caught. They curve in with a little swirl, spin faster and shrink away into the core.
@@ -322,4 +334,9 @@ Our biomes are placed with **TerraBlender** (`worldgen/ProjectZeroRegion`, weigh
   3. Earn rank and reputation, which opens the road to the advanced civilizations.
   4. At level 100, a high-ranked NPC there gives the ceiling-break quest. Report back to them to break the level ceiling (section 2).
   5. Past the ceiling: S-rank gates, dungeon breaks that threaten cities, and the Monarch path (section 8) for the few who reach it.
+- **Civilizations above and below** (owner direction 2026-11-27): each surface people has a home biome (the martial order in the Spirit Bamboo Sea, the elves in Elderwood around the World Tree, salt traders on the Salt Mirror Flats, sky folk on the Skyfall Isles), and some live underground (forge folk in the Magma Forges, fungus folk in the Mycelial Deep, the drowned city in the Drowned Halls).
+- **Travel between civilizations** (owner direction 2026-11-27): biomes are huge, so walking can't be the only way.
+  - **Transport networks** that civilizations run and the player unlocks with reputation: rail lines and mine carts between the forge cities, lift shafts from surface towns down to the underground cities, riverboats, and sky ships or tamed flyers between the isles and the plateau. Each line has stations; riding is fast but follows the route.
+  - **Portal keys:** a key item, earned through quests or bought from a city's guild, that opens a fixed portal to that city's waystone. Keys are found or earned one city at a time, so travel unlocks with the main path. Some underground regions can only be reached by a key at first.
+  - **Waystones:** each city has one. Attuning to it lets you return there with a key or a portal scroll. The System shows known waystones on its map.
 - **Open questions for the owner:** how many civilizations to start with, whether they can be hostile or at war, and whether reputation can be lost.
