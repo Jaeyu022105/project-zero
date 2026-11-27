@@ -98,6 +98,12 @@ def features():
     placed("mana_crater", "projectzero:mana_crater", rarity=4)
     placed("fairy_ring", "projectzero:fairy_ring", rarity=5)
     placed("elven_ruin", "projectzero:elven_ruin", rarity=14)
+    # Polish round 4: tree ferns (Cloud Forest), ice shards (Ice Cathedral), stilt huts (Sunken Marsh).
+    for n in ["tree_fern", "ice_shard", "stilt_hut"]:
+        configured(n, {"type": "projectzero:" + n, "config": {}})
+    placed("tree_fern", "projectzero:tree_fern", count=3)
+    placed("ice_shard", "projectzero:ice_shard", rarity=3)
+    placed("stilt_hut", "projectzero:stilt_hut", rarity=12, water=False)
     gen.plant_patch("bloodmoon_brush", [("minecraft:dead_bush", 3, {}), ("minecraft:short_grass", 2, {})], tries=24)
     placed("bloodmoon_brush", "projectzero:bloodmoon_brush", count=1, heightmap="MOTION_BLOCKING")
     gen.plant_patch("bamboo_shoots", [("minecraft:bamboo", 1, {"age": 0, "leaves": "small", "stage": 0})], tries=32, spread=5)
@@ -110,7 +116,7 @@ BIOMES = {
     # name: template, vanilla features to drop, shared adds, unique adds {step: [..]}, effects/climate overrides
     "cloud_forest": ("taiga", ["minecraft:trees_taiga"],
         ["podzol_patch", "boulder_mossy", "fallen_oak", "fallen_spruce_rare", "shrub_azalea", "undergrowth_dense", "fern_carpet", "moss_floor"],
-        {8: ["projectzero:cloud_springs"], VEG: ["projectzero:cloud_forest_trees"]},
+        {8: ["projectzero:cloud_springs"], VEG: ["projectzero:cloud_forest_trees", "projectzero:tree_fern"]},
         {"temperature": 0.6, "downfall": 0.95, "effects": {"fog_color": 13227728, "sky_color": 11060432, "water_color": 4159204,
          "water_fog_color": 329011, "grass_color": 6200906, "foliage_color": 5016122}}),
     "baobab_savanna": ("savanna", [],
@@ -140,7 +146,7 @@ BIOMES = {
          "grass_color": 9084000, "foliage_color": 7311436}}),
     "ice_cathedral": ("ice_spikes", [],
         ["boulder_stone_rare"],
-        {VEG: ["projectzero:ice_arch"]},
+        {VEG: ["projectzero:ice_arch", "projectzero:ice_shard"]},
         {"effects": {"fog_color": 13697279, "sky_color": 8364543, "water_color": 4020182, "water_fog_color": 329011}}),
     "crystal_tundra": ("snowy_plains", [],
         ["boulder_stone_rare", "snow_scrub"],
@@ -167,7 +173,7 @@ BIOMES = {
          "particle": {"options": {"type": "minecraft:end_rod"}, "probability": 0.0015}}}),
     "sunken_marsh": ("mangrove_swamp", [],
         ["mud_patch", "fern_carpet", "moss_floor"],
-        {VEG: ["projectzero:sunken_ruin"]},
+        {VEG: ["projectzero:sunken_ruin", "projectzero:stilt_hut"]},
         {"effects": {"fog_color": 9412746, "sky_color": 7907327, "water_color": 3824192, "water_fog_color": 2367520,
          "foliage_color": 9285927, "grass_color_modifier": "swamp",
          "particle": {"options": {"type": "minecraft:spore_blossom_air"}, "probability": 0.003}}}),

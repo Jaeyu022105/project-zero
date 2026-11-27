@@ -91,6 +91,12 @@ public final class ModFeatures {
             FEATURES.register("fairy_ring", com.projectzero.worldgen.FairyRingFeature::new);
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> ELVEN_RUIN =
             FEATURES.register("elven_ruin", com.projectzero.worldgen.ElvenRuinFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> TREE_FERN =
+            FEATURES.register("tree_fern", com.projectzero.worldgen.TreeFernFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> ICE_SHARD =
+            FEATURES.register("ice_shard", com.projectzero.worldgen.IceShardFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> STILT_HUT =
+            FEATURES.register("stilt_hut", com.projectzero.worldgen.StiltHutFeature::new);
 
     public static final DeferredRegister<net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType<?>> TREE_DECORATORS =
             DeferredRegister.create(net.minecraft.core.registries.Registries.TREE_DECORATOR_TYPE, ProjectZero.MOD_ID);

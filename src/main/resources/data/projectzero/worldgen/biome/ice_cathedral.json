@@ -84,7 +84,8 @@
       "minecraft:patch_sugar_cane",
       "minecraft:patch_pumpkin",
       "projectzero:boulder_stone_rare",
-      "projectzero:ice_arch"
+      "projectzero:ice_arch",
+      "projectzero:ice_shard"
     ],
     [
       "minecraft:freeze_top_layer"
