@@ -105,6 +105,21 @@ public final class ModBlocks {
                     .sound(SoundType.GLASS)
                     .pushReaction(PushReaction.BLOCK)));
 
+    /**
+     * Carved piece of an ancient gate's stone ring (non-full shapes; runes glow in rank color while
+     * the gate is open). Breakable like stone but drops nothing: the ruins are scenery.
+     */
+    public static final RegistryObject<Block> ANCIENT_GATE_STONE = BLOCKS.register("ancient_gate_stone",
+            () -> new com.projectzero.gates.AncientGateStoneBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.STONE)
+                    .strength(2.5F, 9.0F)
+                    .requiresCorrectToolForDrops()
+                    .noLootTable()
+                    .sound(SoundType.DEEPSLATE_BRICKS)
+                    .noOcclusion()
+                    .lightLevel(com.projectzero.gates.AncientGateStoneBlock::lightLevel)
+                    .pushReaction(PushReaction.BLOCK)));
+
     private static BlockBehaviour.Properties crystalProperties(int light) {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_LIGHT_BLUE)

@@ -30,6 +30,16 @@ public final class ClientModEvents {
         event.registerBlockEntityRenderer(ModBlockEntities.GATE_PORTAL.get(), GateRiftRenderer::new);
     }
 
+    /** Ancient gate runes take the gate's rank color while it is open, and a dead grey once cleared. */
+    @SubscribeEvent
+    public static void onRegisterBlockColors(net.minecraftforge.client.event.RegisterColorHandlersEvent.Block event) {
+        event.register((state, level, pos, tint) -> {
+            if (tint != 0) return -1;
+            if (!state.getValue(com.projectzero.gates.AncientGateStoneBlock.LIT)) return 0xFF34343C;
+            return state.getValue(com.projectzero.gates.AncientGateStoneBlock.RANK).argb();
+        }, com.projectzero.registry.ModBlocks.ANCIENT_GATE_STONE.get());
+    }
+
     @SubscribeEvent
     public static void onRegisterParticles(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ModParticles.GLOW.get(), ManaParticle.Provider::new);

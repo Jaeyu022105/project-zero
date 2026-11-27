@@ -19,6 +19,14 @@ public final class GateRules {
     public static final int SPAWN_MIN_DISTANCE = 20;
     public static final int SPAWN_MAX_DISTANCE = 44;
 
+    /** Share of natural (non-sea) gate spawns that come as ancient gates in a stone ring. */
+    public static final double ANCIENT_NATURAL_SHARE = 0.1;
+    /**
+     * Ancient gates also generate with the terrain: about one per this many chunks. The live value
+     * is the rarity_filter in data/projectzero/worldgen/placed_feature/ancient_gate.json.
+     */
+    public static final int ANCIENT_WORLDGEN_RARITY_CHUNKS = 700;
+
     public static final int PORTAL_COOLDOWN_TICKS = 40;
     /** Water breathing granted on entering a sea gate. Air pockets in the chambers cover the rest. */
     public static final int SEA_GATE_BREATHING_TICKS = 20 * 180;

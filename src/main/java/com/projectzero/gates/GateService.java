@@ -98,6 +98,20 @@ public final class GateService {
         return record;
     }
 
+    /**
+     * Spawns an ancient gate: the rift set in a ring of carved stones on a stepped dais, dressed for
+     * the biome ({@link AncientGate}). {@code ground} is the top solid block under the dais centre.
+     */
+    public static @Nullable DungeonSavedData.DungeonRecord spawnAncientGate(
+            ServerLevel level, BlockPos ground, GateRank rank, GateSize size, boolean alongX) {
+        BlockPos base = AncientGate.baseFromGround(ground, size, alongX);
+        DungeonSavedData.DungeonRecord rec = spawnGate(level, base, rank, size, alongX, false);
+        if (rec == null) return null;
+        AncientGate.build(level, base, rank, size, alongX,
+                AncientGate.paletteFor(level.getBiome(base), base), level.getRandom(), true);
+        return rec;
+    }
+
     public static void onEnterPortal(ServerPlayer player, BlockPos pos, BlockState state) {
         long now = player.serverLevel().getGameTime();
         long until = player.getPersistentData().getLong(COOLDOWN_KEY);
@@ -119,10 +133,24 @@ public final class GateService {
         int slot = be.dungeonSlot();
         DungeonSavedData.DungeonRecord rec = slot >= 0 ? data.record(slot) : null;
         if (rec == null) {
-            rec = data.allocate(be.rank(), be.size(), player.level().dimension().location(), be.anchorPos(), true,
+            // Gates generated with the terrain get their slot on first entry. Read the facing from
+            // the blocks, and link every block of the portal so they all lead to the same dungeon.
+            BlockPos a = be.anchorPos();
+            Level lvl = player.level();
+            boolean alongX = lvl.getBlockState(a.east()).getBlock() instanceof GateBlock
+                    || lvl.getBlockState(a.west()).getBlock() instanceof GateBlock;
+            rec = data.allocate(be.rank(), be.size(), lvl.dimension().location(), a, alongX,
                     state.getValue(GateBlock.SEA));
             slot = rec.slot;
-            be.configure(be.rank(), be.size(), be.openTime(), slot, be.anchorPos());
+            for (int w = 0; w < be.size().portalWidth(); w++) {
+                for (int h = 0; h < be.size().portalHeight(); h++) {
+                    BlockPos p = alongX ? a.offset(w, h, 0) : a.offset(0, h, w);
+                    if (lvl.getBlockEntity(p) instanceof GateBlockEntity other) {
+                        other.configure(other.rank(), other.size(), other.openTime(), slot, a);
+                    }
+                }
+            }
+            be.configure(be.rank(), be.size(), be.openTime(), slot, a);
         }
         if (rec.cleared) {
             system(player, Component.literal("This gate has already collapsed.").withStyle(ChatFormatting.GRAY));
@@ -213,6 +241,8 @@ public final class GateService {
                 }
             }
         }
+        // Ancient gates leave their ruined stone ring behind (dark runes, fallen stones, a seal).
+        AncientGate.ruin(originLevel, rec.gateAnchor, rec.size, rec.alongX);
         originLevel.sendParticles(Fx.mote(rec.rank.argb() & 0xFFFFFF, 1.6F),
                 rec.gateAnchor.getX() + 1.0, rec.gateAnchor.getY() + 1.5, rec.gateAnchor.getZ() + 0.5,
                 40, 1.0, 1.2, 1.0, 0.08);
@@ -280,10 +310,15 @@ public final class GateService {
         GateRank rank = GateRules.randomRank(random);
         GateSize size = GateRules.randomSize(random);
         BlockPos pos = new BlockPos(gx, gy, gz);
-        if (spawnGate(level, pos, rank, size, random.nextBoolean(), sea) != null) {
+        boolean ancient = !sea && random.nextDouble() < GateRules.ANCIENT_NATURAL_SHARE;
+        boolean alongX = random.nextBoolean();
+        var rec = ancient ? spawnAncientGate(level, pos.below(), rank, size, alongX)
+                : spawnGate(level, pos, rank, size, alongX, sea);
+        if (rec != null) {
+            String kind = sea ? "Sea Gate" : ancient ? "Ancient Gate" : "Gate";
             system(anchor, Component.literal("A ")
                     .withStyle(ChatFormatting.WHITE)
-                    .append(Component.literal(rank.name() + "-Rank " + (sea ? "Sea Gate" : "Gate")).withStyle(rank.chatColor()))
+                    .append(Component.literal(rank.name() + "-Rank " + kind).withStyle(rank.chatColor()))
                     .append(Component.literal(" has opened nearby!").withStyle(ChatFormatting.WHITE)));
         }
     }

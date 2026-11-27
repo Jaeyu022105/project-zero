@@ -1,0 +1,177 @@
+{
+ "parent": "minecraft:block/block",
+ "render_type": "minecraft:cutout",
+ "ambientocclusion": false,
+ "textures": {
+  "stone": "minecraft:block/cracked_deepslate_bricks",
+  "particle": "minecraft:block/cracked_deepslate_bricks",
+  "runes": "projectzero:block/ancient_runes"
+ },
+ "elements": [
+  {
+   "from": [
+    4,
+    0,
+    4
+   ],
+   "to": [
+    8,
+    4,
+    12
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone"
+    },
+    "south": {
+     "texture": "#stone"
+    },
+    "east": {
+     "texture": "#stone"
+    },
+    "west": {
+     "texture": "#stone"
+    },
+    "up": {
+     "texture": "#stone"
+    },
+    "down": {
+     "texture": "#stone"
+    }
+   }
+  },
+  {
+   "from": [
+    4,
+    4,
+    4
+   ],
+   "to": [
+    16,
+    12,
+    12
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone"
+    },
+    "south": {
+     "texture": "#stone"
+    },
+    "east": {
+     "texture": "#stone"
+    },
+    "west": {
+     "texture": "#stone"
+    },
+    "up": {
+     "texture": "#stone"
+    },
+    "down": {
+     "texture": "#stone"
+    }
+   }
+  },
+  {
+   "from": [
+    8,
+    12,
+    4
+   ],
+   "to": [
+    16,
+    16,
+    12
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone"
+    },
+    "south": {
+     "texture": "#stone"
+    },
+    "east": {
+     "texture": "#stone"
+    },
+    "west": {
+     "texture": "#stone"
+    },
+    "up": {
+     "texture": "#stone"
+    },
+    "down": {
+     "texture": "#stone"
+    }
+   }
+  },
+  {
+   "from": [
+    4,
+    0,
+    3.98
+   ],
+   "to": [
+    8,
+    4,
+    12.02
+   ],
+   "shade": false,
+   "faces": {
+    "north": {
+     "texture": "#runes",
+     "tintindex": 0
+    },
+    "south": {
+     "texture": "#runes",
+     "tintindex": 0
+    }
+   }
+  },
+  {
+   "from": [
+    4,
+    4,
+    3.98
+   ],
+   "to": [
+    16,
+    12,
+    12.02
+   ],
+   "shade": false,
+   "faces": {
+    "north": {
+     "texture": "#runes",
+     "tintindex": 0
+    },
+    "south": {
+     "texture": "#runes",
+     "tintindex": 0
+    }
+   }
+  },
+  {
+   "from": [
+    8,
+    12,
+    3.98
+   ],
+   "to": [
+    16,
+    16,
+    12.02
+   ],
+   "shade": false,
+   "faces": {
+    "north": {
+     "texture": "#runes",
+     "tintindex": 0
+    },
+    "south": {
+     "texture": "#runes",
+     "tintindex": 0
+    }
+   }
+  }
+ ]
+}

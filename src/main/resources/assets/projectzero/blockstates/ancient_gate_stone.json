@@ -1,0 +1,3328 @@
+{
+ "variants": {
+  "axis=x,lit=true,material=stone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=rubble": {
+   "model": "projectzero:block/ancient_gate_stone/rubble_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_stone_lit"
+  },
+  "axis=x,lit=false,material=stone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_stone_dark"
+  },
+  "axis=x,lit=true,material=mossy,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_mossy_lit"
+  },
+  "axis=x,lit=false,material=mossy,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_mossy_dark"
+  },
+  "axis=x,lit=true,material=sandstone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_sandstone_lit"
+  },
+  "axis=x,lit=false,material=sandstone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_sandstone_dark"
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_red_sandstone_lit"
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_red_sandstone_dark"
+  },
+  "axis=x,lit=true,material=mud,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_mud_lit"
+  },
+  "axis=x,lit=false,material=mud,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_mud_dark"
+  },
+  "axis=x,lit=true,material=deepslate,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_deepslate_lit"
+  },
+  "axis=x,lit=false,material=deepslate,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=seal": {
+   "model": "projectzero:block/ancient_gate_stone/seal_deepslate_dark"
+  },
+  "axis=x,lit=true,material=stone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_stone_lit"
+  },
+  "axis=x,lit=false,material=stone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_stone_dark"
+  },
+  "axis=x,lit=true,material=mossy,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_mossy_lit"
+  },
+  "axis=x,lit=false,material=mossy,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_mossy_dark"
+  },
+  "axis=x,lit=true,material=sandstone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_sandstone_lit"
+  },
+  "axis=x,lit=false,material=sandstone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_sandstone_dark"
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_red_sandstone_lit"
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_red_sandstone_dark"
+  },
+  "axis=x,lit=true,material=mud,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_mud_lit"
+  },
+  "axis=x,lit=false,material=mud,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_mud_dark"
+  },
+  "axis=x,lit=true,material=deepslate,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_deepslate_lit"
+  },
+  "axis=x,lit=false,material=deepslate,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=plate_high": {
+   "model": "projectzero:block/ancient_gate_stone/plate_high_deepslate_dark"
+  },
+  "axis=x,lit=true,material=stone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_stone_lit"
+  },
+  "axis=x,lit=false,material=stone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_stone_dark"
+  },
+  "axis=x,lit=true,material=mossy,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_mossy_lit"
+  },
+  "axis=x,lit=false,material=mossy,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_mossy_dark"
+  },
+  "axis=x,lit=true,material=sandstone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_sandstone_lit"
+  },
+  "axis=x,lit=false,material=sandstone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_sandstone_dark"
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_red_sandstone_lit"
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_red_sandstone_dark"
+  },
+  "axis=x,lit=true,material=mud,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_mud_lit"
+  },
+  "axis=x,lit=false,material=mud,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_mud_dark"
+  },
+  "axis=x,lit=true,material=deepslate,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_deepslate_lit"
+  },
+  "axis=x,lit=false,material=deepslate,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=plate_low": {
+   "model": "projectzero:block/ancient_gate_stone/plate_low_deepslate_dark"
+  },
+  "axis=x,lit=true,material=stone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=k_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/k_1fc8_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=k_3f80": {
+   "model": "projectzero:block/ancient_gate_stone/k_3f80_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=k_ff00": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff00_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=k_ff10": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff10_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=k_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/k_ff31_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_000f": {
+   "model": "projectzero:block/ancient_gate_stone/m_000f_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_037f": {
+   "model": "projectzero:block/ancient_gate_stone/m_037f_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_07ff": {
+   "model": "projectzero:block/ancient_gate_stone/m_07ff_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_0cff": {
+   "model": "projectzero:block/ancient_gate_stone/m_0cff_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_1113": {
+   "model": "projectzero:block/ancient_gate_stone/m_1113_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_1337": {
+   "model": "projectzero:block/ancient_gate_stone/m_1337_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_1fc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_1fc8_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_2776": {
+   "model": "projectzero:block/ancient_gate_stone/m_2776_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_3110": {
+   "model": "projectzero:block/ancient_gate_stone/m_3110_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_3337": {
+   "model": "projectzero:block/ancient_gate_stone/m_3337_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_3377": {
+   "model": "projectzero:block/ancient_gate_stone/m_3377_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_7310": {
+   "model": "projectzero:block/ancient_gate_stone/m_7310_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_7311": {
+   "model": "projectzero:block/ancient_gate_stone/m_7311_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_7fff": {
+   "model": "projectzero:block/ancient_gate_stone/m_7fff_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_888c": {
+   "model": "projectzero:block/ancient_gate_stone/m_888c_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_8cce": {
+   "model": "projectzero:block/ancient_gate_stone/m_8cce_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_8eff": {
+   "model": "projectzero:block/ancient_gate_stone/m_8eff_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_c880": {
+   "model": "projectzero:block/ancient_gate_stone/m_c880_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_cc80": {
+   "model": "projectzero:block/ancient_gate_stone/m_cc80_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_ccc8": {
+   "model": "projectzero:block/ancient_gate_stone/m_ccc8_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_cccc": {
+   "model": "projectzero:block/ancient_gate_stone/m_cccc_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_cee2": {
+   "model": "projectzero:block/ancient_gate_stone/m_cee2_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_ceee": {
+   "model": "projectzero:block/ancient_gate_stone/m_ceee_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_ec88": {
+   "model": "projectzero:block/ancient_gate_stone/m_ec88_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_eecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_eecc_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_eeec": {
+   "model": "projectzero:block/ancient_gate_stone/m_eeec_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_f732": {
+   "model": "projectzero:block/ancient_gate_stone/m_f732_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_fecc": {
+   "model": "projectzero:block/ancient_gate_stone/m_fecc_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_ff31": {
+   "model": "projectzero:block/ancient_gate_stone/m_ff31_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_fff7": {
+   "model": "projectzero:block/ancient_gate_stone/m_fff7_deepslate_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=stone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_stone_lit"
+  },
+  "axis=z,lit=true,material=stone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_stone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=stone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_stone_dark"
+  },
+  "axis=z,lit=false,material=stone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_stone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mossy,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_mossy_lit"
+  },
+  "axis=z,lit=true,material=mossy,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_mossy_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mossy,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_mossy_dark"
+  },
+  "axis=z,lit=false,material=mossy,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_mossy_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=sandstone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_sandstone_lit"
+  },
+  "axis=z,lit=true,material=sandstone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=sandstone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_sandstone_dark"
+  },
+  "axis=z,lit=false,material=sandstone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=red_sandstone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_red_sandstone_lit"
+  },
+  "axis=z,lit=true,material=red_sandstone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_red_sandstone_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=red_sandstone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_red_sandstone_dark"
+  },
+  "axis=z,lit=false,material=red_sandstone,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_red_sandstone_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=mud,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_mud_lit"
+  },
+  "axis=z,lit=true,material=mud,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_mud_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=mud,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_mud_dark"
+  },
+  "axis=z,lit=false,material=mud,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_mud_dark",
+   "y": 90
+  },
+  "axis=x,lit=true,material=deepslate,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_deepslate_lit"
+  },
+  "axis=z,lit=true,material=deepslate,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_deepslate_lit",
+   "y": 90
+  },
+  "axis=x,lit=false,material=deepslate,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_deepslate_dark"
+  },
+  "axis=z,lit=false,material=deepslate,piece=m_ffff": {
+   "model": "projectzero:block/ancient_gate_stone/m_ffff_deepslate_dark",
+   "y": 90
+  }
+ }
+}

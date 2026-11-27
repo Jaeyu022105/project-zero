@@ -1,0 +1,264 @@
+{
+ "parent": "minecraft:block/block",
+ "render_type": "minecraft:cutout",
+ "ambientocclusion": false,
+ "textures": {
+  "stone": "minecraft:block/cut_sandstone",
+  "particle": "minecraft:block/cut_sandstone",
+  "runes": "projectzero:block/ancient_runes"
+ },
+ "elements": [
+  {
+   "from": [
+    12,
+    0,
+    4
+   ],
+   "to": [
+    16,
+    4,
+    12
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone"
+    },
+    "south": {
+     "texture": "#stone"
+    },
+    "east": {
+     "texture": "#stone"
+    },
+    "west": {
+     "texture": "#stone"
+    },
+    "up": {
+     "texture": "#stone"
+    },
+    "down": {
+     "texture": "#stone"
+    }
+   }
+  },
+  {
+   "from": [
+    8,
+    4,
+    4
+   ],
+   "to": [
+    16,
+    8,
+    12
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone"
+    },
+    "south": {
+     "texture": "#stone"
+    },
+    "east": {
+     "texture": "#stone"
+    },
+    "west": {
+     "texture": "#stone"
+    },
+    "up": {
+     "texture": "#stone"
+    },
+    "down": {
+     "texture": "#stone"
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    8,
+    4
+   ],
+   "to": [
+    16,
+    12,
+    12
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone"
+    },
+    "south": {
+     "texture": "#stone"
+    },
+    "east": {
+     "texture": "#stone"
+    },
+    "west": {
+     "texture": "#stone"
+    },
+    "up": {
+     "texture": "#stone"
+    },
+    "down": {
+     "texture": "#stone"
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    12,
+    4
+   ],
+   "to": [
+    4,
+    16,
+    12
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone"
+    },
+    "south": {
+     "texture": "#stone"
+    },
+    "east": {
+     "texture": "#stone"
+    },
+    "west": {
+     "texture": "#stone"
+    },
+    "up": {
+     "texture": "#stone"
+    },
+    "down": {
+     "texture": "#stone"
+    }
+   }
+  },
+  {
+   "from": [
+    12,
+    0,
+    3.98
+   ],
+   "to": [
+    16,
+    4,
+    12.02
+   ],
+   "shade": false,
+   "faces": {
+    "north": {
+     "texture": "#runes",
+     "tintindex": 0,
+     "forge_data": {
+      "block_light": 15,
+      "sky_light": 15
+     }
+    },
+    "south": {
+     "texture": "#runes",
+     "tintindex": 0,
+     "forge_data": {
+      "block_light": 15,
+      "sky_light": 15
+     }
+    }
+   }
+  },
+  {
+   "from": [
+    8,
+    4,
+    3.98
+   ],
+   "to": [
+    16,
+    8,
+    12.02
+   ],
+   "shade": false,
+   "faces": {
+    "north": {
+     "texture": "#runes",
+     "tintindex": 0,
+     "forge_data": {
+      "block_light": 15,
+      "sky_light": 15
+     }
+    },
+    "south": {
+     "texture": "#runes",
+     "tintindex": 0,
+     "forge_data": {
+      "block_light": 15,
+      "sky_light": 15
+     }
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    8,
+    3.98
+   ],
+   "to": [
+    16,
+    12,
+    12.02
+   ],
+   "shade": false,
+   "faces": {
+    "north": {
+     "texture": "#runes",
+     "tintindex": 0,
+     "forge_data": {
+      "block_light": 15,
+      "sky_light": 15
+     }
+    },
+    "south": {
+     "texture": "#runes",
+     "tintindex": 0,
+     "forge_data": {
+      "block_light": 15,
+      "sky_light": 15
+     }
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    12,
+    3.98
+   ],
+   "to": [
+    4,
+    16,
+    12.02
+   ],
+   "shade": false,
+   "faces": {
+    "north": {
+     "texture": "#runes",
+     "tintindex": 0,
+     "forge_data": {
+      "block_light": 15,
+      "sky_light": 15
+     }
+    },
+    "south": {
+     "texture": "#runes",
+     "tintindex": 0,
+     "forge_data": {
+      "block_light": 15,
+      "sky_light": 15
+     }
+    }
+   }
+  }
+ ]
+}

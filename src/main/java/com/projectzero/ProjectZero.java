@@ -45,6 +45,7 @@ public final class ProjectZero {
         ModMenus.MENUS.register(modBus);
         ModLootModifiers.LOOT_MODIFIERS.register(modBus);
         com.projectzero.fx.ModParticles.PARTICLES.register(modBus);
+        com.projectzero.registry.ModFeatures.FEATURES.register(modBus);
 
         GateRules.init();
         context.registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT, com.projectzero.config.ClientConfig.SPEC);

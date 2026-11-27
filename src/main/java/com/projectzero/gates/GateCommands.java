@@ -17,7 +17,7 @@ import java.util.Locale;
 
 /**
  * Operator commands merged into {@code /pz}:
- *   /pz gate spawn <rank> <size>
+ *   /pz gate spawn <rank> <size> [sea|ancient]
  *   /pz gate leave
  */
 public final class GateCommands {
@@ -52,7 +52,39 @@ public final class GateCommands {
                                                         .executes(ctx -> spawnGate(
                                                                 ctx.getSource(),
                                                                 StringArgumentType.getString(ctx, "rank"),
-                                                                StringArgumentType.getString(ctx, "size"), true))))))));
+                                                                StringArgumentType.getString(ctx, "size"), true)))
+                                                .then(Commands.literal("ancient")
+                                                        .executes(ctx -> spawnAncient(
+                                                                ctx.getSource(),
+                                                                StringArgumentType.getString(ctx, "rank"),
+                                                                StringArgumentType.getString(ctx, "size")))))))));
+    }
+
+    /** {@code /pz gate spawn <rank> <size> ancient}: a stone-ringed gate on a dais a few blocks ahead. */
+    private static int spawnAncient(CommandSourceStack source, String rankRaw, String sizeRaw)
+            throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        GateRank rank = GateRank.byName(rankRaw);
+        GateSize size = GateSize.byName(sizeRaw);
+        if (rank == null || size == null) {
+            source.sendFailure(Component.literal("Unknown gate rank or size: " + rankRaw + " " + sizeRaw));
+            return 0;
+        }
+        Direction facing = player.getDirection();
+        boolean alongX = facing.getAxis() == Direction.Axis.Z;
+        // Far enough ahead that the paving on this side starts in front of the player.
+        BlockPos col = player.blockPosition().relative(facing, 6);
+        int top = player.serverLevel().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                col.getX(), col.getZ());
+        BlockPos ground = new BlockPos(col.getX(), top - 1, col.getZ());
+        var rec = GateService.spawnAncientGate(player.serverLevel(), ground, rank, size, alongX);
+        if (rec == null) {
+            source.sendFailure(Component.literal("Failed to spawn gate (missing projectzero:dungeon dimension)."));
+            return 0;
+        }
+        source.sendSuccess(() -> Component.literal("Spawned ancient " + rank.name() + "-Rank (" + size.name()
+                + ") Gate at " + rec.gateAnchor.toShortString() + " [slot " + rec.slot + "]."), false);
+        return 1;
     }
 
     private static int spawnGate(CommandSourceStack source, String rankRaw, String sizeRaw, boolean sea)

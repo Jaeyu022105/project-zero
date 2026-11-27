@@ -13,7 +13,7 @@ After every meaningful prompt or implementation pass, update this file with:
 **How this file is organized**
 
 - **Reference sections (top, up to "Operating Guidance For Future AI")** describe the project *as it is now*. Keep them current: when your work makes one of them wrong, fix it in place.
-- **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log — YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
+- **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
 Last caught up: **2026-11-27** (Task 7: Gate backend skeleton + full 12h backend sprint complete).
@@ -50,7 +50,7 @@ Last caught up: **2026-11-27** (Task 7: Gate backend skeleton + full 12h backend
 ## Context Sources Used
 
 - Owner's messages in the Claude project "Project Zero" (2026-11-26): the pitch, the leveling design, Awakening Stones, gates by color and size, the Monarch goal.
-- Owner decision (2026-11-26): each job reroll at an Awakening Stone consumes one Awakening Shard, which only drops from gate bosses (`DESIGN-DOCUMENT.md` §6).
+- Owner decision (2026-11-26): each job reroll at an Awakening Stone consumes one Awakening Shard, which only drops from gate bosses (`DESIGN-DOCUMENT.md` Â§6).
 - The owner's `HANDOFF.md` from another project (Kogane), used only as the template for this file's structure.
 
 The durable project context lives in:
@@ -68,15 +68,15 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 
 - Mod scaffold: Forge 52.1.0 for Minecraft 1.21.1, Java 21, Gradle 8.10.2 wrapper, official Mojang mappings.
 - Leveling: levels 1 to 100, progressively harder XP curve, 5 ability points per level, full heal and "LEVEL UP!" title on level up.
-- XP from kills: every non-player mob gives XP. Vanilla ×0.3, other mods ×1, gate monsters ×3 (`projectzero:gate_monsters` tag or `projectzero:gate_monster` NBT), bosses ×10, multiplied by `GateRank` (`×1..×32`) and level-gap penalty (`−5%` per level past a 5-level gap, `10%` floor).
-- Mob Ranks, Gates & Dungeon Skeleton (`gates/`): `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `MobScaling.apply(entity, rank, level)` (`[C · Lv 34] Zombie` nameplates), `GateBlock` + `GateBlockEntity` (stores rank, size, open time, dungeon slot, anchor pos), `projectzero:dungeon` void dimension (`DungeonSavedData` + placeholder `GateDungeonArena`), boss kill loop (drops `Awakening Shard` + 100% rolled accessory, increments `gatesCleared` milestone, opens Dungeon Exit portal, seals overworld Gate), `projectzero:gateSpawning` gamerule (default `false`), `/pz mob spawn <entity> <rank> [level]`, and `/pz gate spawn <rank> <size> | leave`.
+- XP from kills: every non-player mob gives XP. Vanilla Ã—0.3, other mods Ã—1, gate monsters Ã—3 (`projectzero:gate_monsters` tag or `projectzero:gate_monster` NBT), bosses Ã—10, multiplied by `GateRank` (`Ã—1..Ã—32`) and level-gap penalty (`âˆ’5%` per level past a 5-level gap, `10%` floor).
+- Mob Ranks, Gates & Dungeon Skeleton (`gates/`): `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `MobScaling.apply(entity, rank, level)` (`[C Â· Lv 34] Zombie` nameplates), `GateBlock` + `GateBlockEntity` (stores rank, size, open time, dungeon slot, anchor pos), `projectzero:dungeon` void dimension (`DungeonSavedData` + placeholder `GateDungeonArena`), boss kill loop (drops `Awakening Shard` + 100% rolled accessory, increments `gatesCleared` milestone, opens Dungeon Exit portal, seals overworld Gate), `projectzero:gateSpawning` gamerule (default `false`), `/pz mob spawn <entity> <rank> [level]`, and `/pz gate spawn <rank> <size> | leave`.
 - Stats: Strength, Agility, Vitality, Sense, Intelligence, rebalanced onto diminishing-return soft-cap curves (`LevelingRules.soft(p, k)`).
 - Jobs & Library Domain: at level 10 the System opens the **Library domain** (`projectzero:library` void dimension) where 7 face-down `JobCardEntity` cards orbit the frozen player; right-clicking one (or waiting out the 90s timeout) flips it, burns the others away, assigns the pre-rolled job, and returns the player home. Jobs are JSON data in `data/projectzero/jobs/` (10 placeholder jobs, 2 per rarity).
 - Awakening Stones, Crystal Formations & Reawakening Vision: small two-block crystal (`awakening_stone`), glassy shell `awakening_crystal`, opaque interior `awakening_crystal_deep`, glowing `awakening_core` veins, surface `awakening_cluster` spikes, procedural `CrystalFormation` (`small`, `large`, `colossal`), and `awakening_shard`. Offering a shard applies `JobService.awakeningRerollQuiet` immediately (logout-safe) and plays the ~14s `ReawakeningVision` (eyelid overlay `VisionOverlayRenderer`, mirror `void_sea` + `void_mote`, 64 drifting cards, rising card with heartbeat, reveal, return home, and rarity-colored particle aura burst).
 - Shard Vessel (`projectzero:shard_vessel`, stack size 1): right-click with an Awakening Shard in the other hand to insert; sneak + right-click to extract. While holding a non-maxed shard in inventory (first active Vessel only), 50% of kill XP (`VESSEL_DIVERT = 0.5`) diverts into the Vessel (`ShardCharge` data component) across 5 charge tiers (`Dim`, `Glowing`, `Radiant`, `Blazing`, `Resplendent`, thresholds `t * 0.6 * xpToNextLevel(level)`). Extracted shards keep their `shard_charge_tier` (`0..5`) component, stack only with shards of the same tier, shift Awakening Stone rarity weights (`JobRules.weightsForShardTier`), and pass `shardTier` on `JobService.AwakeningResult` for future golden-sea tinting in `ReawakeningVision`.
 - Skills Foundation & Mana (`skills/`): current mana + max mana from Intelligence (`10 * INT`), regenerating `1 + 2% of max` per second. 14 skills in `data/projectzero/skills/*.json` (`SkillRegistry` + `SkillBehaviors` + `SkillEffects`): 4 basic skills auto-learned at levels 3/8/15/25 (`dash`, `second_wind`, `focus`, `bloodlust`) and 10 job signature skills granted on job assignment (`iron_knuckle`, `ricochet_bolt`, `riposte_stance`, `aegis_bastion`, `cursed_edge`, `pack_howl`, `tempest_call`, `shadow_step`, `soul_shackle`, `solar_cataclysm`). Player state (`projectzero:skills`) stores mana, learned skills, 4 active slots (`Z`, `X`, `C`, `V`), and cooldowns; Awakening Stone rerolls retain up to 3 random old-job skills. Includes `projectzero:skillbook` item and plain-text bottom-left `SkillHudOverlay`.
 - Titles & Milestones (`titles/`): `MilestoneTracker` (`projectzero:milestones` NBT) tracks kills per entity type/tag, total kills, boss kills, deaths, highest level, rerolls, and gates cleared. 6 starter JSON titles in `data/projectzero/titles/*.json` (`wolf_slayer`, `hundred_cuts`, `undead_bane`, `survivor`, `giant_killer` granting milestone skill `colossus_breaker`, `awakened_one`). Equipped title (`projectzero:titles` NBT) applies transient attributes, stat bonuses, damage-vs-entity/tag multipliers, or XP bonuses, and cycles on click in `StatusScreen`.
-- Equipment & Accessories (`equipment/`): 8 active custom slots (`gauntlets`, `ring` ×2, `amulet`, `earrings`, `belt`, `charm` ×2) + 1 spare locked `relic` slot (`PlayerAccessories` in `projectzero:accessories` NBT; copied on clone, dropped on death only when `keepInventory` is false). 9 starter `AccessoryItem`s (`iron_gauntlets`, `copper_ring`, `silver_ring`, `gold_ring`, `bone_amulet`, `obsidian_earrings`, `leather_belt`, `hunter_charm`, `mana_charm`) with rolled `AccessoryData` component (rarity, `GateRank` E..S, flat stats, optional `crit_chance`/`mana_regen`/`lifesteal`/`xp_bonus`/`damage_vs_undead` affix), `AccessoryMenu` + `AccessoryScreen`, and `AccessoryLootModifier` (1.5% vanilla hostile, 3% modded, 8% gate monster, 100% boss).
+- Equipment & Accessories (`equipment/`): 8 active custom slots (`gauntlets`, `ring` Ã—2, `amulet`, `earrings`, `belt`, `charm` Ã—2) + 1 spare locked `relic` slot (`PlayerAccessories` in `projectzero:accessories` NBT; copied on clone, dropped on death only when `keepInventory` is false). 9 starter `AccessoryItem`s (`iron_gauntlets`, `copper_ring`, `silver_ring`, `gold_ring`, `bone_amulet`, `obsidian_earrings`, `leather_belt`, `hunter_charm`, `mana_charm`) with rolled `AccessoryData` component (rarity, `GateRank` E..S, flat stats, optional `crit_chance`/`mana_regen`/`lifesteal`/`xp_bonus`/`damage_vs_undead` affix), `AccessoryMenu` + `AccessoryScreen`, and `AccessoryLootModifier` (1.5% vanilla hostile, 3% modded, 8% gate monster, 100% boss).
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
 - Data saved with the player and kept on death (accessories follow `keepInventory`).
 - Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`, `/pz gate spawn <rank> <size>`, `/pz gate leave`.
@@ -141,7 +141,7 @@ Package layout (`src/main/java/com/projectzero/`):
 - `client/`
   - `ClientStatsCache`, `ClientJobCache`, `ClientSkillsCache`, `ClientTitlesCache`, `ClientBonusCache`: synced local caches with zero client-only imports so packet handlers are server-safe.
   - `ClientEvents.java` & `ClientModEvents.java`: logout cache reset, `JobCardRenderer`, and `MenuScreens.register` for `AccessoryScreen`.
-  - `ModKeyBindings.java`: `K` opens `StatusScreen`; `Z`, `X`, `C`, `V` cast active skill slots 1–4.
+  - `ModKeyBindings.java`: `K` opens `StatusScreen`; `Z`, `X`, `C`, `V` cast active skill slots 1â€“4.
   - `StatusScreen.java`, `AccessoryScreen.java`, `SkillHudOverlay.java`, `VisionOverlayRenderer.java`.
 
 Resources:
@@ -161,7 +161,7 @@ Player data lives in the player's persistent NBT under `projectzero:stats`:
 - `level` (int, 1 to 100)
 - `xp` (long, progress inside the current level)
 - `points` (int, unspent ability points)
-- `stats` (compound: `strength`, `agility`, `vitality`, `sense`, `intelligence`, ints ≥ 10)
+- `stats` (compound: `strength`, `agility`, `vitality`, `sense`, `intelligence`, ints â‰¥ 10)
 
 It is copied to the new player entity in `PlayerEvent.Clone`, so it survives death and leaving the End. Attribute modifiers are transient and re-applied on login and respawn, so they never pile up in saves.
 
@@ -199,8 +199,8 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 ### High Priority
 
 - Visual polish pass by Claude on all `TODO(claude-art)` placeholders (HUD bars/icons, System skills & accessories frames, item icons, worn gauntlet arm model, skill VFX, gate portal shader/model, golden sea shimmer in `ReawakeningVision` for charged shards).
-- Multi-room template dungeon generator (replacing `GateDungeonArena`), dungeon loot chests with `Skillbook` drops, original gate monster models, and Souls-like boss state machines (`DESIGN-DOCUMENT.md` §9–10).
-- Deeper job skill trees, job leveling XP, and job advancement trials (§5).
+- Multi-room template dungeon generator (replacing `GateDungeonArena`), dungeon loot chests with `Skillbook` drops, original gate monster models, and Souls-like boss state machines (`DESIGN-DOCUMENT.md` Â§9â€“10).
+- Deeper job skill trees, job leveling XP, and job advancement trials (Â§5).
 
 ### Medium Priority
 
@@ -238,7 +238,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ## Session Logs
 
-### Session Log — 2026-11-26 (Project scaffold + leveling system v0.1.0)
+### Session Log â€” 2026-11-26 (Project scaffold + leveling system v0.1.0)
 
 **Context & Direction Check**
 
@@ -262,13 +262,13 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 **Remaining Recommendations**
 
-1. Compile and fix API mismatches (see Known Gaps → Critical).
+1. Compile and fix API mismatches (see Known Gaps â†’ Critical).
 2. Playtest: `/pz xp 1000`, spend points, check health/speed/damage change, die and respawn, relog.
-3. Then start jobs and basic skills (§4–5 of the design doc).
+3. Then start jobs and basic skills (Â§4â€“5 of the design doc).
 
 ---
 
-### Session Log — 2026-11-26 (Gemini CLI skills setup)
+### Session Log â€” 2026-11-26 (Gemini CLI skills setup)
 
 **Context & Direction Check**
 
@@ -289,15 +289,15 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 **Remaining Recommendations**
 
 1. Run the first `gradlew build` and `gradlew runClient` to compile v0.1.0 and fix any Forge 1.21.1 API mismatches.
-2. Playtest the leveling system and then move on to basic skills and jobs (§4–5 of `DESIGN-DOCUMENT.md`).
+2. Playtest the leveling system and then move on to basic skills and jobs (Â§4â€“5 of `DESIGN-DOCUMENT.md`).
 
 ---
 
-### Session Log — 2026-11-26 (Job system: random job by rarity at level 10)
+### Session Log â€” 2026-11-26 (Job system: random job by rarity at level 10)
 
 **Context & Direction Check**
 
-- Reviewer's command: fix the stale build status in the handoff, then build §5 jobs: rarity enum, JSON job data, Job Change Quest at level 10 (auto-complete for now), weighted random job stored in player NBT and synced, JOB field on the status window, `/pz job set|reroll`. No Awakening Stones, no skills.
+- Reviewer's command: fix the stale build status in the handoff, then build Â§5 jobs: rarity enum, JSON job data, Job Change Quest at level 10 (auto-complete for now), weighted random job stored in player NBT and synced, JOB field on the status window, `/pz job set|reroll`. No Awakening Stones, no skills.
 - Small additions beyond the command: `/pz job clear` (needed to re-test the level-10 quest, since `/pz reset` leaves the job alone), a hover tooltip on the JOB field (rarity + job level), and a `PlayerLevelUpEvent` so the leveling package does not call into jobs directly (titles and basic skills can hook the same event).
 - On login, a player who is level 10+ with no job gets the quest then. Covers saves from before jobs existed.
 - `firstJobLevel` is always the job change level (10), even if one XP grant jumps past 10, because the quest belongs to level 10.
@@ -311,7 +311,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 - `client/ClientJobCache.java` (new); `client/StatusScreen.java` JOB field.
 - `data/projectzero/jobs/*.json`: 10 placeholder jobs (listed in Architecture Notes). Duelist upgrades to Veilstalker and Hexblade to Stormweaver, to exercise the `upgradesTo`/`trial` fields; nothing reads them yet.
 - `en_us.json`: job names, rarity names, `projectzero.job.none`, `projectzero.job.tooltip`.
-- `DESIGN-DOCUMENT.md` §5: status tags updated.
+- `DESIGN-DOCUMENT.md` Â§5: status tags updated.
 
 **Verification Executed**
 
@@ -327,16 +327,16 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 **Remaining Recommendations**
 
 1. Run the in-game steps above and fix anything that breaks.
-2. Basic skills, mana and cooldowns (§4), then job skills on top of them.
+2. Basic skills, mana and cooldowns (Â§4), then job skills on top of them.
 3. Replace placeholder job names when the owner picks final ones (rename the JSON file and the lang key together).
 
 ---
 
-### Session Log — 2026-11-26 (Job system review fixes + runClient build fix)
+### Session Log â€” 2026-11-26 (Job system review fixes + runClient build fix)
 
 **Context & Direction Check**
 
-- Applied reviewer fixes before pushing the job system commit: `/pz reset` should also clear the job, client caches should reset on logout, and stale "owner still needs to pick reroll unlock condition" lines should be removed now that the owner chose an Awakening Shard (gate boss drop, `DESIGN-DOCUMENT.md` §6).
+- Applied reviewer fixes before pushing the job system commit: `/pz reset` should also clear the job, client caches should reset on logout, and stale "owner still needs to pick reroll unlock condition" lines should be removed now that the owner chose an Awakening Shard (gate boss drop, `DESIGN-DOCUMENT.md` Â§6).
 - Also fixed a Forge 52.1.0 `runClient` mod-loading crash discovered when launching `gradlew runClient`.
 
 **Changes Made**
@@ -344,7 +344,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 - `src/main/java/com/projectzero/leveling/LevelingCommands.java`: `/pz reset` now calls `JobService.clear(player)` after `LevelingService.reset(player)`.
 - `src/main/java/com/projectzero/client/ClientEvents.java` (new): `Dist.CLIENT` Forge bus subscriber on `ClientPlayerNetworkEvent.LoggingOut` that resets `ClientStatsCache` to `new PlayerStats()` and `ClientJobCache` to `PlayerJob.NONE`.
 - `build.gradle`: added `mods { projectzero { source sourceSets.main } }` under `runs.configureEach` and merged `sourcesSets/<name>` output directory so Forge 52.1.0 loads `projectzero` cleanly during `runClient`/`runServer`.
-- `DESIGN-DOCUMENT.md` §6: replaced the open unlock options with the owner's decision (each reroll consumes one Awakening Shard, dropped only by gate bosses).
+- `DESIGN-DOCUMENT.md` Â§6: replaced the open unlock options with the owner's decision (each reroll consumes one Awakening Shard, dropped only by gate bosses).
 - `HANDOFF.md`: updated reference sections, removed the stale reroll-cost recommendation lines, and appended this session log.
 
 **Verification Executed**
@@ -355,17 +355,17 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 **Remaining Recommendations**
 
 1. Complete the in-world playtest in `gradlew runClient` (`/pz xp 20000`, K window, `/pz job set|reroll`, `/pz reset`, death and relog).
-2. Build basic skills, mana, and cooldowns (`DESIGN-DOCUMENT.md` §4), then job skills on top of them.
+2. Build basic skills, mana, and cooldowns (`DESIGN-DOCUMENT.md` Â§4), then job skills on top of them.
 3. Replace placeholder job names when final names are chosen.
 
 ---
 
-### Session Log — 2026-11-26 (Awakening Stone reroll backend)
+### Session Log â€” 2026-11-26 (Awakening Stone reroll backend)
 
 **Context & Direction Check**
 
 - Committed Claude's Awakening Stone block, Awakening Shard item, creative tab, models, textures, and effects first as-is (`21c87f2`) without changing visuals.
-- Implemented the real Awakening Stone reroll backend (`DESIGN-DOCUMENT.md` §6): `JobService.awakeningReroll` resets level to `PlayerJob.firstJobLevel` (XP 0, base stats, `(level - 1) * 5` unspent points), draws a different random job, includes a hook + TODO to keep up to 3 random old job skills once skills exist, and consumes the Awakening Shard only on success.
+- Implemented the real Awakening Stone reroll backend (`DESIGN-DOCUMENT.md` Â§6): `JobService.awakeningReroll` resets level to `PlayerJob.firstJobLevel` (XP 0, base stats, `(level - 1) * 5` unspent points), draws a different random job, includes a hook + TODO to keep up to 3 random old job skills once skills exist, and consumes the Awakening Shard only on success.
 - Added temporary op command `/pz shard give [count]` until gate boss loot drops Awakening Shards.
 
 **Changes Made**
@@ -376,7 +376,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 - `src/main/java/com/projectzero/jobs/JobService.java`: added `awakeningReroll(ServerPlayer)` and `retainRandomJobSkillsOnReroll(ServerPlayer, ResourceLocation)` hook with `TODO(skills)`.
 - `src/main/java/com/projectzero/awakening/AwakeningService.java`: replaced `TODO(gemini)` `JobService.reroll` call with `JobService.awakeningReroll`, returning early without consuming the shard if reroll fails. Visuals/particles/sounds untouched.
 - `src/main/java/com/projectzero/awakening/AwakeningCommands.java` & `AwakeningEvents.java` (new): `/pz shard give [count]` op command.
-- `DESIGN-DOCUMENT.md` §6 and `HANDOFF.md`: updated status tags, reference sections, and session log.
+- `DESIGN-DOCUMENT.md` Â§6 and `HANDOFF.md`: updated status tags, reference sections, and session log.
 
 **Verification Executed**
 
@@ -391,16 +391,16 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 **Remaining Recommendations**
 
 1. Run the in-world Awakening Stone + job system playtest in `gradlew runClient`.
-2. Build basic skills, mana, and cooldowns (`DESIGN-DOCUMENT.md` §4), then wire `JobService.retainRandomJobSkillsOnReroll` when job skills exist.
+2. Build basic skills, mana, and cooldowns (`DESIGN-DOCUMENT.md` Â§4), then wire `JobService.retainRandomJobSkillsOnReroll` when job skills exist.
 3. Add Awakening Shard drops to gate boss loot tables and custom village generation for Awakening Stones once gates/villages are built.
 
 ---
 
-### Session Log — 2026-11-26 (Crystal formations, glassy crystal, reroll fixes)
+### Session Log â€” 2026-11-26 (Crystal formations, glassy crystal, reroll fixes)
 
 **Context & Direction Check**
 
-- Committed Claude's crystal formation visuals/blocks (`CrystalFormation`, `AwakeningCrystalBlock`, `awakening_crystal` glassy translucent animated texture + `awakening_core` glowing veins, `/pz crystal small|large|colossal`, touch cooldown in `AwakeningService`, Library domain & formations design notes in `DESIGN-DOCUMENT.md` §5–6) without modifying visuals.
+- Committed Claude's crystal formation visuals/blocks (`CrystalFormation`, `AwakeningCrystalBlock`, `awakening_crystal` glassy translucent animated texture + `awakening_core` glowing veins, `/pz crystal small|large|colossal`, touch cooldown in `AwakeningService`, Library domain & formations design notes in `DESIGN-DOCUMENT.md` Â§5â€“6) without modifying visuals.
 - Applied/verified two backend fixes:
   1. `JobRegistry`: keep `GSON` declared before `INSTANCE` so `SimpleJsonResourceReloadListener` does not receive a null `Gson` on world load (crash fix).
   2. `JobService.awakeningReroll`: reset level to `Math.min(LevelingService.get(player).level(), current.firstJobLevel())` so an Awakening Stone reroll can never raise a player's level.
@@ -413,7 +413,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 - `src/main/resources/assets/projectzero/`: glassy animated `awakening_crystal.png` + `.mcmeta`, `awakening_core.png`, blockstates, block/item models, updated `awakening_stone.json` and `en_us.json`.
 - `src/main/java/com/projectzero/jobs/JobRegistry.java`: `GSON` declared before `INSTANCE` (fixes world-load NPE).
 - `src/main/java/com/projectzero/jobs/JobService.java`: `awakeningReroll` resets to `Math.min(currentLevel, firstJobLevel)`.
-- `DESIGN-DOCUMENT.md` §5–6: added Library domain job-choice ceremony plan and crystal formations spec.
+- `DESIGN-DOCUMENT.md` Â§5â€“6: added Library domain job-choice ceremony plan and crystal formations spec.
 - `HANDOFF.md`: updated Current App State, Architecture Notes, and appended this session log.
 
 **Verification Executed**
@@ -425,17 +425,17 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 **Remaining Recommendations**
 
 1. Load a world in `gradlew runClient` and run `/pz crystal colossal`, `/pz xp 20000`, `/pz shard give`, and right-click the crystal formation with a shard (confirm `Loaded 10 jobs`, no crash on world load, glassy crystal visuals, and level reset `min(current, firstJobLevel)`).
-2. Begin the Library domain job-choice ceremony (`DESIGN-DOCUMENT.md` §5) or basic skills/mana/cooldowns (§4).
+2. Begin the Library domain job-choice ceremony (`DESIGN-DOCUMENT.md` Â§5) or basic skills/mana/cooldowns (Â§4).
 
 ---
 
-### Session Log — 2026-11-26 (Task 0: Commit domain/vision/crystals + stat soft-cap rebalance)
+### Session Log â€” 2026-11-26 (Task 0: Commit domain/vision/crystals + stat soft-cap rebalance)
 
 **Context & Direction Check**
 
 - Started `gemini-12h-backlog.md` backend sprint (Task 0).
 - Committed and pushed Claude's uncommitted work in 4 clean commits (`e15efed` Library domain, `bd44fdd` solid-core crystals & clusters, `16b9baf` Reawakening vision with `VisionOverlayRenderer` preserved untouched, `135831e` docs/roadmap/backlog).
-- Rebalanced all combat/evade stats onto owner-approved soft-cap curves (`DESIGN-DOCUMENT.md` §3).
+- Rebalanced all combat/evade stats onto owner-approved soft-cap curves (`DESIGN-DOCUMENT.md` Â§3).
 
 **Changes Made**
 
@@ -461,11 +461,11 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ---
 
-### Session Log — 2026-11-26 (Task 1: Shard Vessel & charged Awakening Shards)
+### Session Log â€” 2026-11-26 (Task 1: Shard Vessel & charged Awakening Shards)
 
 **Context & Direction Check**
 
-- Implemented `DESIGN-DOCUMENT.md` §6 Shard Vessel and charged Awakening Shards using MC 1.21 data components (`ModDataComponents`), keeping `ReawakeningVision` untouched while adding `int shardTier` to `JobService.AwakeningResult` for Claude's future golden-sea tinting.
+- Implemented `DESIGN-DOCUMENT.md` Â§6 Shard Vessel and charged Awakening Shards using MC 1.21 data components (`ModDataComponents`), keeping `ReawakeningVision` untouched while adding `int shardTier` to `JobService.AwakeningResult` for Claude's future golden-sea tinting.
 
 **Changes Made**
 
@@ -490,11 +490,11 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ---
 
-### Session Log — 2026-11-26 (Task 2: Skills foundation, mana, skillbooks, placeholder HUD)
+### Session Log â€” 2026-11-26 (Task 2: Skills foundation, mana, skillbooks, placeholder HUD)
 
 **Context & Direction Check**
 
-- Implemented `DESIGN-DOCUMENT.md` §4 skills foundation, mana + regen, 4 active keybind slots (`Z`, `X`, `C`, `V`), `SkillbookItem` (`projectzero:skill_id` data component), job-reroll 3-skill retention, `StatusScreen` skills list, and bottom-left placeholder HUD.
+- Implemented `DESIGN-DOCUMENT.md` Â§4 skills foundation, mana + regen, 4 active keybind slots (`Z`, `X`, `C`, `V`), `SkillbookItem` (`projectzero:skill_id` data component), job-reroll 3-skill retention, `StatusScreen` skills list, and bottom-left placeholder HUD.
 
 **Changes Made**
 
@@ -520,7 +520,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ---
 
-### Session Log — 2026-11-27 (Task 3: Basic skills + 10 signature job skills)
+### Session Log â€” 2026-11-27 (Task 3: Basic skills + 10 signature job skills)
 
 **Context & Direction Check**
 
@@ -533,16 +533,16 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 - `src/main/resources/data/projectzero/skills/*.json` & `lang/en_us.json`: 14 skill JSON definitions and translations:
   - **Basic**: `dash` (lvl 3, forward burst + 6t i-frames; `TODO(claude-art)`: wind trail), `second_wind` (lvl 8, 30% max HP over 3s; `TODO(claude-art)`: green/cyan healing aura), `focus` (lvl 15 passive, +10% first-hit on full-HP foes), `bloodlust` (lvl 25, +20% total atk & +10% speed 10s; `TODO(claude-art)`: red pressure aura).
   - **Job signatures**:
-    1. Brawler — `iron_knuckle`: shockwave cone punch + heavy knockback (`TODO(claude-art)`: fist shockwave ring).
-    2. Slinger — `ricochet_bolt`: ranged bolt chaining to 2 nearby enemies (`TODO(claude-art)`: glowing tracer beam).
-    3. Duelist — `riposte_stance`: 1.75s parry window negating + countering next attack (`TODO(claude-art)`: blade flash).
-    4. Bulwark — `aegis_bastion`: 6 absorption hearts + Resistance + AoE taunt (`TODO(claude-art)`: translucent hex shield).
-    5. Hexblade — `cursed_edge`: 10-block dark slash wave applying Wither II + 2 HP drain/hit (`TODO(claude-art)`: crescent dark wave).
-    6. Beastcaller — `pack_howl`: summons 2 temporary tamed Spirit Hounds for 12s (`TODO(claude-art)`: ground summon sigil + spectral wolf texture).
-    7. Stormweaver — `tempest_call`: fire-safe lightning storm on up to 5 foes (`TODO(claude-art)`: custom arc VFX).
-    8. Veilstalker — `shadow_step`: blink behind target + brief invisibility + +50% next hit (`TODO(claude-art)`: shadow mist).
-    9. Gravewarden — `soul_shackle`: AoE necrotic root + magic damage + 25% life siphon (`TODO(claude-art)`: rising spectral chains).
-    10. Sunbreaker — `solar_cataclysm`: radiant fire nova + debuff cleanse + Fire Resistance (`TODO(claude-art)`: solar pillar).
+    1. Brawler â€” `iron_knuckle`: shockwave cone punch + heavy knockback (`TODO(claude-art)`: fist shockwave ring).
+    2. Slinger â€” `ricochet_bolt`: ranged bolt chaining to 2 nearby enemies (`TODO(claude-art)`: glowing tracer beam).
+    3. Duelist â€” `riposte_stance`: 1.75s parry window negating + countering next attack (`TODO(claude-art)`: blade flash).
+    4. Bulwark â€” `aegis_bastion`: 6 absorption hearts + Resistance + AoE taunt (`TODO(claude-art)`: translucent hex shield).
+    5. Hexblade â€” `cursed_edge`: 10-block dark slash wave applying Wither II + 2 HP drain/hit (`TODO(claude-art)`: crescent dark wave).
+    6. Beastcaller â€” `pack_howl`: summons 2 temporary tamed Spirit Hounds for 12s (`TODO(claude-art)`: ground summon sigil + spectral wolf texture).
+    7. Stormweaver â€” `tempest_call`: fire-safe lightning storm on up to 5 foes (`TODO(claude-art)`: custom arc VFX).
+    8. Veilstalker â€” `shadow_step`: blink behind target + brief invisibility + +50% next hit (`TODO(claude-art)`: shadow mist).
+    9. Gravewarden â€” `soul_shackle`: AoE necrotic root + magic damage + 25% life siphon (`TODO(claude-art)`: rising spectral chains).
+    10. Sunbreaker â€” `solar_cataclysm`: radiant fire nova + debuff cleanse + Fire Resistance (`TODO(claude-art)`: solar pillar).
 
 **Verification Executed**
 
@@ -555,11 +555,11 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ---
 
-### Session Log — 2026-11-27 (Task 4: Titles and milestones)
+### Session Log â€” 2026-11-27 (Task 4: Titles and milestones)
 
 **Context & Direction Check**
 
-- Implemented `DESIGN-DOCUMENT.md` §7 milestone tracking, data-driven JSON titles, 6 starter titles, milestone skill `colossus_breaker`, `/pz title` & `/pz milestone` commands, and clickable `TITLE` cycling in `StatusScreen`.
+- Implemented `DESIGN-DOCUMENT.md` Â§7 milestone tracking, data-driven JSON titles, 6 starter titles, milestone skill `colossus_breaker`, `/pz title` & `/pz milestone` commands, and clickable `TITLE` cycling in `StatusScreen`.
 
 **Changes Made**
 
@@ -584,15 +584,15 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ---
 
-### Session Log — 2026-11-27 (Task 5: Equipment and accessories)
+### Session Log â€” 2026-11-27 (Task 5: Equipment and accessories)
 
 **Context & Direction Check**
 
-- Implemented `DESIGN-DOCUMENT.md` §12 custom 8-slot accessory system (+1 spare locked Relic slot) since Curios has no Forge 1.21.1 build, rolled `AccessoryData` data component, `AccessoryMenu`/`AccessoryScreen`, `AccessoryLootModifier` drops, `StatusScreen` `GEAR` button + `(+X)` bonus stat display, and `/pz gear roll`.
+- Implemented `DESIGN-DOCUMENT.md` Â§12 custom 8-slot accessory system (+1 spare locked Relic slot) since Curios has no Forge 1.21.1 build, rolled `AccessoryData` data component, `AccessoryMenu`/`AccessoryScreen`, `AccessoryLootModifier` drops, `StatusScreen` `GEAR` button + `(+X)` bonus stat display, and `/pz gear roll`.
 
 **Changes Made**
 
-- `src/main/java/com/projectzero/gates/GateRank.java` (new): shared `E..S` rank ladder (`×1..×32` multipliers, level ranges, colors, codecs).
+- `src/main/java/com/projectzero/gates/GateRank.java` (new): shared `E..S` rank ladder (`Ã—1..Ã—32` multipliers, level ranges, colors, codecs).
 - `src/main/java/com/projectzero/equipment/` (new): `AccessorySlotType`, `AccessoryData` (`ModDataComponents.ACCESSORY_DATA`), `EquipmentRules` (1.5% / 3% / 8% / 100% drop rates + stat/affix rolling), `AccessoryItem` (rarity/rank name & tooltip + quick-equip right-click), `PlayerAccessories` (`projectzero:accessories` NBT), `EquipmentService`, `AccessoryMenu`, `AccessoryLootModifier`, `EquipmentCommands` (`/pz gear roll <slot> <rarity> <rank>`), `EquipmentEvents` (`keepInventory`-aware death drops + `crit_chance`, `lifesteal`, `damage_vs_undead` combat hooks).
 - `src/main/java/com/projectzero/registry/`: `ModMenus`, `ModLootModifiers`, 9 starter items in `ModItems` & `ModCreativeTabs`.
 - `src/main/java/com/projectzero/network/` & `client/`: `SyncStatBonusesPacket`, `OpenAccessoriesPacket`, bumped `ModNetwork.PROTOCOL_VERSION` to `6`, `ClientBonusCache`, `AccessoryScreen` (`TODO(claude-art)`: styled System container frame & slot silhouettes), `StatusScreen` `GEAR` button + `STR 25 (+3)` bonus rendering.
@@ -614,22 +614,22 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ---
 
-### Session Log — 2026-11-27 (Task 6: Mob ranks and scaling infrastructure)
+### Session Log â€” 2026-11-27 (Task 6: Mob ranks and scaling infrastructure)
 
 **Context & Direction Check**
 
-- Implemented `DESIGN-DOCUMENT.md` §9 rank-based mob scaling (`GateRank` E..S, `MobScaling.apply`), `XpRewards` rank multiplier + level-gap penalty (`−5%` per level beyond 5-level grace, `10%` floor), and `/pz mob spawn <entity> <rank> [level]`.
+- Implemented `DESIGN-DOCUMENT.md` Â§9 rank-based mob scaling (`GateRank` E..S, `MobScaling.apply`), `XpRewards` rank multiplier + level-gap penalty (`âˆ’5%` per level beyond 5-level grace, `10%` floor), and `/pz mob spawn <entity> <rank> [level]`.
 
 **Changes Made**
 
-- `src/main/java/com/projectzero/gates/`: `GateRank.randomLevel`, `MobScaling` (idempotent `ADD_MULTIPLIED_BASE` permanent health & attack damage modifiers, `projectzero:mob_rank` / `mob_level` / `mob_scaled` NBT, `[C · Lv 34] Zombie` custom nameplate, `unscaledMaxHealth` helper), `MobCommands` (`/pz mob spawn <entity> <rank> [level]`), `MobEvents`.
-- `src/main/java/com/projectzero/leveling/`: `LevelingRules.levelGapXpMultiplier`, `XpRewards.forKill(killed, killerLevel)` (uses `unscaledMaxHealth` × `rank.multiplier()` × `levelGapXpMultiplier`, plus `projectzero:gate_monster` / `gate_boss` NBT tag support), and `LevelingEvents.onKill`.
+- `src/main/java/com/projectzero/gates/`: `GateRank.randomLevel`, `MobScaling` (idempotent `ADD_MULTIPLIED_BASE` permanent health & attack damage modifiers, `projectzero:mob_rank` / `mob_level` / `mob_scaled` NBT, `[C Â· Lv 34] Zombie` custom nameplate, `unscaledMaxHealth` helper), `MobCommands` (`/pz mob spawn <entity> <rank> [level]`), `MobEvents`.
+- `src/main/java/com/projectzero/leveling/`: `LevelingRules.levelGapXpMultiplier`, `XpRewards.forKill(killed, killerLevel)` (uses `unscaledMaxHealth` Ã— `rank.multiplier()` Ã— `levelGapXpMultiplier`, plus `projectzero:gate_monster` / `gate_boss` NBT tag support), and `LevelingEvents.onKill`.
 
 **Verification Executed**
 
 - `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
 - `gradlew.bat runClient --no-daemon` (loaded world):
-  - Spawned E-rank Lv 10 Zombie (`[E · Lv 10] Zombie`, `maxHp=20.0`, `atk=3.0`, `xp=12`, `hitsToKill(10dmg)=2`) and S-rank Lv 95 Zombie (`[S · Lv 95] Zombie`, `maxHp=640.0`, `atk=96.0`, `xp=384`, `hitsToKill(10dmg)=64` — exact `32×` scaling across HP, damage, XP, and hits to kill).
+  - Spawned E-rank Lv 10 Zombie (`[E Â· Lv 10] Zombie`, `maxHp=20.0`, `atk=3.0`, `xp=12`, `hitsToKill(10dmg)=2`) and S-rank Lv 95 Zombie (`[S Â· Lv 95] Zombie`, `maxHp=640.0`, `atk=96.0`, `xp=384`, `hitsToKill(10dmg)=64` â€” exact `32Ã—` scaling across HP, damage, XP, and hits to kill).
   - Verified level-gap rule on C-rank Lv 30 Gate Zombie: killer Lv 35 = `480 XP` (100%), killer Lv 45 = `240 XP` (50%), killer Lv 90 = `48 XP` (10% floor). Zero errors in `run/logs/latest.log`.
 - Placeholders: none added in Task 6.
 
@@ -639,11 +639,11 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ---
 
-### Session Log — 2026-11-27 (Task 7: Gate backend skeleton)
+### Session Log â€” 2026-11-27 (Task 7: Gate backend skeleton)
 
 **Context & Direction Check**
 
-- Implemented Stretch Task 7 (`DESIGN-DOCUMENT.md` §9): `GateBlock` + `GateBlockEntity`, `projectzero:dungeon` void dimension, code-built placeholder dungeon chamber (`GateDungeonArena`) with rank-scaled gate monsters and boss, boss kill loop (Awakening Shard drop, `gatesCleared` milestone, exit portal activation, overworld gate sealing), `projectzero:gateSpawning` gamerule (default `false`), and `/pz gate spawn <rank> <size>` + `/pz gate leave`.
+- Implemented Stretch Task 7 (`DESIGN-DOCUMENT.md` Â§9): `GateBlock` + `GateBlockEntity`, `projectzero:dungeon` void dimension, code-built placeholder dungeon chamber (`GateDungeonArena`) with rank-scaled gate monsters and boss, boss kill loop (Awakening Shard drop, `gatesCleared` milestone, exit portal activation, overworld gate sealing), `projectzero:gateSpawning` gamerule (default `false`), and `/pz gate spawn <rank> <size>` + `/pz gate leave`.
 
 **Changes Made**
 
@@ -656,7 +656,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 - `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
 - `gradlew.bat runClient --no-daemon` (loaded world):
   - Verified `projectzero:gateSpawning` gamerule defaults to `false`.
-  - Ran `/pz gate spawn c small`, verified `GateBlockEntity` (`rank=C`, `size=SMALL`, `slot=0`), entered gate into `projectzero:dungeon`, verified 4 C-rank gate monsters + `[C · BOSS · Lv 50] Vindicator` spawned and exit sealed behind iron bars.
+  - Ran `/pz gate spawn c small`, verified `GateBlockEntity` (`rank=C`, `size=SMALL`, `slot=0`), entered gate into `projectzero:dungeon`, verified 4 C-rank gate monsters + `[C Â· BOSS Â· Lv 50] Vindicator` spawned and exit sealed behind iron bars.
   - Killed the boss: verified `exitOpened=true`, `shardDrops=1` (`Awakening Shard`), `gatesCleared=1`, and `overworldClosed=true`.
   - Stepped through the Exit Portal and verified return to `minecraft:overworld`. Zero errors in `run/logs/latest.log`.
 - Placeholders (`TODO(claude-art)`): `textures/block/gate_portal_{e,d,c,b,a,s,exit}.png` + cube models (flat colored translucent portal blocks) and `GateDungeonArena.java` (code-built deepslate chamber).
@@ -667,7 +667,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ---
 
-### Session Log — 2026-11-27 (Final 12-Hour Backend Sprint Summary)
+### Session Log â€” 2026-11-27 (Final 12-Hour Backend Sprint Summary)
 
 **Sprint Task Status & Commits (All Tasks Complete, World-Tested, and Pushed to `main`)**
 
@@ -679,7 +679,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 | **Task 3:** 4 Basic skills + 10 Job signature skills | **done** | `3757e42` | Auto-granted basic skills (`dash`, `second_wind`, `focus`, `bloodlust`) + 10 signature job skills (`iron_knuckle`, `ricochet_bolt`, `riposte_stance`, `aegis_bastion`, `cursed_edge`, `pack_howl`, `tempest_call`, `shadow_step`, `soul_shackle`, `solar_cataclysm`). |
 | **Task 4:** Titles and milestones | **done** | `c5e978d` | `MilestoneTracker`, `TitleRegistry` JSONs, 6 starter titles (`wolf_slayer`, `hundred_cuts`, `undead_bane`, `survivor`, `giant_killer` + milestone skill `colossus_breaker`, `awakened_one`), clickable `TITLE` field in `StatusScreen`, `/pz title` & `/pz milestone`. |
 | **Task 5:** Equipment and accessories (own slots) | **done** | `09f9b33` | 8 active custom slots + locked Relic slot (`PlayerAccessories`), `AccessoryData` component, `AccessoryMenu`/`AccessoryScreen`, `AccessoryLootModifier`, 9 starter items, `StatusScreen` `GEAR` button & `(+X)` bonus stats, `keepInventory` death rules, `/pz gear roll`. |
-| **Task 6:** Mob ranks and scaling infrastructure | **done** | `5341e38` | `GateRank` (`E..S`, `×1..×32`), `MobScaling.apply` (`[C · Lv 34] Zombie` nameplates), `XpRewards` rank multiplier + level-gap penalty (`−5%`/lvl past 5, `10%` floor), `/pz mob spawn`. |
+| **Task 6:** Mob ranks and scaling infrastructure | **done** | `5341e38` | `GateRank` (`E..S`, `Ã—1..Ã—32`), `MobScaling.apply` (`[C Â· Lv 34] Zombie` nameplates), `XpRewards` rank multiplier + level-gap penalty (`âˆ’5%`/lvl past 5, `10%` floor), `/pz mob spawn`. |
 | **Task 7 (Stretch):** Gate backend skeleton | **done** | `0d4e03a` | `GateBlock` + `GateBlockEntity`, `projectzero:dungeon` void dimension, `DungeonSavedData`, `GateDungeonArena` chamber with scaled gate mobs & boss, boss Awakening Shard drop + exit portal + overworld gate closure, `projectzero:gateSpawning` gamerule, `/pz gate spawn|leave`. |
 
 **Complete `TODO(claude-art)` Placeholder Inventory for Claude**
@@ -704,11 +704,26 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 **Balance Observations**
 
 - **Tier-5 Shard Rarity Spread (`Task 1`)**: Across 20 in-world Tier-5 (`Resplendent`) rerolls, observed `{COMMON=6, UNCOMMON=2, RARE=7, EPIC=5, LEGENDARY=0}` (60% Rare+), which feels rewarding for sacrificing half kill XP without making Legendary trivial.
-- **High-Rank Accessory Scaling (`Task 5` + `Task 0`)**: An `S-Rank Legendary` accessory rolls 3–4 stat lines of ~38–55 points each (`~140–190` total stat points across stats). Because `StatEffects` feeds gear points into `LevelingRules.soft(p, k)` rather than linear scaling, stacking multiple S-rank pieces stays bounded and never breaks movement speed (`< +40%`) or evade (`< 30%`), though end-game S-rank flat stat ranges in `EquipmentRules` (`16..24 × 2.4`) may want tuning once full 8-slot S-rank loadouts are playtested against S-rank bosses (`×32` HP = `640+` HP).
+- **High-Rank Accessory Scaling (`Task 5` + `Task 0`)**: An `S-Rank Legendary` accessory rolls 3â€“4 stat lines of ~38â€“55 points each (`~140â€“190` total stat points across stats). Because `StatEffects` feeds gear points into `LevelingRules.soft(p, k)` rather than linear scaling, stacking multiple S-rank pieces stays bounded and never breaks movement speed (`< +40%`) or evade (`< 30%`), though end-game S-rank flat stat ranges in `EquipmentRules` (`16..24 Ã— 2.4`) may want tuning once full 8-slot S-rank loadouts are playtested against S-rank bosses (`Ã—32` HP = `640+` HP).
 - **Dungeon Boss Toughness (`Task 6` + `Task 7`)**: `GateRules.BOSS_EXTRA_HEALTH_MULT = 2.5` on top of `GateRank.multiplier()` puts an E-rank Husk boss at `50 HP`, a C-rank Vindicator boss at `240 HP`, and an S-rank Wither Skeleton boss at `1,600 HP`, matching the progression curve well once weapon + Strength soft-caps kick in.
 
 **Open Questions for Owner**
 
-1. **Red Gates (`DESIGN-DOCUMENT.md` §9)**: Currently all gates seal their exit behind iron bars until the dungeon boss dies (with `/pz gate leave` for operators). Should normal `E..A` gates allow retreating back out through an open entrance portal before the boss dies (leaving the gate open in the overworld), reserving the locked-until-boss-dies rule strictly for **Red Gates** (S-rank or a random "Red Gate" anomaly roll on lower ranks)?
+1. **Red Gates (`DESIGN-DOCUMENT.md` Â§9)**: Currently all gates seal their exit behind iron bars until the dungeon boss dies (with `/pz gate leave` for operators). Should normal `E..A` gates allow retreating back out through an open entrance portal before the boss dies (leaving the gate open in the overworld), reserving the locked-until-boss-dies rule strictly for **Red Gates** (S-rank or a random "Red Gate" anomaly roll on lower ranks)?
 2. **Skill Slot Assignment UI**: Players can currently rebind learned active skills via `/pz skill slot <1-4> <skill>` (and newly learned active skills auto-fill empty slots). Should clicking the `SKILLS` area in `StatusScreen` open a dedicated System Skill Loadout sub-screen next?
 3. **Relic Slot (Slot 9)**: What mechanic should unlock and populate the 9th `RELIC` slot in `PlayerAccessories` (e.g., Monarch trials, hidden-dungeon boss drops, or level 50 advancement)?
+
+### Session Log â€” 2026-11-27 (Ancient gates: stone ring, dais, biome dressing, ruins)
+
+What changed (Claude, uncommitted in the Downloads clone on top of `claude/visual-pass`):
+- `gates/AncientGate.java`: builds the structure around a portal anchor on a live level or during worldgen. Palettes per biome (`paletteFor`), stepped dais with foundation down to the ground, corner posts, the stone ring, rune floor plates, biome dressing, and `ruin()` for cleared gates. `setRank()` recolors the runes (call it from gate aging rank-ups; not wired yet because aging is not built).
+- `gates/AncientGateStoneBlock.java` + `gates/AncientStonePiece.java`: the ring stone block (`piece`, `material`, `axis`, `lit`, `rank`). Rune faces are tinted by `ClientModEvents.onRegisterBlockColors` and glow (Forge `forge_data` light on the rune faces) while `lit`.
+- `AncientStonePiece`, the 684 models in `models/block/ancient_gate_stone/` and `blockstates/ancient_gate_stone.json` are **generated** by `tools/ancient_gate/gen.py` (`python tools/ancient_gate/gen.py .` from the repo root). Ring radius matches `RiftShape#radius`; change both together.
+- Textures: `textures/block/ancient_runes.png`, `ancient_sigil.png`, `ancient_seal.png` (white, tinted in game).
+- Worldgen: `gates/AncientGateFeature.java`, `registry/ModFeatures.java`, `data/projectzero/worldgen/{configured,placed}_feature/ancient_gate.json`, `data/projectzero/forge/biome_modifier/ancient_gate.json` (rarity 1/700 chunks, `surface_structures`). Worldgen portals have dungeon slot -1; `GateService.onEnterPortal` now allocates on first entry with the real facing and links every block of the portal (it used to hard-code `alongX=true` and link only the touched block).
+- `GateService`: `spawnAncientGate`, natural spawns roll `GateRules.ANCIENT_NATURAL_SHARE` (0.1) for non-sea gates, `closeOverworldGate` calls `AncientGate.ruin`. `GateCommands`: `/pz gate spawn <rank> <size> ancient`.
+
+Revised the same day at the owner's request: no dais or steps. The ring stands on the ground clinging to the rift's glowing line (`ring.py` `band()`: from 0.9 R out to about R + 0.5, wobbling with the angle), with worn `plate_high` (4 px) and `plate_low` (2 px) paving, many plates missing, 25% of upper ring stones pre-fallen.
+
+Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runClient is run by the owner). To check: `/pz gate spawn c medium ancient` in a jungle, desert, snowy and swamp biome; walk through it; kill the boss and look at the ruin; make a new world and fly around to find a generated one (rare by design).
+
