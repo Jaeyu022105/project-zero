@@ -84,7 +84,9 @@
       "minecraft:warm_ocean_vegetation",
       "minecraft:seagrass_warm",
       "minecraft:sea_pickle",
-      "projectzero:karst_tower"
+      "projectzero:karst_tower",
+      "projectzero:karst_islet",
+      "projectzero:karst_sea_arch"
     ],
     [
       "minecraft:freeze_top_layer"

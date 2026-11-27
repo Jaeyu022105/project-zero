@@ -102,9 +102,42 @@ public class FloatingIslandFeature extends Feature<NoneFeatureConfiguration> {
                 BlockPos w = c.offset(dx, top[i], dz);
                 level.setBlock(w, Blocks.WATER.defaultBlockState(), 2);
                 level.scheduleTick(w, Fluids.WATER, 0);
+                splashPool(level, w, o, r);
             }
         }
         return true;
+    }
+
+    /** Catches a spring in a small lined pool when the land below is close and level. */
+    private static void splashPool(WorldGenLevel level, BlockPos spring, BlockPos origin, RandomSource r) {
+        int radius = 2 + r.nextInt(2);
+        int x = spring.getX(), z = spring.getZ();
+        int surface = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG, x, z);
+        if (Math.abs(surface - origin.getY()) > 16 || surface <= level.getMinBuildHeight() + 3
+                || surface >= level.getMaxBuildHeight() - 1) return;
+        // A level footprint lets the mossy rim hold water instead of spilling across a slope.
+        for (int dx = -radius; dx <= radius; dx++) for (int dz = -radius; dz <= radius; dz++) {
+            if (dx * dx + dz * dz > (radius + 1) * (radius + 1)) continue;
+            if (level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG, x + dx, z + dz) != surface) return;
+        }
+        int depth = 1 + r.nextInt(2);
+        for (int dx = -radius; dx <= radius; dx++) for (int dz = -radius; dz <= radius; dz++) {
+            double d = Math.sqrt(dx * dx + dz * dz);
+            if (d > radius + 0.3) continue;
+            BlockPos floor = new BlockPos(x + dx, surface - 1, z + dz);
+            if (d >= radius - 0.45) {
+                level.setBlock(floor, r.nextFloat() < 0.55F ? Blocks.MOSS_BLOCK.defaultBlockState()
+                        : Blocks.MOSSY_COBBLESTONE.defaultBlockState(), 2);
+                continue;
+            }
+            for (int down = 1; down <= depth; down++)
+                level.setBlock(new BlockPos(x + dx, surface - down, z + dz), Blocks.WATER.defaultBlockState(), 2);
+            level.setBlock(new BlockPos(x + dx, surface - depth - 1, z + dz), Blocks.MOSSY_COBBLESTONE.defaultBlockState(), 2);
+            if (d < 1.1 && r.nextFloat() < 0.55F) {
+                BlockPos pad = new BlockPos(x + dx, surface, z + dz);
+                if (level.getBlockState(pad).isAir()) level.setBlock(pad, Blocks.LILY_PAD.defaultBlockState(), 2);
+            }
+        }
     }
 
     private static void hang(WorldGenLevel level, BlockPos at, BlockState s, int len) {

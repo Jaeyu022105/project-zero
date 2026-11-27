@@ -37,6 +37,14 @@ public class TsingyFeature extends Feature<NoneFeatureConfiguration> {
             int h = (int) (Math.max(0.25, edgeFall) * (tall * (0.6 + r.nextDouble() * 0.7))) + 3;
             needle(level, o.offset(dx, 0, dz), rad, h, r);
         }
+        rubble(level, o, r);
+        if (r.nextFloat() < 0.55F) {
+            int pools = 1 + r.nextInt(2);
+            for (int i = 0; i < pools; i++) {
+                int dx = r.nextInt(15) - 7, dz = r.nextInt(15) - 7;
+                slotPool(level, o.offset(dx, 0, dz), r);
+            }
+        }
         return true;
     }
 
@@ -44,6 +52,7 @@ public class TsingyFeature extends Feature<NoneFeatureConfiguration> {
         int ground = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, at.getX(), at.getZ());
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
         int ri = (int) Math.ceil(r0);
+        boolean weatheredTip = r.nextFloat() < 0.38F;
         for (int y = -2; y < h; y++) {
             double t = Math.max(0, y) / (double) h;
             double rad = r0 * (1 - t * t) + 0.25;
@@ -54,7 +63,9 @@ public class TsingyFeature extends Feature<NoneFeatureConfiguration> {
                 if (!(cur.isAir() || cur.canBeReplaced() || cur.is(net.minecraft.tags.BlockTags.DIRT) || cur.is(net.minecraft.tags.BlockTags.SAND)
                         || cur.is(net.minecraft.tags.BlockTags.BASE_STONE_OVERWORLD) || cur.is(net.minecraft.tags.BlockTags.TERRACOTTA))) continue;
                 float f = r.nextFloat();
-                BlockState s = f < 0.72F ? ModNature.LIMESTONE.get().defaultBlockState()
+                BlockState s = weatheredTip && y >= h - 4
+                        ? (r.nextBoolean() ? Blocks.TUFF.defaultBlockState() : Blocks.ANDESITE.defaultBlockState())
+                        : f < 0.72F ? ModNature.LIMESTONE.get().defaultBlockState()
                         : f < 0.88F ? Blocks.STONE.defaultBlockState() : Blocks.TUFF.defaultBlockState();
                 level.setBlock(p, s, 2);
             }
@@ -74,6 +85,71 @@ public class TsingyFeature extends Feature<NoneFeatureConfiguration> {
             for (int k = 0; k < h / 2 && level.getBlockState(v).isAir() && !level.getBlockState(v.relative(d.getOpposite())).isAir(); k++) {
                 level.setBlock(v, Blocks.VINE.defaultBlockState().setValue(net.minecraft.world.level.block.VineBlock.getPropertyForFace(d.getOpposite()), true), 2);
                 v.move(Direction.DOWN);
+            }
+        }
+    }
+
+    /** Scattered sharp limestone chips break up the bare floor between dense stands. */
+    private static void rubble(WorldGenLevel level, BlockPos origin, RandomSource r) {
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        int heaps = 3 + r.nextInt(4);
+        for (int i = 0; i < heaps; i++) {
+            int dx = r.nextInt(19) - 9, dz = r.nextInt(19) - 9;
+            int y = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, origin.getX() + dx, origin.getZ() + dz);
+            int pieces = 2 + r.nextInt(5);
+            for (int n = 0; n < pieces; n++) {
+                int ox = r.nextInt(5) - 2, oz = r.nextInt(5) - 2;
+                int h = r.nextFloat() < 0.35F ? 2 : 1;
+                for (int dy = 0; dy < h; dy++) {
+                    p.set(origin.getX() + dx + ox, y + dy, origin.getZ() + dz + oz);
+                    BlockState current = level.getBlockState(p);
+                    if (current.isAir() || current.canBeReplaced())
+                        level.setBlock(p, r.nextFloat() < 0.25F ? Blocks.ANDESITE.defaultBlockState()
+                                : ModNature.LIMESTONE.get().defaultBlockState(), 2);
+                }
+            }
+        }
+    }
+
+    /** A still, shallow basin in a natural gap; uneven or spike-covered ground is left alone. */
+    private static void slotPool(WorldGenLevel level, BlockPos at, RandomSource r) {
+        int surface = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, at.getX(), at.getZ());
+        if (Math.abs(surface - at.getY()) > 4) return;
+        for (int dx = -2; dx <= 2; dx++) for (int dz = -2; dz <= 2; dz++) {
+            if (level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, at.getX() + dx, at.getZ() + dz) != surface) return;
+            BlockState ground = level.getBlockState(new BlockPos(at.getX() + dx, surface - 1, at.getZ() + dz));
+            if (!ground.is(net.minecraft.tags.BlockTags.DIRT) && !ground.is(Blocks.GRASS_BLOCK)) return;
+        }
+        for (int dx = -2; dx <= 2; dx++) for (int dz = -2; dz <= 2; dz++) {
+            double d = Math.sqrt(dx * dx + dz * dz);
+            if (d > 2.2) continue;
+            BlockPos floor = new BlockPos(at.getX() + dx, surface - 1, at.getZ() + dz);
+            if (d < 1.45) {
+                level.setBlock(floor, Blocks.WATER.defaultBlockState(), 2);
+                level.setBlock(floor.below(), r.nextBoolean() ? ModNature.LIMESTONE.get().defaultBlockState()
+                        : Blocks.GRAVEL.defaultBlockState(), 2);
+            } else {
+                level.setBlock(floor, r.nextFloat() < 0.3F ? Blocks.MOSS_BLOCK.defaultBlockState()
+                        : ModNature.LIMESTONE.get().defaultBlockState(), 2);
+                BlockPos fern = floor.above();
+                if (r.nextFloat() < 0.24F && level.getBlockState(fern).isAir())
+                    level.setBlock(fern, Blocks.FERN.defaultBlockState(), 2);
+            }
+        }
+        // A couple of vine strands cling to the sharp limestone lips beside the water.
+        for (Direction d : Direction.Plane.HORIZONTAL) {
+            if (r.nextFloat() > 0.5F) continue;
+            BlockPos wall = new BlockPos(at.getX() + d.getStepX() * 2, surface, at.getZ() + d.getStepZ() * 2);
+            level.setBlock(wall, ModNature.LIMESTONE.get().defaultBlockState(), 2);
+            level.setBlock(wall.above(), ModNature.LIMESTONE.get().defaultBlockState(), 2);
+            BlockPos.MutableBlockPos vine = new BlockPos.MutableBlockPos(wall.getX() + d.getStepX(), surface + 1,
+                    wall.getZ() + d.getStepZ());
+            BlockState vineState = Blocks.VINE.defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.VineBlock.getPropertyForFace(d.getOpposite()), true);
+            for (int k = 0; k < 3 && level.getBlockState(vine).isAir()
+                    && !level.getBlockState(vine.relative(d.getOpposite())).isAir(); k++) {
+                level.setBlock(vine, vineState, 2);
+                vine.move(Direction.DOWN);
             }
         }
     }

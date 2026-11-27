@@ -84,7 +84,8 @@
       "projectzero:shrub_oak",
       "projectzero:undergrowth_dense",
       "projectzero:fern_carpet",
-      "projectzero:wildflowers"
+      "projectzero:wildflowers",
+      "projectzero:sky_arch"
     ],
     [
       "minecraft:freeze_top_layer"

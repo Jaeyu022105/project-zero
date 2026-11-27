@@ -39,6 +39,12 @@ public final class ModFeatures {
     /** Floating islands with hanging vines and waterfalls (Skyfall Isles). */
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> FLOATING_ISLAND =
             FEATURES.register("floating_island", com.projectzero.worldgen.FloatingIslandFeature::new);
+    /** Loose floating stone fragments above the Skyfall Isles. */
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> SKY_FRAGMENT =
+            FEATURES.register("sky_fragment", com.projectzero.worldgen.SkyFragmentFeature::new);
+    /** Banded natural arches with mossy valley-floor boulder heaps (Sky Pillars). */
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> SKY_ARCH =
+            FEATURES.register("sky_arch", com.projectzero.worldgen.SkyArchFeature::new);
 
     // Round 3 biomes.
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> BAOBAB =
@@ -49,6 +55,12 @@ public final class ModFeatures {
             FEATURES.register("tsingy", com.projectzero.worldgen.TsingyFeature::new);
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> KARST_TOWER =
             FEATURES.register("karst_tower", com.projectzero.worldgen.KarstTowerFeature::new);
+    /** Low limestone islets with sand coves in the Karst Tower Bay. */
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> KARST_ISLET =
+            FEATURES.register("karst_islet", com.projectzero.worldgen.KarstIsletFeature::new);
+    /** Occasional sea arches rising from the shallow bay floor. */
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> KARST_SEA_ARCH =
+            FEATURES.register("karst_sea_arch", com.projectzero.worldgen.KarstSeaArchFeature::new);
 
     // Round 4 biomes.
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> SALT_POOL =

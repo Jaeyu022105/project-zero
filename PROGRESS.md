@@ -4,7 +4,7 @@ Where the project stands against the plan, in one page. `DESIGN-DOCUMENT.md` is 
 
 **Every agent keeps this file current** (AGENTS.md §3): when you finish or start a piece of work, move it between the lists below, and when the owner adds to the plan, add a line to the plan log at the bottom in the same commit as the design doc change.
 
-Last updated: **2026-11-27**
+Last updated: **2026-11-28**
 
 ---
 
@@ -34,7 +34,7 @@ Last updated: **2026-11-27**
 - **Gemini's reset backlog** (`.agents/prompts/gemini-reset-backlog.md`): Tasks 1 to 5 are done and merged into this branch (System notices bottom right, level ceiling at 100, storming a breaking gate, corruption spread, fireflies). Gemini ran out of tokens there, so Task 6 (companions foundation and screen) is not started, and Task 7 moved to Claude (the bamboo and plateau polish threads).
 - **Spirit Bamboo Sea polish [Built] 2026-11-27:** thick 2x2/3x3 culms with node rings, per-grove lean and height, leaf sprays, noise lanes with stone lanterns, moss floor; biome enlarged by mapping Flower Forest to it.
 - **Shattered Sky Plateau polish [Built] 2026-11-27:** flat table, stepped misty chasms, big slabs and arches (in-game look not yet checked).
-- **Claude, polish pass on every existing biome** (DESIGN-DOCUMENT §15), starting with the biomes Gemini's Task 7 doesn't touch. Round 1 written, being built and tested: Bloodmoon Steppe (more common, dead trees, giant skeletons), Baobab Savanna kopjes, Salt Mirror Flats salt cones. Round 2 written, not built yet: Geyser Basin travertine terraces, Crystal Tundra frozen ponds. Round 3 written, not built yet: Mana Wastes blast craters, Capwood fairy rings, Elderwood elven ruins. Round 4 written, not built yet: Cloud Forest tree ferns, Ice Cathedral ice shard clusters, Sunken Ruins Marsh stilt huts. Still to polish: Sky Pillars, Skyfall Isles, Tsingy, Karst Tower Bay. The Spirit Bamboo Sea and the Shattered Sky Plateau each have their own polish thread.
+- **Claude, polish pass on every existing biome** (DESIGN-DOCUMENT §15): built rounds 1 to 4 cover Bloodmoon Steppe, Baobab Savanna, Salt Mirror Flats, Geyser Basin, Crystal Tundra, Mana Wastes, Capwood, Elderwood, Cloud Forest, Ice Cathedral and Sunken Ruins Marsh. The separate Codex pass completed the remaining four: Sky Pillars arches and valley boulder heaps; Skyfall Isles splash pools and sky fragments; Tsingy weathered needle tips, rubble and slot pools; Karst Tower Bay low sand-coved islets and sea arches. The Spirit Bamboo Sea and the Shattered Sky Plateau each have their own polish thread.
 
 ## Next, from the plan
 
