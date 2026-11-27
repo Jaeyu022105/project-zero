@@ -167,6 +167,19 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
             leftArm.zRot -= fly * (0.15F + up * 0.15F);
         }
         float floatBob = fly * Mth.sin(age * 0.09F) * 0.5F;
+        // Ladders: hand over hand, alternating feet, driven by how far you climb.
+        float climb = st.climb(pt);
+        if (climb > 0.01F) {
+            float cp = st.climbPhase(pt);
+            float reach = Mth.sin(cp), step = Mth.cos(cp);
+            rightArm.xRot = Mth.lerp(climb, rightArm.xRot, -2.5F + reach * 0.35F);
+            leftArm.xRot = Mth.lerp(climb, leftArm.xRot, -2.5F - reach * 0.35F);
+            rightArm.zRot = Mth.lerp(climb, rightArm.zRot, 0.1F);
+            leftArm.zRot = Mth.lerp(climb, leftArm.zRot, -0.1F);
+            rightLeg.xRot = Mth.lerp(climb, rightLeg.xRot, -0.45F - Math.max(0F, step) * 0.5F);
+            leftLeg.xRot = Mth.lerp(climb, leftLeg.xRot, -0.45F - Math.max(0F, -step) * 0.5F);
+            move *= 1F - climb;
+        }
 
         float dy = bob + breathe * 0.5F + dip + floatBob;
         head.y += dy;
@@ -191,8 +204,8 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
         float lElbow = elbowBase + Math.max(0F, -leftArm.xRot) * 0.3F;
         // Knees: the leg swinging forward folds; jumping tucks; landing and crouching give.
         float kneeK = move * (0.6F + sprint * 0.7F);
-        float rKnee = 0.08F * move + Math.max(0F, Mth.sin(phase)) * kneeK;
-        float lKnee = 0.08F * move + Math.max(0F, -Mth.sin(phase)) * kneeK;
+        float rKnee = 0.08F * move + Math.max(0F, Mth.sin(phase)) * kneeK + climb * (0.5F + Math.max(0F, Mth.cos(st.climbPhase(pt))) * 0.7F);
+        float lKnee = 0.08F * move + Math.max(0F, -Mth.sin(phase)) * kneeK + climb * (0.5F + Math.max(0F, -Mth.cos(st.climbPhase(pt))) * 0.7F);
         rKnee += air * (1.1F * rise + 0.3F * fall) + land * 0.9F + crouch * 0.45F + fly * (0.25F + 0.2F * fall);
         lKnee += air * (0.4F * rise + 0.3F * fall) + land * 0.9F + crouch * 0.45F + fly * (0.45F + 0.2F * fall);
         return new float[] {rElbow, lElbow, rKnee, lKnee};

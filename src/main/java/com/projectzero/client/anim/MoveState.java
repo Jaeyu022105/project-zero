@@ -22,6 +22,8 @@ public final class MoveState {
     public float turn, turnO;        // smoothed yaw speed (deg/tick), signed
     public float fly, flyO;          // 0 .. 1 creative/ability flight (not elytra)
     public float flySpeed, flySpeedO; // 0 .. 1 horizontal flight speed
+    public float climb, climbO;      // 0 .. 1 on a ladder or vines, off the ground
+    public float climbPhase, climbPhaseO; // advances with vertical movement on a ladder
     public float rise;               // + going up, - falling (for jump vs fall poses)
     /** Blade combo step (index into PlayerPoses.COMBO) and the tick its swing started. */
     public int combo;
@@ -49,6 +51,10 @@ public final class MoveState {
         fly += ((flying ? 1F : 0F) - fly) * 0.2F;
         float hs = (float) p.getDeltaMovement().horizontalDistance();
         flySpeed += (Mth.clamp(hs / 0.5F, 0F, 1F) - flySpeed) * 0.2F;
+        climbO = climb; climbPhaseO = climbPhase;
+        boolean climbing = p.onClimbable() && !p.onGround() && !flying;
+        climb += ((climbing ? 1F : 0F) - climb) * 0.3F;
+        if (climbing) climbPhase += (float) Math.abs(p.getDeltaMovement().y) * 9F;
         boolean ground = p.onGround() || p.isPassenger() || p.isInWater() || p.getAbilities().flying || p.onClimbable();
         air += ((ground ? 0F : 1F) - air) * (ground ? 0.6F : 0.35F);
         sprint += ((p.isSprinting() && !p.isSwimming() ? 1F : 0F) - sprint) * 0.25F;
@@ -86,5 +92,7 @@ public final class MoveState {
     public float land(float pt) { return Mth.lerp(pt, landO, land); }
     public float turn(float pt) { return Mth.lerp(pt, turnO, turn); }
     public float fly(float pt) { return Mth.lerp(pt, flyO, fly); }
+    public float climb(float pt) { return Mth.lerp(pt, climbO, climb); }
+    public float climbPhase(float pt) { return Mth.lerp(pt, climbPhaseO, climbPhase); }
     public float flySpeed(float pt) { return Mth.lerp(pt, flySpeedO, flySpeed); }
 }
