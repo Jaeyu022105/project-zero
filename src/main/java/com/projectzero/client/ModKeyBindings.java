@@ -48,6 +48,19 @@ public final class ModKeyBindings {
             GLFW.GLFW_KEY_V,
             CATEGORY);
 
+    public static final KeyMapping OPEN_SKILLS = new KeyMapping(
+            "key." + ProjectZero.MOD_ID + ".skills",
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_J,
+            CATEGORY);
+
+    /** Swaps to the next skill preset, usable mid-fight. */
+    public static final KeyMapping CYCLE_PRESET = new KeyMapping(
+            "key." + ProjectZero.MOD_ID + ".cycle_preset",
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_R,
+            CATEGORY);
+
     public static final KeyMapping[] SKILL_KEYS = {SKILL_1, SKILL_2, SKILL_3, SKILL_4};
 
     @Mod.EventBusSubscriber(modid = ProjectZero.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -55,6 +68,8 @@ public final class ModKeyBindings {
         @SubscribeEvent
         public static void onRegisterKeys(RegisterKeyMappingsEvent event) {
             event.register(OPEN_STATUS);
+            event.register(OPEN_SKILLS);
+            event.register(CYCLE_PRESET);
             for (KeyMapping key : SKILL_KEYS) {
                 event.register(key);
             }
@@ -69,6 +84,16 @@ public final class ModKeyBindings {
             while (OPEN_STATUS.consumeClick()) {
                 if (mc.player != null && mc.screen == null) {
                     mc.setScreen(new StatusScreen());
+                }
+            }
+            while (OPEN_SKILLS.consumeClick()) {
+                if (mc.player != null && mc.screen == null) {
+                    mc.setScreen(new SkillLoadoutScreen());
+                }
+            }
+            while (CYCLE_PRESET.consumeClick()) {
+                if (mc.player != null && mc.screen == null) {
+                    ModNetwork.sendToServer(new com.projectzero.network.SwitchPresetPacket(-1));
                 }
             }
             for (int i = 0; i < SKILL_KEYS.length; i++) {

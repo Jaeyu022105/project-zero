@@ -6,6 +6,10 @@ public final class SkillRules {
 
     /** Number of active skill keybind slots (Z, X, C, V). */
     public static final int ACTIVE_SLOTS = 4;
+    /** Skill presets (loadouts) a player can keep and swap between mid-fight. */
+    public static final int PRESETS = 3;
+    /** Ticks after a preset swap before skills can be cast: swapping is a choice, not free (0.5 s). */
+    public static final int PRESET_SWAP_LOCK_TICKS = 10;
 
     /** Base flat mana regenerated per second. */
     public static final double MANA_REGEN_BASE_PER_SECOND = 1.0;

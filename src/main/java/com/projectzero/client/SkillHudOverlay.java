@@ -87,6 +87,9 @@ public final class SkillHudOverlay {
     private static final Map<ResourceLocation, Integer> COOLDOWN_TOTAL = new HashMap<>();
     private static final Map<ResourceLocation, Boolean> ICON_EXISTS = new HashMap<>();
 
+    private static int shownPreset = -1;
+    private static long swapAt;
+
     private static void render(GuiGraphics g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
@@ -99,9 +102,24 @@ public final class SkillHudOverlay {
         int slotY = panelY - 5 - SLOT;
 
         PlayerSkills skills = ClientSkillsCache.get();
-        for (int i = 0; i < SkillRules.ACTIVE_SLOTS; i++) {
-            drawSlot(g, mc, x + i * (SLOT + 4), slotY, i, skills);
+        // After a preset swap the slots drop in from above and the preset tag flashes.
+        int preset = skills.activePreset();
+        if (preset != shownPreset) {
+            if (shownPreset >= 0) swapAt = System.currentTimeMillis();
+            shownPreset = preset;
         }
+        float swap = Mth.clamp((System.currentTimeMillis() - swapAt) / 350F, 0F, 1F);
+        float ease = 1F - (1F - swap) * (1F - swap);
+        for (int i = 0; i < SkillRules.ACTIVE_SLOTS; i++) {
+            float d = Mth.clamp(ease * 1.4F - i * 0.1F, 0F, 1F);
+            g.pose().pushPose();
+            g.pose().translate(0, (1F - d) * -10F, 0);
+            drawSlot(g, mc, x + i * (SLOT + 4), slotY, i, skills);
+            g.pose().popPose();
+        }
+        String tag = com.projectzero.skills.SkillService.roman(preset + 1);
+        int tx = x + SkillRules.ACTIVE_SLOTS * (SLOT + 4) + 1;
+        g.drawString(mc.font, tag, tx, slotY + (SLOT - 8) / 2, swap < 1F ? 0xFFFFD34D : LABEL, false);
 
         frame(g, x, panelY, PANEL_W, PANEL_H, BORDER);
 

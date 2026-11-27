@@ -15,12 +15,15 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A player's mana, learned skills, 4 active slots, and remaining skill cooldowns (NBT {@code projectzero:skills}).
+ * A player's mana, learned skills, skill presets (each 4 active slots; one preset is live), and
+ * remaining skill cooldowns (NBT {@code projectzero:skills}). Cooldowns belong to skills, not
+ * slots, so switching presets never resets a cooldown.
  */
 public final class PlayerSkills {
     private double mana = -1.0; // -1 means uninitialized; filled to maxMana on first load
     private final LinkedHashSet<ResourceLocation> learned = new LinkedHashSet<>();
-    private final ResourceLocation[] slots = new ResourceLocation[SkillRules.ACTIVE_SLOTS];
+    private final ResourceLocation[][] presets = new ResourceLocation[SkillRules.PRESETS][SkillRules.ACTIVE_SLOTS];
+    private int activePreset;
     private final Map<ResourceLocation, Integer> cooldowns = new HashMap<>();
 
     public double rawMana() { return mana; }
@@ -45,9 +48,22 @@ public final class PlayerSkills {
         return learned.contains(id);
     }
 
+    public int activePreset() {
+        return activePreset;
+    }
+
+    public void setActivePreset(int preset) {
+        if (preset >= 0 && preset < presets.length) activePreset = preset;
+    }
+
+    private ResourceLocation[] slots() {
+        return presets[activePreset];
+    }
+
     public boolean addSkill(ResourceLocation id, boolean autoSlotActive) {
         boolean added = learned.add(id);
         if (added && autoSlotActive && slotOf(id) == -1) {
+            ResourceLocation[] slots = slots();
             for (int i = 0; i < slots.length; i++) {
                 if (slots[i] == null) {
                     slots[i] = id;
@@ -61,21 +77,34 @@ public final class PlayerSkills {
     public boolean removeSkill(ResourceLocation id) {
         boolean removed = learned.remove(id);
         if (removed) {
-            for (int i = 0; i < slots.length; i++) {
-                if (id.equals(slots[i])) slots[i] = null;
+            for (ResourceLocation[] slots : presets) {
+                for (int i = 0; i < slots.length; i++) {
+                    if (id.equals(slots[i])) slots[i] = null;
+                }
             }
             cooldowns.remove(id);
         }
         return removed;
     }
 
+    /** A slot of the live preset. */
     public @Nullable ResourceLocation slot(int index) {
-        if (index < 0 || index >= slots.length) return null;
-        return slots[index];
+        return slot(activePreset, index);
+    }
+
+    public @Nullable ResourceLocation slot(int preset, int index) {
+        if (preset < 0 || preset >= presets.length || index < 0 || index >= SkillRules.ACTIVE_SLOTS) return null;
+        return presets[preset][index];
     }
 
     public void setSlot(int index, @Nullable ResourceLocation skillId) {
-        if (index < 0 || index >= slots.length) return;
+        setSlot(activePreset, index, skillId);
+    }
+
+    /** Puts a skill in a preset slot; a skill appears at most once per preset (it moves). */
+    public void setSlot(int preset, int index, @Nullable ResourceLocation skillId) {
+        if (preset < 0 || preset >= presets.length || index < 0 || index >= SkillRules.ACTIVE_SLOTS) return;
+        ResourceLocation[] slots = presets[preset];
         if (skillId != null) {
             for (int i = 0; i < slots.length; i++) {
                 if (skillId.equals(slots[i])) slots[i] = null;
@@ -85,6 +114,7 @@ public final class PlayerSkills {
     }
 
     public int slotOf(ResourceLocation skillId) {
+        ResourceLocation[] slots = slots();
         for (int i = 0; i < slots.length; i++) {
             if (skillId.equals(slots[i])) return i;
         }
@@ -137,11 +167,16 @@ public final class PlayerSkills {
         }
         tag.put("learned", learnedList);
 
-        CompoundTag slotTag = new CompoundTag();
-        for (int i = 0; i < slots.length; i++) {
-            if (slots[i] != null) slotTag.putString("s" + i, slots[i].toString());
+        ListTag presetList = new ListTag();
+        for (ResourceLocation[] slots : presets) {
+            CompoundTag slotTag = new CompoundTag();
+            for (int i = 0; i < slots.length; i++) {
+                if (slots[i] != null) slotTag.putString("s" + i, slots[i].toString());
+            }
+            presetList.add(slotTag);
         }
-        tag.put("slots", slotTag);
+        tag.put("presets", presetList);
+        tag.putInt("activePreset", activePreset);
 
         CompoundTag cdTag = new CompoundTag();
         for (Map.Entry<ResourceLocation, Integer> e : cooldowns.entrySet()) {
@@ -161,14 +196,20 @@ public final class PlayerSkills {
             ResourceLocation id = ResourceLocation.tryParse(learnedList.getString(i));
             if (id != null) s.learned.add(id);
         }
-        CompoundTag slotTag = tag.getCompound("slots");
-        for (int i = 0; i < s.slots.length; i++) {
-            String key = "s" + i;
-            if (slotTag.contains(key)) {
-                ResourceLocation id = ResourceLocation.tryParse(slotTag.getString(key));
-                if (id != null && s.learned.contains(id)) s.slots[i] = id;
+        // Older saves had one "slots" compound: it becomes preset 1.
+        ListTag presetList = tag.getList("presets", Tag.TAG_COMPOUND);
+        for (int p = 0; p < s.presets.length; p++) {
+            CompoundTag slotTag = p < presetList.size() ? presetList.getCompound(p)
+                    : (p == 0 && presetList.isEmpty() ? tag.getCompound("slots") : new CompoundTag());
+            for (int i = 0; i < SkillRules.ACTIVE_SLOTS; i++) {
+                String key = "s" + i;
+                if (slotTag.contains(key)) {
+                    ResourceLocation id = ResourceLocation.tryParse(slotTag.getString(key));
+                    if (id != null && s.learned.contains(id)) s.presets[p][i] = id;
+                }
             }
         }
+        s.setActivePreset(tag.getInt("activePreset"));
         CompoundTag cdTag = tag.getCompound("cooldowns");
         for (String key : cdTag.getAllKeys()) {
             ResourceLocation id = ResourceLocation.tryParse(key);
@@ -186,9 +227,12 @@ public final class PlayerSkills {
         for (ResourceLocation id : learned) {
             buf.writeResourceLocation(id);
         }
-        for (ResourceLocation slot : slots) {
-            buf.writeBoolean(slot != null);
-            if (slot != null) buf.writeResourceLocation(slot);
+        buf.writeVarInt(activePreset);
+        for (ResourceLocation[] slots : presets) {
+            for (ResourceLocation slot : slots) {
+                buf.writeBoolean(slot != null);
+                if (slot != null) buf.writeResourceLocation(slot);
+            }
         }
         buf.writeVarInt(cooldowns.size());
         for (Map.Entry<ResourceLocation, Integer> e : cooldowns.entrySet()) {
@@ -204,8 +248,11 @@ public final class PlayerSkills {
         for (int i = 0; i < learnedCount; i++) {
             s.learned.add(buf.readResourceLocation());
         }
-        for (int i = 0; i < s.slots.length; i++) {
-            if (buf.readBoolean()) s.slots[i] = buf.readResourceLocation();
+        s.activePreset = buf.readVarInt();
+        for (ResourceLocation[] slots : s.presets) {
+            for (int i = 0; i < slots.length; i++) {
+                if (buf.readBoolean()) slots[i] = buf.readResourceLocation();
+            }
         }
         int cdCount = buf.readVarInt();
         for (int i = 0; i < cdCount; i++) {

@@ -132,5 +132,8 @@
   "block.projectzero.gate_portal": "Gate Portal",
   "gamerule.projectzero:gateSpawning": "Natural Gate Spawning",
   "block.projectzero.mana_crystal": "Mana Crystal",
-  "item.projectzero.mana_crystal_shard": "Mana Crystal Shard"
+  "item.projectzero.mana_crystal_shard": "Mana Crystal Shard",
+  "key.projectzero.skills": "Open Skills Window",
+  "key.projectzero.cycle_preset": "Next Skill Preset",
+  "screen.projectzero.skills": "Skills"
 }

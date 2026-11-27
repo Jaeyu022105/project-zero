@@ -7,7 +7,6 @@ import com.projectzero.jobs.PlayerJob;
 import com.projectzero.leveling.PlayerStats;
 import com.projectzero.leveling.Stat;
 import com.projectzero.network.AllocateStatPacket;
-import com.projectzero.network.AssignSkillSlotPacket;
 import com.projectzero.network.CycleTitlePacket;
 import com.projectzero.network.ModNetwork;
 import com.projectzero.network.OpenAccessoriesPacket;
@@ -286,7 +285,7 @@ public class StatusScreen extends Screen {
 
         g.fill(RX, SKILL_Y - 8, RX + RW, SKILL_Y - 7, DIVIDER);
 
-        // Skill loadout: 4 slots, click to cycle.
+        // Skill loadout: the live preset's 4 slots. Click opens the Skills window.
         PlayerSkills skills = ClientSkillsCache.get();
         int slotStride = RW / 4;
         for (int i = 0; i < ModKeyBindings.SKILL_KEYS.length && i < 4; i++) {
@@ -319,7 +318,8 @@ public class StatusScreen extends Screen {
                     SyncSkillsPacket.SkillMeta meta = ClientSkillsCache.meta(id);
                     if (meta != null) lines.add(Component.literal(meta.manaCost() + " MP").withStyle(ChatFormatting.BLUE));
                 }
-                lines.add(Component.literal("Left-click: next skill. Right-click: previous. Shift-click: clear.")
+                lines.add(Component.literal("Click to open the Skills window ("
+                        + ModKeyBindings.OPEN_SKILLS.getTranslatedKeyMessage().getString().toUpperCase() + ").")
                         .withStyle(ChatFormatting.GRAY));
                 lines.add(Component.literal(activeLearned(skills).size() + " active skills learned.")
                         .withStyle(ChatFormatting.DARK_GRAY));
@@ -395,24 +395,10 @@ public class StatusScreen extends Screen {
                 }
             }
         }
-        int slotStride = RW / 4;
-        for (int i = 0; i < 4; i++) {
-            if (!in(mx, my, RX + i * slotStride, SKILL_Y, slotStride - 4, SKILL_SLOT)) continue;
-            PlayerSkills skills = ClientSkillsCache.get();
-            ResourceLocation next;
-            if (hasShiftDown()) {
-                next = null;
-            } else {
-                List<ResourceLocation> pool = activeLearned(skills);
-                if (pool.isEmpty()) return true;
-                ResourceLocation cur = skills.slot(i);
-                int idx = cur == null ? -1 : pool.indexOf(cur);
-                int step = button == GLFW.GLFW_MOUSE_BUTTON_RIGHT ? -1 : 1;
-                int n = idx < 0 ? (step > 0 ? 0 : pool.size() - 1) : Math.floorMod(idx + step, pool.size());
-                next = pool.get(n);
-            }
+        // Skill slots: the loadout lives in its own window now.
+        if (in(mx, my, RX, SKILL_Y, RW, SKILL_SLOT)) {
             click();
-            ModNetwork.sendToServer(new AssignSkillSlotPacket(i, next));
+            minecraft.setScreen(new SkillLoadoutScreen());
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);

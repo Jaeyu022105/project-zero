@@ -64,6 +64,16 @@ Skill types: **active** (bound to 4 skill keys `Z`, `X`, `C`, `V`, cost mana, ha
 
 Up to 4 active skill slots on keys, more slots as the player levels. **[Idea]**
 
+**[Built] Skills window and presets (owner idea, 2026-11-27).**
+- Open the Skills window with `J`. Clicking the skill slots in the Status window also opens it.
+- Learned active skills are on the left and **3 presets** of 4 slots are on the right.
+- Drag a skill onto a slot, or click the skill and then the slot.
+- Dragging between slots swaps them. Dragging a slot out, or right-clicking it, clears it.
+- Click a preset's header to make it live. `R` cycles to the next preset mid-fight.
+- After a swap, casting is locked for 0.5 s (`SkillRules.PRESET_SWAP_LOCK_TICKS`), so swapping is a choice.
+- Cooldowns belong to skills, not slots, so swapping can't dodge a cooldown.
+- The HUD shows the live preset (I, II, III), and the slots drop in after a swap. Old saves move into preset I.
+
 ## 5. Jobs
 
 - **[Built]** At **level 10** the System gives the player a **Job Change Quest**. Clearing it assigns a job. For now the quest completes instantly; the trial dungeon is **[Planned]**. (Solo Leveling uses level 40; 10 keeps the early game short. Tune once we can playtest.)

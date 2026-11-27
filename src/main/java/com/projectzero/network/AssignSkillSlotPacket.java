@@ -8,25 +8,27 @@ import net.minecraftforge.event.network.CustomPayloadEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Client to server: put a learned active skill in a hotbar skill slot (0-based), or clear it
- * with a null id. Sent by clicking a slot in the Status window. The server checks everything.
+ * Client to server: put a learned active skill in a slot (0-based) of a preset, or clear it with
+ * a null id. Sent from the Skills window. The server checks everything.
  */
-public record AssignSkillSlotPacket(int slot, @Nullable ResourceLocation skillId) {
+public record AssignSkillSlotPacket(int preset, int slot, @Nullable ResourceLocation skillId) {
     public static void encode(AssignSkillSlotPacket msg, FriendlyByteBuf buf) {
+        buf.writeVarInt(msg.preset);
         buf.writeVarInt(msg.slot);
         buf.writeBoolean(msg.skillId != null);
         if (msg.skillId != null) buf.writeResourceLocation(msg.skillId);
     }
 
     public static AssignSkillSlotPacket decode(FriendlyByteBuf buf) {
+        int preset = buf.readVarInt();
         int slot = buf.readVarInt();
-        return new AssignSkillSlotPacket(slot, buf.readBoolean() ? buf.readResourceLocation() : null);
+        return new AssignSkillSlotPacket(preset, slot, buf.readBoolean() ? buf.readResourceLocation() : null);
     }
 
     public static void handle(AssignSkillSlotPacket msg, CustomPayloadEvent.Context ctx) {
         ServerPlayer player = ctx.getSender();
         if (player != null) {
-            SkillService.assignSlot(player, msg.slot, msg.skillId);
+            SkillService.assignSlot(player, msg.preset, msg.slot, msg.skillId);
         }
         ctx.setPacketHandled(true);
     }

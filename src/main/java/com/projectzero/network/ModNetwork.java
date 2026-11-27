@@ -14,7 +14,8 @@ public final class ModNetwork {
     // 5: SyncTitlesPacket + CycleTitlePacket. 6: SyncStatBonusesPacket + OpenAccessoriesPacket.
     // 7: SyncWornGearPacket + AssignSkillSlotPacket + SkillVisualPacket.
     // Bump whenever the packet list or a packet's format changes.
-    private static final int PROTOCOL_VERSION = 7;
+    // 8: skill presets (AssignSkillSlotPacket preset field, SwitchPresetPacket, preset sync).
+    private static final int PROTOCOL_VERSION = 8;
 
     public static final SimpleChannel CHANNEL = ChannelBuilder
             .named(ProjectZero.id("main"))
@@ -88,6 +89,11 @@ public final class ModNetwork {
                 .consumerMainThread(SyncWornGearPacket::handle)
                 .add();
 
+        CHANNEL.messageBuilder(SwitchPresetPacket.class, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(SwitchPresetPacket::encode)
+                .decoder(SwitchPresetPacket::decode)
+                .consumerMainThread(SwitchPresetPacket::handle)
+                .add();
         CHANNEL.messageBuilder(AssignSkillSlotPacket.class, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(AssignSkillSlotPacket::encode)
                 .decoder(AssignSkillSlotPacket::decode)

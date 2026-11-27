@@ -103,16 +103,43 @@ public final class SkillService {
     }
 
     public static boolean assignSlot(ServerPlayer player, int slotIndex, ResourceLocation skillId) {
+        return assignSlot(player, get(player).activePreset(), slotIndex, skillId);
+    }
+
+    /** Puts a learned active skill (or nothing) in a slot of any preset. Sent from the Skills window. */
+    public static boolean assignSlot(ServerPlayer player, int preset, int slotIndex, ResourceLocation skillId) {
         if (slotIndex < 0 || slotIndex >= SkillRules.ACTIVE_SLOTS) return false;
+        if (preset < 0 || preset >= SkillRules.PRESETS) return false;
         PlayerSkills data = get(player);
         if (skillId != null) {
             if (!data.hasLearned(skillId)) return false;
             Skill def = SkillRegistry.get(skillId);
             if (def == null || def.type() != SkillType.ACTIVE) return false;
         }
-        data.setSlot(slotIndex, skillId);
+        data.setSlot(preset, slotIndex, skillId);
         set(player, data);
         return true;
+    }
+
+    /** Game time until which a player who just swapped presets cannot cast. Not saved. */
+    private static final java.util.Map<java.util.UUID, Long> SWAP_LOCK = new java.util.HashMap<>();
+
+    /** Makes {@code preset} live ({@code -1} = next). Casting is locked briefly after a swap. */
+    public static void switchPreset(ServerPlayer player, int preset) {
+        PlayerSkills data = get(player);
+        int target = preset < 0 ? (data.activePreset() + 1) % SkillRules.PRESETS : preset;
+        if (target >= SkillRules.PRESETS || target == data.activePreset()) return;
+        data.setActivePreset(target);
+        set(player, data);
+        SWAP_LOCK.put(player.getUUID(), player.level().getGameTime() + SkillRules.PRESET_SWAP_LOCK_TICKS);
+        player.displayClientMessage(Component.literal("[System] ").withStyle(ChatFormatting.AQUA)
+                .append(Component.literal("Preset " + roman(target + 1)).withStyle(ChatFormatting.WHITE)), true);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_CHIME, net.minecraft.sounds.SoundSource.PLAYERS, 0.7F, 1.6F);
+    }
+
+    public static String roman(int n) {
+        return switch (n) { case 1 -> "I"; case 2 -> "II"; case 3 -> "III"; case 4 -> "IV"; case 5 -> "V"; default -> String.valueOf(n); };
     }
 
     public static void setMana(ServerPlayer player, double amount) {
@@ -125,6 +152,12 @@ public final class SkillService {
     public static boolean castSlot(ServerPlayer player, int slotIndex) {
         if (slotIndex < 0 || slotIndex >= SkillRules.ACTIVE_SLOTS) return false;
         if (LibraryDomain.isInDomain(player) || ReawakeningVision.isInVision(player)) return false;
+
+        Long lock = SWAP_LOCK.get(player.getUUID());
+        if (lock != null) {
+            if (player.level().getGameTime() < lock) return false;
+            SWAP_LOCK.remove(player.getUUID());
+        }
 
         PlayerSkills data = get(player);
         ResourceLocation skillId = data.slot(slotIndex);
