@@ -38,6 +38,7 @@ public final class ProjectZero {
     public ProjectZero(FMLJavaModLoadingContext context) {
         IEventBus modBus = context.getModEventBus();
         ModDataComponents.DATA_COMPONENTS.register(modBus);
+        com.projectzero.registry.ModNature.init();
         ModBlocks.BLOCKS.register(modBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modBus);
         ModItems.ITEMS.register(modBus);

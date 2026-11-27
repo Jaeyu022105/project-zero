@@ -140,5 +140,9 @@
   "key.projectzero.cycle_preset": "Next Skill Preset",
   "screen.projectzero.skills": "Skills",
   "biome.projectzero.capwood": "Capwood",
-  "biome.projectzero.elderwood": "Elderwood"
+  "biome.projectzero.elderwood": "Elderwood",
+  "block.projectzero.glowcap_gills": "Glowcap Gills",
+  "block.projectzero.violet_cap": "Violet Cap",
+  "biome.projectzero.sky_pillars": "Sky Pillars",
+  "biome.projectzero.skyfall_isles": "Skyfall Isles"
 }

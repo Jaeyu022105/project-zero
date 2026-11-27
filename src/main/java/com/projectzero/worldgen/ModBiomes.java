@@ -17,6 +17,10 @@ public final class ModBiomes {
     public static final ResourceKey<Biome> CAPWOOD = key("capwood");
     /** Elven woods: giant pale elder trees with leaf-cloud crowns and glowing berry vines, birch between them. */
     public static final ResourceKey<Biome> ELDERWOOD = key("elderwood");
+    /** Sheer stone pillars over misty green valleys, pines and vines on top. */
+    public static final ResourceKey<Biome> SKY_PILLARS = key("sky_pillars");
+    /** Floating islands with waterfalls over lush flowered land. */
+    public static final ResourceKey<Biome> SKYFALL_ISLES = key("skyfall_isles");
 
     private static ResourceKey<Biome> key(String name) {
         return ResourceKey.create(Registries.BIOME, ProjectZero.id(name));

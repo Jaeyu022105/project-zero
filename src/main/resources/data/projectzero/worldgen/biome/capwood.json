@@ -8,12 +8,12 @@
   },
   "downfall": 0.9,
   "effects": {
-    "fog_color": 11904731,
-    "sky_color": 9413352,
-    "water_color": 4874192,
+    "fog_color": 10783446,
+    "sky_color": 10135280,
+    "water_color": 5918672,
     "water_fog_color": 1055290,
-    "grass_color": 6197068,
-    "foliage_color": 5209925,
+    "grass_color": 8032090,
+    "foliage_color": 7244362,
     "particle": {
       "options": {
         "type": "minecraft:spore_blossom_air"
@@ -85,15 +85,12 @@
       "minecraft:spring_lava"
     ],
     [
-      "minecraft:glow_lichen",
       "projectzero:capwood_moss",
       "projectzero:capwood_small_mushrooms",
-      "minecraft:patch_grass_forest",
+      "projectzero:mega_mushroom",
       "projectzero:capwood_giant_mushrooms",
-      "projectzero:capwood_trees",
-      "minecraft:brown_mushroom_normal",
-      "minecraft:red_mushroom_normal",
-      "minecraft:patch_sugar_cane"
+      "projectzero:fern_carpet",
+      "projectzero:moss_floor"
     ],
     [
       "minecraft:freeze_top_layer"

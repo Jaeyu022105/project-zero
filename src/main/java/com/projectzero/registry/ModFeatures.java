@@ -29,4 +29,14 @@ public final class ModFeatures {
     /** Half-buried boulder of the configured block. */
     public static final RegistryObject<Feature<net.minecraft.world.level.levelgen.feature.configurations.BlockStateConfiguration>> BOULDER =
             FEATURES.register("boulder", com.projectzero.worldgen.BoulderFeature::new);
+
+    /** Giant 28-48 block mushrooms with glowing gills (Capwood). */
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> MEGA_MUSHROOM =
+            FEATURES.register("mega_mushroom", com.projectzero.worldgen.MegaMushroomFeature::new);
+    /** Sheer stone pillars with pines on top (Sky Pillars). */
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> STONE_SPIRE =
+            FEATURES.register("stone_spire", com.projectzero.worldgen.StoneSpireFeature::new);
+    /** Floating islands with hanging vines and waterfalls (Skyfall Isles). */
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> FLOATING_ISLAND =
+            FEATURES.register("floating_island", com.projectzero.worldgen.FloatingIslandFeature::new);
 }

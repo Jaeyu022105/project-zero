@@ -20,6 +20,8 @@ public final class ModCreativeTabs {
                     .icon(() -> new ItemStack(ModItems.AWAKENING_SHARD.get()))
                     .displayItems((params, output) -> {
                         output.accept(ModItems.AWAKENING_STONE.get());
+                        output.accept(ModNature.GLOWCAP_GILLS.get());
+                        output.accept(ModNature.VIOLET_CAP.get());
                         output.accept(ModItems.AWAKENING_SHARD.get());
                         output.accept(ModItems.SHARD_VESSEL.get());
                         output.accept(ModItems.SKILLBOOK.get());

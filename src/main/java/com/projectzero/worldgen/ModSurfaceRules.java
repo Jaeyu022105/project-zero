@@ -13,11 +13,11 @@ public final class ModSurfaceRules {
     private static final SurfaceRules.RuleSource COARSE_DIRT = SurfaceRules.state(Blocks.COARSE_DIRT.defaultBlockState());
 
     public static SurfaceRules.RuleSource rules() {
-        // Capwood: mycelium drifts and podzol patches over the grass, with a little coarse dirt.
+        // Capwood: mostly mycelium, with podzol and coarse dirt where the surface noise dips.
         SurfaceRules.RuleSource capwoodFloor = SurfaceRules.sequence(
-                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.12D), MYCELIUM),
-                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.25D), PODZOL),
-                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.45D), COARSE_DIRT));
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.30D), MYCELIUM),
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.55D), PODZOL),
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.70D), COARSE_DIRT));
         SurfaceRules.RuleSource capwood = SurfaceRules.ifTrue(SurfaceRules.isBiome(ModBiomes.CAPWOOD),
                 SurfaceRules.ifTrue(SurfaceRules.abovePreliminarySurface(),
                         SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR,

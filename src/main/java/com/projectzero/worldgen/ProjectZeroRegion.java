@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * and the world still feels like Minecraft. Weight sets how much of the world uses this region.
  */
 public class ProjectZeroRegion extends Region {
-    public static final int WEIGHT = 6;
+    public static final int WEIGHT = 30;   // vanilla's own region is 10: ours covers about three quarters of the world
 
     public ProjectZeroRegion(ResourceLocation name) {
         super(name, RegionType.OVERWORLD, WEIGHT);
@@ -30,6 +30,12 @@ public class ProjectZeroRegion extends Region {
             builder.replaceBiome(Biomes.DARK_FOREST, ModBiomes.CAPWOOD);
             builder.replaceBiome(Biomes.BIRCH_FOREST, ModBiomes.ELDERWOOD);
             builder.replaceBiome(Biomes.OLD_GROWTH_BIRCH_FOREST, ModBiomes.ELDERWOOD);
+            builder.replaceBiome(Biomes.WINDSWEPT_HILLS, ModBiomes.SKY_PILLARS);
+            builder.replaceBiome(Biomes.WINDSWEPT_FOREST, ModBiomes.SKY_PILLARS);
+            builder.replaceBiome(Biomes.WINDSWEPT_GRAVELLY_HILLS, ModBiomes.SKY_PILLARS);
+            builder.replaceBiome(Biomes.MEADOW, ModBiomes.SKYFALL_ISLES);
+            builder.replaceBiome(Biomes.SPARSE_JUNGLE, ModBiomes.SKYFALL_ISLES);
+            builder.replaceBiome(Biomes.FLOWER_FOREST, ModBiomes.SKYFALL_ISLES);
         });
     }
 }
