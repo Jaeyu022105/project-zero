@@ -203,6 +203,10 @@ Our own mechanic, not in Solo Leveling.
   - Sword and axe swings become a diagonal slice with a faint swipe arc.
   - Sprinting adds a slight forward lean.
   - First person moves the held item to match.
+  - Every movement is animated in third and first person: stride bob and twist, sprint pump and lean, idle breathing, jump, fall, landing squash, crouch, and turn lag.
+  - The sword combo is forehand, backhand, overhead chop, then thrust. It resets after 16 ticks without a click.
+  - The slash trail traces the real blade tip.
+  - **Owner rule:** all our future mobs ship with full movement and attack animation sets (game-feel skill §8).
 - **[Idea]** A dodge dash with i-frames needs the owner's approval. There is no separate stamina bar; cooldowns and mana are the commitment cost.
 
 ## 11. The System's feel (UI and messages)

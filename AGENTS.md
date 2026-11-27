@@ -27,6 +27,10 @@ Shared instructions for every AI agent working on this repo (Claude, Gemini, Cod
 
 The owner works with several AI chats at once. One acts as **adviser/reviewer**: it critiques work and writes the exact instructions ("commands") for the builder chats. Builder chats implement. If you are a builder, follow the reviewer's instructions, but push back with reasons when something conflicts with this file or the design doc.
 
+## 4b. Owner rule: everything is animated
+
+Every movement of the player is animated in third **and** first person: walk, run, jump, land, crouch, idle, turn, attacks and skills. Every mob we add, in dungeons or the overworld, ships with a full movement and attack animation set and a blood type. The specifics are in `.agents/skills/game-feel/SKILL.md` §8.
+
 ## 5. Skills index (`.agents/skills/`)
 
 | Skill | Use it when |

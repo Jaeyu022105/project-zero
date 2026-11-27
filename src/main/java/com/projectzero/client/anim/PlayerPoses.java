@@ -65,6 +65,24 @@ public final class PlayerPoses {
             k(0.50F, -1.0F, -0.9F, 0.1F, 0.2F, 0F, -0.2F, -0.40F, 3F, -0.35F, -0.08F, -0.15F, -10, -55, 35),
             k(0.85F, -0.9F, -0.9F, 0.1F, 0.2F, 0F, -0.2F, -0.40F, 2F, -0.35F, -0.08F, -0.15F, -10, -55, 35)};
 
+    /** Combo step 2: backhand, from low left rising to high right. */
+    public static final Key[] SWING_BACK = {
+            k(0.10F, -1.2F, -1.0F, 0.1F, 0.2F, 0F, -0.2F, -0.40F, 0F, -0.30F, -0.08F, -0.05F, -10, -50, 35),
+            k(0.50F, -2.0F, 0.9F, 0.5F, -0.3F, 0F, -0.1F, 0.40F, 2F, 0.30F, 0.15F, -0.10F, 15, 50, -35),
+            k(0.85F, -1.9F, 0.9F, 0.5F, -0.3F, 0F, -0.1F, 0.40F, 1F, 0.30F, 0.15F, -0.10F, 15, 50, -35)};
+    /** Combo step 3: overhead chop straight down. */
+    public static final Key[] SWING_CHOP = {
+            k(0.12F, -3.0F, 0.1F, 0.1F, -0.6F, 0F, -0.2F, 0F, -3F, 0F, 0.28F, 0.10F, 50, 0, -10),
+            k(0.50F, -0.6F, -0.1F, 0F, 0.3F, 0F, -0.2F, 0F, 7F, -0.05F, -0.25F, -0.20F, -75, 0, 5),
+            k(0.85F, -0.5F, -0.1F, 0F, 0.3F, 0F, -0.2F, 0F, 6F, -0.05F, -0.25F, -0.20F, -75, 0, 5)};
+    /** Combo step 4: pull back and thrust. */
+    public static final Key[] SWING_THRUST = {
+            k(0.15F, -1.3F, 0.2F, 0.1F, -0.4F, 0F, -0.2F, 0.45F, -2F, 0.05F, -0.02F, 0.15F, -50, 0, 0),
+            k(0.45F, -1.6F, -0.05F, 0F, 0.4F, 0F, -0.2F, -0.35F, 6F, -0.10F, 0.05F, -0.45F, -60, 0, 0),
+            k(0.85F, -1.55F, -0.05F, 0F, 0.4F, 0F, -0.2F, -0.35F, 5F, -0.10F, 0.05F, -0.45F, -60, 0, 0)};
+    /** The blade combo, in order. Spamming walks through it; a pause resets to the first slash. */
+    public static final Key[][] COMBO = {SWING, SWING_BACK, SWING_CHOP, SWING_THRUST};
+
     public static Key[] keys(PlayerAnim anim) {
         return switch (anim) {
             case SLASH -> SLASH; case SLAM -> SLAM; case PUNCH -> PUNCH; case THROW -> THROW; case GUARD -> GUARD;

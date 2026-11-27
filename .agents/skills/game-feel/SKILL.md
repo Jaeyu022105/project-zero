@@ -95,6 +95,39 @@ Keep it Minecraft:
 - **Telegraphs:** keyframed wind-up poses plus a charge sound. An Fx.inflow pull toward the attacker is allowed, because it is part of the attack itself, not a separate warning.
 - **Sound:** register our own SoundEvents in sounds.json, with separate swing, impact and charge sounds. Play impact sounds from the server on the hit tick, at the victim's position.
 
+## 8. Everything moves (owner rule, 2026-11-27)
+
+Every movement is animated, even ordinary ones, and players see it **in first person too**.
+
+**Player** (built, in `client/anim/`):
+- `AnimatedPlayerModel`:
+  - Stride bob and torso counter-twist.
+  - Sprint arm pump.
+  - Idle breathing.
+  - Jump tuck and fall reach.
+  - A landing knee-give, scaled by how far you fell.
+- `PlayerAnimEvents`:
+  - Sprint lean and landing squash.
+  - First-person hand motion: stride swing, sprint pump, jump lift, landing dip, crouch sink, breathing, and turn lag.
+- `MoveState`: per-player blends, so nothing pops.
+- Blade combo (`PlayerPoses.COMBO`): forehand, backhand, overhead chop, thrust.
+  - Clicks within 16 ticks continue the chain. A pause resets it.
+  - Each step starts where the last one ended.
+- `BladeTrail`: the slash trail follows the actual blade tip, not a fixed arc.
+  - It is sampled every frame through the same transforms used to draw the sword.
+  - Third person records in world space; first person records in hand space.
+  - New weapons only need to set their hilt and tip points if their shape differs from a sword.
+
+**Every new mob must ship with:**
+- Idle: breathing or a weight shift, plus a look-around now and then.
+- Walk and run cycles with body bob (twice per cycle) and counter-twist. Running leans in.
+- Jump or leap: crouch, launch, tuck, land with a knee-give.
+- Hurt flinch toward the hit direction (on top of the white flash). Bosses only flinch on heavy hits or stagger.
+- Death: a short fall or collapse pose before vanilla's tip-over or our own dissolve.
+- Every attack in the five phases (§1), with readable wind-up poses (no warning overlays).
+- A blood type in `EnemyReactions.bloodOf` and, for bosses, a `pz_boss_kind`.
+- Model-part rotations, blended with smoothing state like `MoveState`. Never snap from one pose to another.
+
 ## 7. Checklist before calling an attack done
 
 - [ ] All five phases exist. Signal + strike is at least 7 ticks for enemy attacks.

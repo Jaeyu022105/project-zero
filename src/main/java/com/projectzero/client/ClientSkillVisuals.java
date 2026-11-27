@@ -46,6 +46,8 @@ public final class ClientSkillVisuals {
         public int age;
         /** Facing locked on first draw (slash arcs); NaN until then. */
         public float yaw = Float.NaN;
+        /** Slash arcs: 0 forehand (right to left), 1 backhand (left to right), 2 overhead chop. */
+        public int variant;
 
         Visual(int entityId, Kind kind, int rgb, int total) {
             this.entityId = entityId;
@@ -62,12 +64,14 @@ public final class ClientSkillVisuals {
 
     private static final List<Visual> ACTIVE = new ArrayList<>();
 
-    public static void add(int entityId, int kind, int rgb, int ticks) {
+    public static Visual add(int entityId, int kind, int rgb, int ticks) {
         Kind k = Kind.byId(kind);
         // One bubble per entity: a recast refreshes it.
         if (k == Kind.BUBBLE || k == Kind.HIT_FLASH || k == Kind.SHAKE || k == Kind.PUNCH || k == Kind.ANIM || k == Kind.MARK || k == Kind.TAG)
             ACTIVE.removeIf(v -> v.entityId == entityId && v.kind == k);
-        ACTIVE.add(new Visual(entityId, k, rgb, ticks));
+        Visual v = new Visual(entityId, k, rgb, ticks);
+        ACTIVE.add(v);
+        return v;
     }
 
     public static List<Visual> active() {

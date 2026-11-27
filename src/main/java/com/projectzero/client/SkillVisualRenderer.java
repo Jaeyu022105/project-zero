@@ -39,7 +39,6 @@ public final class SkillVisualRenderer {
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) return;
-        if (ClientSkillVisuals.active().isEmpty()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
         float partial = mc.getTimer().getGameTimeDeltaPartialTick(false);
@@ -49,6 +48,7 @@ public final class SkillVisualRenderer {
         PoseStack pose = new PoseStack();
         pose.mulPose(event.getPoseStack());
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
+        com.projectzero.client.anim.BladeTrail.renderWorld(pose, buffers, cam);
 
         for (ClientSkillVisuals.Visual v : ClientSkillVisuals.active()) {
             Entity e = mc.level.getEntity(v.entityId);
@@ -63,7 +63,7 @@ public final class SkillVisualRenderer {
                 case BUBBLE -> bubble(pose, buffers, e, life, v.age + partial, r, g, b);
                 case SLASH -> {
                     if (Float.isNaN(v.yaw)) v.yaw = e.getViewYRot(partial);
-                    slash(pose, buffers, e, v.yaw, life, r, g, b);
+                    slash(pose, buffers, e, v.yaw, v.variant, life, r, g, b);
                 }
                 case TAG -> tag(pose, buffers, mc, e, life, v.rgb == 1);
                 default -> {}
@@ -107,18 +107,19 @@ public final class SkillVisualRenderer {
      * across in the first 35% of life, alpha is 0 at the tail and full at the leading edge, then the
      * whole arc fades. Additive (eyes), so darker = more transparent.
      */
-    private static void slash(PoseStack pose, MultiBufferSource buffers, Entity e, float yaw, float life,
+    private static void slash(PoseStack pose, MultiBufferSource buffers, Entity e, float yaw, int variant, float life,
                               float r, float g, float b) {
         float sweep = Math.min(1F, life / 0.35F);
         sweep = 1F - (1F - sweep) * (1F - sweep) * (1F - sweep);          // ease out: fast start, settles
         float fade = life < 0.35F ? 1F : 1F - (life - 0.35F) / 0.65F;
-        float from = -80F, lead = Mth.lerp(sweep, from, 80F);
+        // Forehand sweeps right to left (matching the arm), backhand left to right, chop top to bottom.
+        float from = variant == 1 ? -80F : 80F, to = -from, lead = Mth.lerp(sweep, from, to);
         float tail = Mth.lerp(Math.max(0F, (life - 0.2F) / 0.8F), from, lead);  // tail chases the lead
-        if (lead - tail < 1F || fade <= 0F) return;
+        if (Math.abs(lead - tail) < 1F || fade <= 0F) return;
         float inner = 1.0F + e.getBbWidth() * 0.5F, outer = inner + 1.1F;
         pose.translate(0, e.getBbHeight() * 0.6, 0);
         pose.mulPose(Axis.YP.rotationDegrees(-yaw));
-        pose.mulPose(Axis.ZP.rotationDegrees(-14F));                       // slight diagonal tilt
+        pose.mulPose(Axis.ZP.rotationDegrees(variant == 1 ? 22F : variant == 2 ? -84F : -18F));  // diagonal / vertical
         VertexConsumer vc = buffers.getBuffer(RenderType.eyes(SLASH));
         PoseStack.Pose p = pose.last();
         int seg = 20;
