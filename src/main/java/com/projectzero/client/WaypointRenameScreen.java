@@ -37,13 +37,16 @@ public final class WaypointRenameScreen extends Screen {
         onClose();
     }
 
-    @Override public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        renderBackground(g, mouseX, mouseY, partialTick);
+    @Override public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(g, mouseX, mouseY, partialTick);
         g.fill(left - 2, top - 2, left + panelW + 2, top + 96, 0x553FD0FF);
         g.fill(left, top, left + panelW, top + 94, PANEL);
         g.renderOutline(left, top, panelW, 94, BORDER);
-        g.drawCenteredString(font, title.getString().toUpperCase(), left + panelW / 2, top + 10, LABEL);
+    }
+
+    @Override public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
+        g.drawCenteredString(font, title.getString().toUpperCase(), left + panelW / 2, top + 10, LABEL);
     }
 
     @Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {

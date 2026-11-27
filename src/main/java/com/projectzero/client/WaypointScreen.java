@@ -30,11 +30,15 @@ public final class WaypointScreen extends Screen {
 
     private int visibleRows() { return Math.max(1, (panelH - 54) / 27); }
 
-    @Override public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        renderBackground(g, mouseX, mouseY, partialTick);
+    @Override public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(g, mouseX, mouseY, partialTick);
         g.fill(left - 2, top - 2, left + panelW + 2, top + panelH + 2, 0x553FD0FF);
         g.fill(left, top, left + panelW, top + panelH, PANEL);
         g.renderOutline(left, top, panelW, panelH, BORDER);
+    }
+
+    @Override public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
         g.drawCenteredString(font, title.getString().toUpperCase(), left + panelW / 2, top + 10, LABEL);
         g.fill(left + 10, top + 25, left + panelW - 10, top + 26, 0x803FD0FF);
         List<WaypointService.Entry> entries = ClientWaypointCache.entries();
@@ -59,7 +63,6 @@ public final class WaypointScreen extends Screen {
                     entry.valid() ? GOLD : MUTED);
         }
         g.drawCenteredString(font, Component.translatable("screen.projectzero.waypoints.close"), left + panelW / 2, top + panelH - 16, MUTED);
-        super.render(g, mouseX, mouseY, partialTick);
     }
 
     @Override public boolean mouseClicked(double mouseX, double mouseY, int button) {

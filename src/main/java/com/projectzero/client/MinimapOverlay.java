@@ -302,6 +302,13 @@ public final class MinimapOverlay {
             drawMarker(g, x + size / 2, y + size / 2, radius, dx, dz, marker.rank().argb(),
                     marker.broken(), mc.level.getGameTime());
         }
+        for (var waypoint : ClientWaypointCache.entries()) {
+            if (!waypoint.valid() || !waypoint.dimension().equals(mc.level.dimension().location())) continue;
+            BlockPos pos = BlockPos.of(waypoint.pos());
+            int dx = Math.round((pos.getX() - mc.player.blockPosition().getX()) / (float) zoom);
+            int dz = Math.round((pos.getZ() - mc.player.blockPosition().getZ()) / (float) zoom);
+            drawWaypointMarker(g, x + size / 2, y + size / 2, radius, dx, dz);
+        }
         for (var other : mc.level.players()) {
             if (other == mc.player || other.isSpectator()) continue;
             int dx = (int) Math.round((other.getX() - mc.player.getX()) / zoom);
@@ -363,5 +370,17 @@ public final class MinimapOverlay {
         g.fill(1, -4, 5, -1, color);
         g.fill(1, 1, 5, 4, color);
         g.pose().popPose();
+    }
+
+    private static void drawWaypointMarker(GuiGraphics g, int cx, int cy, int radius, int dx, int dz) {
+        if (dx * dx + dz * dz > radius * radius) {
+            drawMarker(g, cx, cy, radius, dx, dz, 0xFF55E8FF, false, 0L);
+            return;
+        }
+        int px = cx + dx, py = cy + dz;
+        int color = 0xFF55E8FF;
+        g.fill(px, py - 2, px + 1, py - 1, color);
+        g.fill(px - 1, py - 1, px + 2, py + 1, color);
+        g.fill(px, py + 1, px + 1, py + 2, color);
     }
 }
