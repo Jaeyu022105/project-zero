@@ -40,7 +40,6 @@ public class ProjectZeroRegion extends Region {
             builder.replaceBiome(Biomes.SPARSE_JUNGLE, ModBiomes.SKY_PILLARS);
             builder.replaceBiome(Biomes.BAMBOO_JUNGLE, ModBiomes.SKY_PILLARS);
             builder.replaceBiome(Biomes.MEADOW, ModBiomes.SKYFALL_ISLES);
-            builder.replaceBiome(Biomes.FLOWER_FOREST, ModBiomes.SKYFALL_ISLES);
             builder.replaceBiome(Biomes.TAIGA, ModBiomes.CLOUD_FOREST);
             builder.replaceBiome(Biomes.SAVANNA, ModBiomes.BAOBAB_SAVANNA);
             builder.replaceBiome(Biomes.SAVANNA_PLATEAU, ModBiomes.BAOBAB_SAVANNA);

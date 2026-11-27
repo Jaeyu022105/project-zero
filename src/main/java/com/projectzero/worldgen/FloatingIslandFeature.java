@@ -29,6 +29,13 @@ public class FloatingIslandFeature extends Feature<NoneFeatureConfiguration> {
     public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> ctx) {
         WorldGenLevel level = ctx.level();
         RandomSource r = ctx.random();
+        // Islands belong to the Skyfall Isles alone: skip any that would hang over a neighbouring biome.
+        BlockPos o = ctx.origin();
+        for (int i = 0; i < 8; i++) {
+            double a = i * Math.PI / 4;
+            BlockPos edge = o.offset((int) Math.round(Math.cos(a) * (REACH + 6)), 0, (int) Math.round(Math.sin(a) * (REACH + 6)));
+            if (!level.getBiome(edge).is(ModBiomes.SKYFALL_ISLES)) return false;
+        }
         int lift = 35 + r.nextInt(76);
         BlockPos c = ctx.origin().above(lift);
         if (c.getY() + 12 >= level.getMaxBuildHeight()) return false;
