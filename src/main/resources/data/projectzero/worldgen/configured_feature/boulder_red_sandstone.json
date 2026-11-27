@@ -1,0 +1,8 @@
+{
+  "type": "projectzero:boulder",
+  "config": {
+    "state": {
+      "Name": "minecraft:red_sandstone"
+    }
+  }
+}

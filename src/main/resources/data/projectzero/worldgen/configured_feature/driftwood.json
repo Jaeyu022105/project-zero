@@ -1,0 +1,11 @@
+{
+  "type": "projectzero:fallen_log",
+  "config": {
+    "state": {
+      "Name": "minecraft:stripped_oak_log",
+      "Properties": {
+        "axis": "y"
+      }
+    }
+  }
+}

@@ -22,4 +22,11 @@ public final class ModFeatures {
     /** Giant elven-style tree for the Elderwood (see worldgen/ElderTreeFeature). */
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> ELDER_TREE =
             FEATURES.register("elder_tree", com.projectzero.worldgen.ElderTreeFeature::new);
+
+    /** Fallen tree trunk with an optional stump; the log block comes from the config. */
+    public static final RegistryObject<Feature<net.minecraft.world.level.levelgen.feature.configurations.BlockStateConfiguration>> FALLEN_LOG =
+            FEATURES.register("fallen_log", com.projectzero.worldgen.FallenLogFeature::new);
+    /** Half-buried boulder of the configured block. */
+    public static final RegistryObject<Feature<net.minecraft.world.level.levelgen.feature.configurations.BlockStateConfiguration>> BOULDER =
+            FEATURES.register("boulder", com.projectzero.worldgen.BoulderFeature::new);
 }
