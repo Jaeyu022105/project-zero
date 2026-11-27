@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -151,17 +152,29 @@ public final class GateService {
         }
         long now = level.getGameTime();
         if (!level.getGameRules().getBoolean(GateRules.RULE_GATE_AGING)) {
-            // Pause aging progress while the gamerule is off so toggling it back on doesn't jump ahead.
-            if (anchorBe.lastAgeCheck() > 0L && now > anchorBe.lastAgeCheck()) {
-                long pausedTicks = now - anchorBe.lastAgeCheck();
-                shiftPortalOpenTime(level, anchorPos, anchorBe, pausedTicks);
+            // Accumulate paused ticks in memory and only flush once per AGING_CHECK_INTERVAL_TICKS.
+            long paused = anchorBe.recordPausedAgingStep(now);
+            if (paused >= GateRules.AGING_CHECK_INTERVAL_TICKS) {
+                flushPausedAgingTicks(level, anchorPos, anchorBe, now);
             }
-            anchorBe.setLastAgeCheck(now);
             return;
+        }
+        anchorBe.markAgingActiveTick(now);
+        if (anchorBe.pausedAgingTicks() > 0L) {
+            flushPausedAgingTicks(level, anchorPos, anchorBe, now);
         }
         if (now - anchorBe.lastAgeCheck() < GateRules.AGING_CHECK_INTERVAL_TICKS) return;
         anchorBe.setLastAgeCheck(now);
         evaluateAging(level, anchorPos, state, anchorBe);
+    }
+
+    private static void flushPausedAgingTicks(ServerLevel level, BlockPos anchorPos, GateBlockEntity anchorBe, long now) {
+        long paused = anchorBe.pausedAgingTicks();
+        anchorBe.clearPausedAgingTicks();
+        if (paused > 0L) {
+            shiftPortalOpenTime(level, anchorPos, anchorBe, paused);
+        }
+        anchorBe.setLastAgeCheck(now);
     }
 
     /** Evaluates elapsed open time against surge and rank-up thresholds immediately. */
@@ -170,6 +183,9 @@ public final class GateService {
         if (!level.getGameRules().getBoolean(GateRules.RULE_GATE_AGING)) return;
 
         long now = level.getGameTime();
+        if (anchorBe.pausedAgingTicks() > 0L) {
+            flushPausedAgingTicks(level, anchorPos, anchorBe, now);
+        }
         long cycleTicks = (GateRules.AGING_MAX_SURGES + 1L) * GateRules.AGING_SURGE_TICKS; // 28 days
 
         boolean alongX = detectAlongX(level, anchorPos);
@@ -380,13 +396,35 @@ public final class GateService {
     }
 
     private static void tickDungeonBreak(ServerLevel level, BlockPos anchorPos, BlockState state, GateBlockEntity anchorBe) {
+        long now = level.getGameTime();
         if (!anchorBe.isBreaking()) {
-            anchorBe.setBreakState(true, anchorBe.breakWave(), level.getGameTime());
+            anchorBe.setBreakState(true, anchorBe.breakWave(), now);
         }
         int wave = anchorBe.breakWave();
-        if (wave >= GateRules.BREAK_WAVES) return;
+        if (wave >= GateRules.BREAK_WAVES) {
+            checkMissingBreakBoss(level, anchorPos, state, anchorBe, now);
+            return;
+        }
 
-        long now = level.getGameTime();
+        // Pause the wave timer while no player is within BREAK_PLAYER_RADIUS.
+        if (!hasPlayerWithin(level, anchorPos, GateRules.BREAK_PLAYER_RADIUS)) {
+            if (anchorBe.pausedBreakTicks() == 0L && now > anchorBe.nextWaveTime()) {
+                pushPortalNextWaveTime(level, anchorPos, anchorBe, now);
+            }
+            long paused = anchorBe.recordPausedBreakStep(now);
+            if (paused >= GateRules.AGING_CHECK_INTERVAL_TICKS) {
+                anchorBe.clearPausedBreakTicks();
+                pushPortalNextWaveTime(level, anchorPos, anchorBe, anchorBe.nextWaveTime() + paused);
+            }
+            return;
+        }
+
+        anchorBe.markBreakActiveTick(now);
+        if (anchorBe.pausedBreakTicks() > 0L) {
+            long pushed = anchorBe.nextWaveTime() + anchorBe.pausedBreakTicks();
+            anchorBe.clearPausedBreakTicks();
+            pushPortalNextWaveTime(level, anchorPos, anchorBe, pushed);
+        }
         if (now < anchorBe.nextWaveTime()) return;
 
         DungeonSavedData.DungeonRecord rec = ensureRecord(level, anchorBe, state);
@@ -407,6 +445,81 @@ public final class GateService {
 
         spawnBreakWave(level, anchorPos, rec, anchorBe.rank(), size, anchorBe.surges(),
                 state.getValue(GateBlock.SEA), nextWave);
+    }
+
+    private static void pushPortalNextWaveTime(ServerLevel level, BlockPos anchorPos, GateBlockEntity anchorBe, long nextWaveTime) {
+        boolean alongX = detectAlongX(level, anchorPos);
+        GateSize size = anchorBe.size();
+        for (int w = 0; w < size.portalWidth(); w++) {
+            for (int h = 0; h < size.portalHeight(); h++) {
+                BlockPos p = alongX ? anchorPos.offset(w, h, 0) : anchorPos.offset(0, h, w);
+                if (level.getBlockEntity(p) instanceof GateBlockEntity be) {
+                    be.setNextWaveTime(nextWaveTime);
+                }
+            }
+        }
+    }
+
+    private static void checkMissingBreakBoss(ServerLevel level, BlockPos anchorPos, BlockState state,
+                                              GateBlockEntity anchorBe, long now) {
+        if (anchorBe.bossRespawned()) return;
+        if (!hasPlayerWithin(level, anchorPos, GateRules.BREAK_PLAYER_RADIUS)) {
+            anchorBe.resetBossCheckClock(now);
+            return;
+        }
+        long elapsed = anchorBe.consumeBossCheckElapsed(now, 20L);
+        if (elapsed <= 0L) return;
+
+        DungeonSavedData.DungeonRecord rec = ensureRecord(level, anchorBe, state);
+        if (rec == null || rec.cleared) return;
+
+        if (hasLivingSlotBossWithin(level, anchorPos, rec.slot, GateRules.BREAK_BOSS_CHECK_RADIUS)) {
+            anchorBe.resetMissingBossTicks();
+            return;
+        }
+
+        long missing = anchorBe.addMissingBossTicks(elapsed);
+        if (missing < GateRules.BREAK_BOSS_MISSING_TICKS) return;
+
+        anchorBe.resetMissingBossTicks();
+        GateSize size = anchorBe.size();
+        for (int w = 0; w < size.portalWidth(); w++) {
+            for (int h = 0; h < size.portalHeight(); h++) {
+                BlockPos p = rec.alongX ? anchorPos.offset(w, h, 0) : anchorPos.offset(0, h, w);
+                if (level.getBlockEntity(p) instanceof GateBlockEntity be) {
+                    be.setBossRespawned(true);
+                }
+            }
+        }
+
+        Vec3 bossPos = breakSpawnSpot(level, anchorPos, level.getRandom());
+        Mob boss = GateDungeonArena.createGateBoss(level, rec.slot, anchorBe.rank(),
+                state.getValue(GateBlock.SEA), bossPos);
+        if (boss != null) {
+            ServerPlayer nearestTarget = level.players().stream()
+                    .filter(p -> !p.isSpectator() && p.isAlive()
+                            && p.blockPosition().closerThan(anchorPos, GateRules.AGING_MESSAGE_RADIUS))
+                    .min(Comparator.comparingDouble(p -> p.distanceToSqr(Vec3.atCenterOf(anchorPos))))
+                    .orElse(null);
+            if (nearestTarget != null) boss.setTarget(nearestTarget);
+            level.addFreshEntity(boss);
+            ProjectZero.LOGGER.warn(
+                    "Dungeon Break boss for slot {} ({}-Rank gate at {}) was missing for 60s; respawned boss once at {}",
+                    rec.slot, anchorBe.rank(), anchorPos, boss.blockPosition());
+        }
+    }
+
+    private static boolean hasLivingSlotBossWithin(ServerLevel level, BlockPos anchorPos, int slot, double radius) {
+        Vec3 center = Vec3.atCenterOf(anchorPos);
+        double r2 = radius * radius;
+        AABB box = new AABB(center, center).inflate(radius);
+        return !level.getEntitiesOfClass(LivingEntity.class, box, e ->
+                e.isAlive()
+                        && e.position().distanceToSqr(center) <= r2
+                        && e.getPersistentData().getBoolean(MobScaling.GATE_BOSS_KEY)
+                        && e.getPersistentData().contains(GateDungeonArena.DUNGEON_SLOT_KEY)
+                        && e.getPersistentData().getInt(GateDungeonArena.DUNGEON_SLOT_KEY) == slot
+        ).isEmpty();
     }
 
     private static void spawnBreakWave(ServerLevel level, BlockPos anchorPos, DungeonSavedData.DungeonRecord rec,
