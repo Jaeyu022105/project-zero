@@ -78,6 +78,7 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Titles & Milestones (`titles/`): `MilestoneTracker` (`projectzero:milestones` NBT) tracks kills per entity type/tag, total kills, boss kills, deaths, highest level, rerolls, and gates cleared. 6 starter JSON titles in `data/projectzero/titles/*.json` (`wolf_slayer`, `hundred_cuts`, `undead_bane`, `survivor`, `giant_killer` granting milestone skill `colossus_breaker`, `awakened_one`). Equipped title (`projectzero:titles` NBT) applies transient attributes, stat bonuses, damage-vs-entity/tag multipliers, or XP bonuses, and cycles on click in `StatusScreen`.
 - Equipment & Accessories (`equipment/`): 8 active custom slots (`gauntlets`, `ring` Ã—2, `amulet`, `earrings`, `belt`, `charm` Ã—2) + 1 spare locked `relic` slot (`PlayerAccessories` in `projectzero:accessories` NBT; copied on clone, dropped on death only when `keepInventory` is false). 9 starter `AccessoryItem`s (`iron_gauntlets`, `copper_ring`, `silver_ring`, `gold_ring`, `bone_amulet`, `obsidian_earrings`, `leather_belt`, `hunter_charm`, `mana_charm`) with rolled `AccessoryData` component (rarity, `GateRank` E..S, flat stats, optional `crit_chance`/`mana_regen`/`lifesteal`/`xp_bonus`/`damage_vs_undead` affix), `AccessoryMenu` + `AccessoryScreen`, and `AccessoryLootModifier` (1.5% vanilla hostile, 3% modded, 8% gate monster, 100% boss).
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
+- Top-right minimap (`client/MinimapOverlay`): client-only dynamic terrain texture updated 12 rows per tick, loaded-chunk-only gate scan every 20 ticks, nearby player dots, objective-marker hook, biome tint and name, coordinates, and cave-floor sampling in ceiling/dungeon dimensions. Options are under `ui.minimap`, `ui.minimapSize`, `ui.minimapZoom`, and `ui.minimapCoords`.
 - Data saved with the player and kept on death (accessories follow `keepInventory`).
 - Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`, `/pz gate spawn <rank> <size> [sea|ancient]`, `/pz gate leave`, `/pz gate age <days>`, `/pz gate break`.
 
@@ -211,6 +212,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 - Move `LevelingRules` numbers into a Forge config file so they can be tuned without rebuilding.
 - HUD: small level / XP / mana display.
+- Minimap follow-ups: connect Association quests and discovered waypoint stones/civilizations; implement the full-screen map (§11).
 - Data storage: move from persistent NBT to a capability if player data gets large.
 
 ### Low Priority / Nice To Have
@@ -1041,5 +1043,26 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 **Remaining Recommendations**
 1. In-game check of each new feature in a new world (floating parts, chunk seams).
 2. Still to polish: Sky Pillars, Skyfall Isles, Tsingy, Karst Tower Bay.
+
+---
+
+### Session Log — 2026-11-28 (Codex 2: minimap)
+
+**Context & Direction Check**
+- Implemented the first top-right minimap from `.agents/prompts/codex-2.md` in three staged checkpoints. Stayed on `codex/2-minimap`; client-only work, no new dependency, no translation-file changes.
+
+**Changes Made**
+- `src/main/java/com/projectzero/client/MinimapOverlay.java`: round north-up terrain view with a rotating player arrow, height and water shading, rank-colored gate dots and rim arrows, broken-gate pulse, other-player dots, objective hook, biome tint, coordinate/biome line, and cave-layer sampling. Gate discovery scans only already-loaded chunks every 20 ticks; map texture refreshes in slices.
+- `src/main/java/com/projectzero/config/ClientConfig.java`: `ui.minimap` (true), `ui.minimapSize` (64, 48–128), `ui.minimapZoom` (1/2/4 blocks per pixel), and `ui.minimapCoords` (true).
+- `DESIGN-DOCUMENT.md` §11 and `PROGRESS.md`: mark the first version built and record remaining map work.
+
+**Verification Executed**
+- `gradlew.bat build` after each of the three implementation stages: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient`: **BUILD SUCCESSFUL**. Opened a new single-player world and confirmed the map and biome/coordinate line rendered. The initial tutorial toast covered the upper part of the map in that first-world view; a clean HUD view without that toast and marker/cave/F1/F3/screen behavior still need owner inspection. No gameplay crashes observed during this check.
+
+**Remaining Recommendations**
+1. Connect accepted Association quests to `MinimapOverlay.setObjective`.
+2. Add waypoint-stone and civilization discovery and a full-screen map.
+3. In `runClient`, inspect the unobstructed map and verify gate/player markers, broken-gate pulse, cave layer, F1/F3/screen hiding, potion-effect spacing, and the 48–128 size and 1/2/4 zoom options.
 
 ---
