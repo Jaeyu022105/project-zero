@@ -13,12 +13,22 @@ public final class ClientConfig {
     public static final ForgeConfigSpec.BooleanValue FALLING_LEAVES;
     public static final ForgeConfigSpec.BooleanValue FIREFLIES;
     public static final ForgeConfigSpec.BooleanValue NOTICE_CHAT_LINES;
+    public static final ForgeConfigSpec.BooleanValue MINIMAP;
+    public static final ForgeConfigSpec.IntValue MINIMAP_SIZE;
+    public static final ForgeConfigSpec.ConfigValue<Integer> MINIMAP_ZOOM;
+    public static final ForgeConfigSpec.BooleanValue MINIMAP_COORDS;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
         b.push("ui");
         NOTICE_CHAT_LINES = b.comment("Also print [System] chat lines for events shown as bottom-right System notices.")
                 .define("noticeChatLines", false);
+        MINIMAP = b.comment("Show the top-right terrain minimap.").define("minimap", true);
+        MINIMAP_SIZE = b.comment("Minimap diameter in GUI pixels (48 to 128).")
+                .defineInRange("minimapSize", 64, 48, 128);
+        MINIMAP_ZOOM = b.comment("World blocks represented by one minimap pixel (1, 2, or 4).")
+                .define("minimapZoom", 1, value -> value instanceof Integer i && (i == 1 || i == 2 || i == 4));
+        MINIMAP_COORDS = b.comment("Show biome and coordinates under the minimap.").define("minimapCoords", true);
         b.pop();
         b.push("feel");
         SCREEN_SHAKE = b.comment("Small camera shake and FOV punch-in on heavy skill hits.")
