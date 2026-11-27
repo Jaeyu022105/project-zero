@@ -44,6 +44,9 @@ public final class GateRules {
     public static final double BREAK_PLAYER_RADIUS = 96.0;           // requires a player within 96 blocks to rupture
     public static final double BREAK_BOSS_CHECK_RADIUS = 64.0;       // living boss check radius after final wave
     public static final int BREAK_BOSS_MISSING_TICKS = 1200;         // 60s missing while player nearby -> respawn once
+    public static final double BREAK_WAVE_SCAN_RADIUS = 128.0;       // radius to check whether current break wave is cleared
+    public static final int STORM_CHECK_INTERVAL_TICKS = 20;         // check wave clear once per second
+    public static final int STORM_PULSE_INTERVAL_TICKS = 15;         // placeholder END_ROD pulse interval while stormable
 
     /** Share of natural (non-sea) gate spawns that come as ancient gates in a stone ring. */
     public static final double ANCIENT_NATURAL_SHARE = 0.1;

@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Reset backlog Task 2: level 100 ceiling, `LevelingService.breakCeiling`, `"no_ceiling"` job flag, and `/pz ceiling` + `/pz level`).
+Last caught up: **2026-11-27** (Reset backlog Task 3: storming a breaking gate, wave pause while inside, and interior boss break containment).
 
 ---
 
@@ -875,6 +875,34 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 **Remaining Recommendations**
 
 1. Task 3: Storm the gate (`GateBlockEntity.stormable`, wave clear detection, wave pause while inside dungeon, boss clear inside/outside).
+
+---
+
+### Session Log — 2026-11-27 (Reset Backlog Task 3: Storm the gate)
+
+**Context & Direction Check**
+
+- Implemented Task 3 of `.agents/prompts/gemini-reset-backlog.md` (`DESIGN-DOCUMENT.md` §9 "Storm the gate"): clearing all monsters of the current break wave steadies the rift (`GateBlockEntity.stormable = true`, synced in update tag + `END_ROD` pulses), unlocks portal entry even while `BROKEN=true`, pauses outdoor break waves while any player is inside that dungeon slot, keeps interior monsters in place (removing only the interior boss if Wave 5 already walked it out), ends the break when the boss is killed inside, and resumes the remaining wave timer if everyone leaves without clearing.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/gates/GateRules.java`: added `BREAK_WAVE_SCAN_RADIUS = 128.0`, `STORM_CHECK_INTERVAL_TICKS = 20`, and `STORM_PULSE_INTERVAL_TICKS = 15`.
+- `src/main/java/com/projectzero/gates/GateBlockEntity.java`: added persisted/synced `stormable` boolean (`Stormable` in NBT and client update tag), reset to `false` when the next wave spawns.
+- `src/main/java/com/projectzero/gates/DungeonSavedData.java` & `GateDungeonArena.java`: added `bossWalkedOut` and `insidePauseStartedAt` to `DungeonRecord`, plus `GateDungeonArena.clearDungeonBossOnly(...)`. Chose the simpler population design: leave pre-built interior monsters in place when a break starts (or build & populate on first entry if unbuilt), removing only the interior boss if Wave 5 walks it outside.
+- `src/main/java/com/projectzero/gates/GateService.java` & `MobEvents.java`: tagged break-wave mobs with `projectzero:break_wave`, added instant `onBreakWaveMobKilled` + periodic `checkWaveClearedForStorm` steadying the rift with `END_ROD` pulses and a `RIFT STEADIED` notice, allowed `onEnterPortal` when `anchorBe.isStormable()`, paused waves while `hasPlayerInDungeonSlot` is true, shifted `nextWaveTime` on `returnFromDungeon` / empty check so remaining wave time resumes cleanly, and opened the dungeon exit portal when a stormed break boss dies inside.
+- `DESIGN-DOCUMENT.md` & `HANDOFF.md`: marked Storm the gate `[Built]`.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded `pz_backlog_test` world, two-run test):
+  - **Run 1:** Spawned `C SMALL` gate, ran `/pz gate break` (`4` Wave 1 mobs spawned; verified portal entry blocked while wave alive), killed all 4 Wave 1 mobs → verified `stormable=true` and `updateTagStormable=true`, entered `projectzero:dungeon` (`insideMobs=8` + `[C · BOSS · Lv 50] Vindicator`), forced `nextWaveTime` into the past while inside → verified `breakWave=1` (waves paused), killed the boss inside → verified `gateClosed=true`, `exitOpened=true`, `shards=1`, and `clearedDelta=1`.
+  - **Run 2:** Spawned `C SMALL` gate, broke it, cleared Wave 1 (`remBeforeEnter=1182`), entered dungeon for 36 ticks, ran `/pz gate leave` → verified `remAfter36tInside=1179` (timer resumed from where it paused). Zero errors in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): `GateService.emitStormablePulse` uses vanilla `END_ROD` pulses; `GateBlockEntity#isStormable()` is synced for `GateRiftRenderer` steady-rift visuals.
+
+**Remaining Recommendations**
+
+1. Task 4: Dungeon break corruption spread (`GateDungeonArena` theme palette API, `corruptible` block tag, `CorruptionSavedData`, wave-stepped conversion, 30s outer-ring-first receding cleanup, `/pz gate corruption grow|clear`).
 
 ---
 

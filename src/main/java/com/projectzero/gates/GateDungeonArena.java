@@ -967,6 +967,17 @@ public final class GateDungeonArena {
         return mobs.size();
     }
 
+    /** Removes only the interior gate boss of {@code slot} when Wave 5 walks the boss outside. */
+    public static void clearDungeonBossOnly(ServerLevel dungeonLevel, int slot, GateSize size, boolean sea) {
+        Layout layout = layout(slot, size, sea);
+        touchCaveChunks(dungeonLevel, layout);
+        List<Mob> bosses = dungeonLevel.getEntitiesOfClass(Mob.class, dungeonBounds(slot, size, sea),
+                m -> m.isAlive()
+                        && m.getPersistentData().getBoolean(MobScaling.GATE_BOSS_KEY)
+                        && m.getPersistentData().getInt(DUNGEON_SLOT_KEY) == slot);
+        for (Mob b : bosses) b.discard();
+    }
+
     private static BlockPos spawnSpot(Grid g, Cave c, RandomSource random) {
         for (int attempt = 0; attempt < 16; attempt++) {
             double a = random.nextDouble() * Math.PI * 2, rr = random.nextDouble() * 0.7;

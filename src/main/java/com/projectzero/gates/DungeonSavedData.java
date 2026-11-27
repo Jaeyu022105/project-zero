@@ -36,6 +36,10 @@ public class DungeonSavedData extends SavedData {
         public int pendingReinforcements;
         /** True once a dungeon break has ruptured this gate. */
         public boolean broken;
+        /** True once Wave 5 has walked the dungeon boss out into the overworld. */
+        public boolean bossWalkedOut;
+        /** Origin-dimension gameTime when players entered this dungeon during a break (-1 when nobody inside). */
+        public long insidePauseStartedAt = -1L;
 
         public DungeonRecord(int slot, GateRank rank, GateSize size, ResourceLocation originDim,
                              BlockPos gateAnchor, boolean alongX, boolean built, boolean cleared) {
@@ -128,6 +132,8 @@ public class DungeonSavedData extends SavedData {
             rt.putInt("Surges", r.surges);
             rt.putInt("PendingReinforcements", r.pendingReinforcements);
             rt.putBoolean("Broken", r.broken);
+            if (r.bossWalkedOut) rt.putBoolean("BossWalkedOut", true);
+            if (r.insidePauseStartedAt >= 0L) rt.putLong("InsidePauseStartedAt", r.insidePauseStartedAt);
             list.add(rt);
         }
         tag.put("Records", list);
@@ -155,6 +161,8 @@ public class DungeonSavedData extends SavedData {
                 rec.surges = rt.getInt("Surges");
                 rec.pendingReinforcements = rt.getInt("PendingReinforcements");
                 rec.broken = rt.getBoolean("Broken");
+                rec.bossWalkedOut = rt.getBoolean("BossWalkedOut");
+                rec.insidePauseStartedAt = rt.contains("InsidePauseStartedAt") ? rt.getLong("InsidePauseStartedAt") : -1L;
                 data.records.put(slot, rec);
             }
         }

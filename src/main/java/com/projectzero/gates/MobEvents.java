@@ -26,6 +26,7 @@ public final class MobEvents {
         if (event.getEntity().level() instanceof ServerLevel serverLevel) {
             ServerPlayer killer = event.getSource().getEntity() instanceof ServerPlayer sp ? sp : null;
             GateService.onDungeonBossKilled(serverLevel, event.getEntity(), killer);
+            GateService.onBreakWaveMobKilled(serverLevel, event.getEntity());
         }
     }
 
@@ -51,7 +52,7 @@ public final class MobEvents {
         int slot = entity.getPersistentData().getInt(GateDungeonArena.DUNGEON_SLOT_KEY);
         DungeonSavedData.DungeonRecord rec = DungeonSavedData.get(serverLevel).record(slot);
         if (rec == null) return;
-        if (rec.broken) {
+        if (rec.bossWalkedOut && entity.getPersistentData().getBoolean(MobScaling.GATE_BOSS_KEY)) {
             event.setCanceled(true);
             return;
         }
