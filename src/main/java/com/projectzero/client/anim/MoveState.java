@@ -28,6 +28,11 @@ public final class MoveState {
     /** Blade combo step (index into PlayerPoses.COMBO) and the tick its swing started. */
     public int combo;
     private int lastSwing = -1000;
+    /** Bare-hand guard blend: up while you've been punching, eases down after a few seconds. */
+    public float boxing, boxingO;
+    private int lastFist = -1000;
+    /** How long (ticks) the guard stays up after the last punch. */
+    public static final int GUARD_HOLD = 50;
     private boolean wasGround = true;
     private float lastYaw = Float.NaN;
     private int airTicks;
@@ -59,6 +64,10 @@ public final class MoveState {
         air += ((ground ? 0F : 1F) - air) * (ground ? 0.6F : 0.35F);
         sprint += ((p.isSprinting() && !p.isSwimming() ? 1F : 0F) - sprint) * 0.25F;
         crouch += ((p.isCrouching() ? 1F : 0F) - crouch) * 0.35F;
+        boxingO = boxing;
+        boolean guardUp = p.getMainHandItem().isEmpty() && p.tickCount - lastFist < GUARD_HOLD
+                && !p.isUsingItem() && fly < 0.5F && climb < 0.5F && !p.isSwimming();
+        boxing += ((guardUp ? 1F : 0F) - boxing) * 0.15F;
         rise += ((float) Mth.clamp(p.getDeltaMovement().y * 4, -1, 1) - rise) * 0.4F;
         if (!ground) {
             if (wasGround) { airTicks = 0; peakY = p.getY(); }
@@ -79,12 +88,18 @@ public final class MoveState {
     /** Gap (ticks) after which a new swing restarts the combo. */
     public static final int COMBO_WINDOW = 16;
 
-    /** Called when a blade swing starts: next combo step, or back to the first after a pause. */
-    public int nextSwing(int tick) {
-        combo = tick - lastSwing <= COMBO_WINDOW ? (combo + 1) % PlayerPoses.COMBO.length : 0;
+    /**
+     * Called when a main-hand swing starts: next combo step, or back to the first after a pause.
+     * The step is a running count (12 = every set length divides it); each key set takes it modulo its own length.
+     */
+    public int nextSwing(int tick, boolean fist) {
+        combo = tick - lastSwing <= COMBO_WINDOW ? (combo + 1) % 12 : 0;
         lastSwing = tick;
+        if (fist) lastFist = tick;
         return combo;
     }
+
+    public float boxing(float pt) { return Mth.lerp(pt, boxingO, boxing); }
 
     public float air(float pt) { return Mth.lerp(pt, airO, air); }
     public float sprint(float pt) { return Mth.lerp(pt, sprintO, sprint); }

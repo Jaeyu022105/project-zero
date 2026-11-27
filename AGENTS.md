@@ -31,6 +31,8 @@ The owner works with several AI chats at once. One acts as **adviser/reviewer**:
 
 Every movement of the player is animated in third **and** first person: walk, run, jump, land, crouch, idle, turn, attacks and skills. Every mob we add, in dungeons or the overworld, ships with a full movement and attack animation set and a blood type. The specifics are in `.agents/skills/game-feel/SKILL.md` §8.
 
+**Every item and every action gets its own animation.** Bare hands box, swords chain slashes, pickaxes peck, shovels scoop, and so on. When you add an item, give it its own key set in `PlayerPoses` and map it in `PlayerPoses.forHeld`. Never leave it on the generic `TAP` fallback.
+
 ## 5. Skills index (`.agents/skills/`)
 
 | Skill | Use it when |

@@ -141,9 +141,18 @@ public final class PlayerAnimEvents {
         float i = arm == HumanoidArm.RIGHT ? 1F : -1F;
         if (!player.isUsingItem()) locomotion(pose, player, partial, i, mainHand);
 
-        if (!mainHand) return;
         ItemStack stack = event.getItemStack();
-        // Vanilla keeps: empty hand (it draws the arm itself), using items (bows, shields, food), maps.
+        // Bare hands box: both fists come up into a guard and throw jab, cross, hook, uppercut.
+        if (stack.isEmpty() && player.getMainHandItem().isEmpty() && !player.isUsingItem() && !player.isInvisible()
+                && (mainHand || MoveState.of(player).boxing(partial) > 0.01F || player.getAttackAnim(partial) > 0F)) {
+            event.setCanceled(true);
+            float dip = mainHand ? event.getEquipProgress() : 0F;
+            renderFist(pose, event.getMultiBufferSource(), event.getPackedLight(), player, arm, mainHand, partial, dip);
+            if (mainHand) BladeTrail.renderHand(event.getMultiBufferSource());
+            return;
+        }
+        if (!mainHand) return;
+        // Vanilla keeps: using items (bows, shields, food), maps.
         if (stack.isEmpty() || player.isUsingItem() || player.isInvisible()
                 || stack.getItem() instanceof net.minecraft.world.item.MapItem) {
             BladeTrail.renderHand(event.getMultiBufferSource());   // let any tail or motes finish
@@ -156,14 +165,15 @@ public final class PlayerAnimEvents {
         if (v != null) {
             keys = PlayerPoses.keys(PlayerAnim.byId(v.rgb));
             t = v.progress(partial);
-        } else if (swing > 0F && AnimatedPlayerModel.isBlade(stack)) {
-            keys = PlayerPoses.COMBO[MoveState.of(player).combo];
+        } else if (swing > 0F) {
+            // Each item family swings its own way (see PlayerPoses.forHeld).
+            keys = PlayerPoses.forHeld(stack, MoveState.of(player).combo);
             t = swing;
         }
         event.setCanceled(true);
         pose.pushPose();
         if (keys == null) {
-            // Vanilla's item swing, unchanged (so tools, blocks and food feel the same).
+            // At rest: vanilla's held-item spot (with the equip dip when you switch items).
             float sq = Mth.sqrt(swing);
             pose.translate(i * -0.4F * Mth.sin(sq * Mth.PI), 0.2F * Mth.sin(sq * Mth.TWO_PI), -0.2F * Mth.sin(swing * Mth.PI));
             pose.translate(i * 0.56F, -0.52F + event.getEquipProgress() * -0.6F, -0.72F);
@@ -207,6 +217,57 @@ public final class PlayerAnimEvents {
         pose.mulPose(Axis.XP.rotationDegrees(200F));
         pose.mulPose(Axis.YP.rotationDegrees(i * -135F));
         pose.translate(i * 5.6F, 0F, 0F);
+        com.projectzero.client.GauntletLayer.renderFirstPerson(pose, buffers, light, player, arm);
+        if (arm == HumanoidArm.RIGHT) renderer.renderRightHand(pose, buffers, light, player);
+        else renderer.renderLeftHand(pose, buffers, light, player);
+        pose.popPose();
+    }
+
+    /**
+     * One bare fist in first person. At rest it sits where vanilla's empty arm does; while you've been
+     * punching both fists come up and in (the guard). The main fist throws the jab and the hook, the
+     * other fist the cross and the uppercut, and the idle fist tucks in while its partner punches.
+     */
+    private static void renderFist(PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers, int light,
+                                   LocalPlayer player, HumanoidArm arm, boolean main, float pt, float dip) {
+        if (!(Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(player) instanceof PlayerRenderer renderer)) return;
+        MoveState st = MoveState.of(player);
+        float f = arm == HumanoidArm.RIGHT ? 1F : -1F;
+        float g = st.boxing(pt);
+        float swing = player.getAttackAnim(pt);
+        int punch = st.combo % PlayerPoses.FIST_COMBO.length;
+        // Fast out (30%), slower back: the snap of a punch.
+        float e = swing <= 0F ? 0F : swing < 0.3F ? swing / 0.3F : Math.max(0F, 1F - (swing - 0.3F) / 0.45F);
+        e = e * e * (3F - 2F * e);
+        float wind = swing <= 0F ? 0F : swing < 0.12F ? swing / 0.12F : Math.max(0F, 1F - (swing - 0.12F) / 0.18F);
+        boolean throwing = swing > 0F && (punch % 2 == 0) == main;
+        float x = 0.64F, y = -0.6F - dip * 0.6F * (1F - g), z = -0.72F;
+        float rx = 0F, ry = 0F, rz = 0F;
+        // Guard: fists up by the chin, a little in and back.
+        x -= 0.13F * g; y += 0.13F * g; z += 0.08F * g; rz -= 10F * g; rx -= 6F * g;
+        if (throwing) {
+            switch (punch) {
+                case 0 -> { x -= 0.12F * e; y += 0.04F * e; z -= 0.34F * e; }                       // jab: straight
+                case 1 -> { x -= 0.30F * e; y += 0.06F * e; z -= 0.38F * e; ry -= 12F * e; }        // cross: across the middle
+                case 2 -> { x += 0.08F * wind - 0.40F * e; y += 0.10F * e;                            // hook: wide arc, elbow up
+                            z -= 0.20F * Mth.sin(e * Mth.PI) + 0.06F * e; rz += 30F * e; ry -= 25F * e; }
+                default -> { y += -0.10F * wind + 0.30F * e; x -= 0.14F * e; z -= 0.16F * e; rx -= 25F * e; } // uppercut
+            }
+        } else if (swing > 0F) {
+            z += 0.05F * e; y += 0.02F * e;                                                          // tuck in
+        }
+        pose.pushPose();
+        pose.translate(f * x, y, z);
+        pose.mulPose(Axis.YP.rotationDegrees(f * 45F));
+        pose.mulPose(Axis.XP.rotationDegrees(rx));
+        pose.mulPose(Axis.YP.rotationDegrees(f * ry));
+        pose.mulPose(Axis.ZP.rotationDegrees(f * rz));
+        // Vanilla's arm-mesh placement (ItemInHandRenderer.renderPlayerArm).
+        pose.translate(f * -1F, 3.6F, 3.5F);
+        pose.mulPose(Axis.ZP.rotationDegrees(f * 120F));
+        pose.mulPose(Axis.XP.rotationDegrees(200F));
+        pose.mulPose(Axis.YP.rotationDegrees(f * -135F));
+        pose.translate(f * 5.6F, 0F, 0F);
         com.projectzero.client.GauntletLayer.renderFirstPerson(pose, buffers, light, player, arm);
         if (arm == HumanoidArm.RIGHT) renderer.renderRightHand(pose, buffers, light, player);
         else renderer.renderLeftHand(pose, buffers, light, player);
@@ -266,10 +327,11 @@ public final class PlayerAnimEvents {
         MoveState.tickAll();
         for (AbstractClientPlayer p : mc.level.players()) {
             // swingTime is 0 on the first tick of a swing.
-            if (p.swinging && p.swingTime == 0 && p.swingingArm == InteractionHand.MAIN_HAND
-                    && AnimatedPlayerModel.isBlade(p.getMainHandItem())) {
-                // Advance the combo; the blade itself draws its trail (BladeTrail).
-                MoveState.of(p).nextSwing(p.tickCount);
+            if (p.swinging && p.swingTime == 0 && p.swingingArm == InteractionHand.MAIN_HAND) {
+                // Advance the combo for every main-hand swing; blades draw their own trail (BladeTrail).
+                // Breaking blocks bare-handed doesn't raise the boxing guard.
+                boolean mining = p == mc.player && mc.gameMode != null && mc.gameMode.isDestroying();
+                MoveState.of(p).nextSwing(p.tickCount, p.getMainHandItem().isEmpty() && !mining);
             }
         }
     }

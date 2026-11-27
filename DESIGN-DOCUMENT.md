@@ -216,6 +216,7 @@ Our own mechanic, not in Solo Leveling.
   - Every movement is animated in third and first person: stride bob and twist, sprint pump and lean, idle breathing, jump, fall, landing squash, crouch, and turn lag.
   - The sword combo is forehand, backhand, overhead chop, then thrust. It resets after 16 ticks without a click.
   - The slash trail traces the real blade tip.
+  - Every item swings its own way: bare hands box (guard, jab, cross, hook, uppercut), and pickaxe, axe, shovel, hoe, trident, mace, fishing rod, thrown items and blocks each have their own motion. **Owner rule:** every new item or action gets a unique animation.
   - **Owner rule:** all our future mobs ship with full movement and attack animation sets (game-feel skill §8).
 - **[Idea]** A dodge dash with i-frames needs the owner's approval. There is no separate stamina bar; cooldowns and mana are the commitment cost.
 

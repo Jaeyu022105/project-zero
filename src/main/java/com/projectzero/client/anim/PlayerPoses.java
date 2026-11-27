@@ -80,6 +80,92 @@ public final class PlayerPoses {
             k(0.15F, -1.3F, 0.2F, 0.1F, -0.4F, 0F, -0.2F, 0.45F, -2F, 0.05F, 0.08F, 0.15F, -30, 0, 0),
             k(0.45F, -1.6F, -0.05F, 0F, 0.4F, 0F, -0.2F, -0.35F, 6F, -0.10F, 0.12F, -0.40F, -35, 0, 0),
             k(0.85F, -1.55F, -0.05F, 0F, 0.4F, 0F, -0.2F, -0.35F, 5F, -0.10F, 0.12F, -0.40F, -35, 0, 0)};
+    // ---- bare hands: boxing ----
+    /** Loose guard, fists by the chin. Held (t = 0.5) while you've been punching. */
+    public static final Key[] BOX_GUARD = {
+            k(0.50F, -1.15F, -0.35F, 0F, -1.25F, 0.40F, 0F, 0.15F, 2F, 0, 0, 0, 0, 0, 0)};
+    public static final Key[] JAB = {
+            k(0.12F, -1.20F, -0.35F, 0F, -1.25F, 0.40F, 0F, 0.20F, 1F, 0, 0, 0, 0, 0, 0),
+            k(0.38F, -1.62F, 0.05F, 0F, -1.25F, 0.45F, 0F, -0.15F, 4F, 0, 0, 0, 0, 0, 0),
+            k(0.75F, -1.62F, 0.05F, 0F, -1.25F, 0.45F, 0F, -0.15F, 4F, 0, 0, 0, 0, 0, 0)};
+    public static final Key[] CROSS = {
+            k(0.12F, -1.15F, -0.40F, 0F, -1.20F, 0.35F, 0F, -0.25F, 1F, 0, 0, 0, 0, 0, 0),
+            k(0.38F, -1.15F, -0.45F, 0F, -1.62F, -0.05F, 0F, 0.50F, 5F, 0, 0, 0, 0, 0, 0),
+            k(0.75F, -1.15F, -0.45F, 0F, -1.62F, -0.05F, 0F, 0.50F, 5F, 0, 0, 0, 0, 0, 0)};
+    public static final Key[] HOOK = {
+            k(0.15F, -1.30F, 0.80F, -0.4F, -1.25F, 0.40F, 0F, 0.45F, 1F, 0, 0, 0, 0, 0, 0),
+            k(0.42F, -1.45F, -0.75F, -0.1F, -1.20F, 0.45F, 0F, -0.55F, 3F, 0, 0, 0, 0, 0, 0),
+            k(0.75F, -1.45F, -0.75F, -0.1F, -1.20F, 0.45F, 0F, -0.55F, 3F, 0, 0, 0, 0, 0, 0)};
+    public static final Key[] UPPERCUT = {
+            k(0.18F, -0.50F, 0.10F, 0.1F, -1.25F, 0.40F, 0F, 0.35F, 4F, 0, 0, 0, 0, 0, 0),
+            k(0.45F, -2.60F, -0.20F, 0F, -1.10F, 0.40F, 0F, -0.30F, -5F, 0, 0, 0, 0, 0, 0),
+            k(0.78F, -2.60F, -0.20F, 0F, -1.10F, 0.40F, 0F, -0.30F, -5F, 0, 0, 0, 0, 0, 0)};
+    /** Jab, cross, hook, uppercut: same chain rules as the blade combo. */
+    public static final Key[][] FIST_COMBO = {JAB, CROSS, HOOK, UPPERCUT};
+
+    // ---- tools and other items: each family swings its own way ----
+    /** Pickaxe: up over the shoulder, a short hard pick down. */
+    public static final Key[] PICK = {
+            k(0.15F, -2.70F, 0.20F, 0.2F, -0.40F, 0F, -0.1F, 0.15F, -2F, 0.05F, 0.20F, 0.10F, 45, 10, -5),
+            k(0.45F, -0.90F, -0.10F, 0F, -0.20F, 0F, -0.1F, -0.10F, 6F, 0F, -0.02F, -0.15F, -45, 0, 5),
+            k(0.75F, -0.95F, -0.10F, 0F, -0.20F, 0F, -0.1F, -0.10F, 5F, 0F, -0.02F, -0.15F, -45, 0, 5)};
+    /** Axe: a heavy two-step, big wind-up chop then a rising backhand. */
+    public static final Key[] AXE_CHOP = {
+            k(0.18F, -2.60F, 0.70F, 0.5F, -0.50F, 0F, -0.2F, 0.45F, -3F, 0.25F, 0.20F, 0.05F, 30, 40, -35),
+            k(0.48F, -0.70F, -0.70F, 0.1F, 0.10F, 0F, -0.2F, -0.45F, 8F, -0.30F, -0.02F, -0.15F, -40, -45, 30),
+            k(0.80F, -0.65F, -0.70F, 0.1F, 0.10F, 0F, -0.2F, -0.45F, 7F, -0.30F, -0.02F, -0.15F, -40, -45, 30)};
+    public static final Key[][] AXE = {AXE_CHOP, SWING_BACK};
+    /** Shovel: dig low and forward, then scoop up. */
+    public static final Key[] SHOVEL = {
+            k(0.18F, -0.50F, 0F, 0.1F, -0.70F, 0.3F, 0F, 0.10F, 4F, 0F, -0.10F, 0.05F, -20, 0, 0),
+            k(0.42F, -1.10F, 0F, 0.1F, -1.00F, 0.3F, 0F, 0.10F, 7F, 0F, -0.05F, -0.30F, -35, 0, 0),
+            k(0.62F, -1.60F, 0F, 0.1F, -1.30F, 0.3F, 0F, 0F, 2F, 0F, 0.12F, -0.20F, 15, 0, 0),
+            k(0.85F, -1.50F, 0F, 0.1F, -1.20F, 0.3F, 0F, 0F, 2F, 0F, 0.12F, -0.20F, 15, 0, 0)};
+    /** Hoe: reach out and rake back toward you. */
+    public static final Key[] HOE = {
+            k(0.20F, -1.55F, 0.30F, 0F, -0.30F, 0F, -0.1F, 0.20F, 5F, 0.05F, 0.05F, -0.35F, -10, 15, 0),
+            k(0.55F, -0.80F, -0.10F, 0F, -0.30F, 0F, -0.1F, -0.10F, 1F, 0F, -0.08F, 0.05F, -35, -5, 0),
+            k(0.80F, -0.80F, -0.10F, 0F, -0.30F, 0F, -0.1F, -0.10F, 1F, 0F, -0.08F, 0.05F, -35, -5, 0)};
+    /** Trident: a straight spear thrust. */
+    public static final Key[] STAB = {
+            k(0.18F, -1.40F, 0.30F, 0.1F, -0.60F, 0.2F, 0F, 0.45F, -3F, 0.05F, 0.05F, 0.20F, -70, 0, 0),
+            k(0.42F, -1.62F, -0.05F, 0F, -0.30F, 0.2F, 0F, -0.30F, 8F, -0.08F, 0.08F, -0.50F, -80, 0, 0),
+            k(0.78F, -1.60F, -0.05F, 0F, -0.30F, 0.2F, 0F, -0.30F, 7F, -0.08F, 0.08F, -0.50F, -80, 0, 0)};
+    /** Blocks and other placeables: a short push forward to set it down. */
+    public static final Key[] PLACE = {
+            k(0.15F, -0.90F, 0F, 0F, -0.10F, 0F, -0.1F, 0F, 0F, 0F, 0F, 0.05F, 5, 0, 0),
+            k(0.40F, -1.35F, -0.10F, 0F, -0.10F, 0F, -0.1F, -0.05F, 3F, -0.05F, 0F, -0.20F, -15, -10, 0),
+            k(0.70F, -1.30F, -0.10F, 0F, -0.10F, 0F, -0.1F, -0.05F, 2F, -0.05F, 0F, -0.20F, -15, -10, 0)};
+    /** Fishing rod: lift back, flick out. */
+    public static final Key[] FLICK = {
+            k(0.20F, -2.40F, 0F, 0.1F, -0.30F, 0F, -0.1F, 0.10F, -3F, 0F, 0.22F, 0.10F, 40, 0, 0),
+            k(0.42F, -1.30F, 0F, 0F, -0.30F, 0F, -0.1F, -0.10F, 4F, 0F, 0.02F, -0.15F, -25, 0, 0),
+            k(0.75F, -1.25F, 0F, 0F, -0.30F, 0F, -0.1F, -0.10F, 3F, 0F, 0.02F, -0.15F, -25, 0, 0)};
+    /** Anything else: a light wrist tap. */
+    public static final Key[] TAP = {
+            k(0.15F, -0.80F, 0.15F, 0F, -0.10F, 0F, -0.1F, 0.05F, 0F, 0.02F, 0.05F, 0.05F, 10, 0, 0),
+            k(0.40F, -1.25F, -0.15F, 0F, -0.10F, 0F, -0.1F, -0.05F, 2F, -0.04F, -0.02F, -0.12F, -20, -5, 0),
+            k(0.70F, -1.20F, -0.15F, 0F, -0.10F, 0F, -0.1F, -0.05F, 2F, -0.04F, -0.02F, -0.12F, -20, -5, 0)};
+
+    /** The swing for whatever is in the main hand, at this step of the chain. */
+    public static Key[] forHeld(net.minecraft.world.item.ItemStack stack, int combo) {
+        net.minecraft.world.item.Item item = stack.getItem();
+        if (stack.isEmpty()) return FIST_COMBO[combo % FIST_COMBO.length];
+        if (item instanceof net.minecraft.world.item.SwordItem) return COMBO[combo % COMBO.length];
+        if (item instanceof net.minecraft.world.item.AxeItem) return AXE[combo % AXE.length];
+        if (item instanceof net.minecraft.world.item.PickaxeItem) return PICK;
+        if (item instanceof net.minecraft.world.item.ShovelItem) return SHOVEL;
+        if (item instanceof net.minecraft.world.item.HoeItem) return HOE;
+        if (item instanceof net.minecraft.world.item.TridentItem) return STAB;
+        if (item instanceof net.minecraft.world.item.MaceItem) return SLAM;
+        if (item instanceof net.minecraft.world.item.FishingRodItem) return FLICK;
+        if (item instanceof net.minecraft.world.item.SnowballItem || item instanceof net.minecraft.world.item.EggItem
+                || item instanceof net.minecraft.world.item.EnderpearlItem || item instanceof net.minecraft.world.item.ThrowablePotionItem
+                || item instanceof net.minecraft.world.item.ExperienceBottleItem) return THROW;
+        if (item instanceof net.minecraft.world.item.BlockItem) return PLACE;
+        return TAP;
+    }
+
     /** The blade combo, in order. Spamming walks through it; a pause resets to the first slash. */
     public static final Key[][] COMBO = {SWING, SWING_BACK, SWING_CHOP, SWING_THRUST};
 
@@ -104,6 +190,19 @@ public final class PlayerPoses {
         joints(PUSH, 1.4F, 1.4F, 0.2F, 0F, 0F, 0.3F, 0.05F, 0.05F, 0.25F);
         joints(ROAR, 0.6F, 0.6F, 0.3F, 0.6F, 0.6F, 0.3F);
         joints(DASH, 0.9F, 0.9F, 0.5F, 0.9F, 0.9F, 0.5F);
+        joints(BOX_GUARD, 1.7F, 1.8F, 0.25F);
+        joints(JAB, 1.7F, 1.8F, 0.25F, 0.05F, 1.8F, 0.3F, 0.1F, 1.8F, 0.3F);
+        joints(CROSS, 1.8F, 1.7F, 0.25F, 1.8F, 0.05F, 0.35F, 1.8F, 0.1F, 0.35F);
+        joints(HOOK, 1.6F, 1.8F, 0.3F, 1.4F, 1.8F, 0.3F, 1.4F, 1.8F, 0.3F);
+        joints(UPPERCUT, 1.9F, 1.8F, 0.55F, 1.0F, 1.8F, 0.1F, 1.1F, 1.8F, 0.1F);
+        joints(PICK, 1.3F, 0.4F, 0.15F, 0.2F, 0.4F, 0.3F, 0.25F, 0.4F, 0.3F);
+        joints(AXE_CHOP, 1.2F, 0.6F, 0.2F, 0.1F, 0.6F, 0.45F, 0.15F, 0.6F, 0.4F);
+        joints(SHOVEL, 0.3F, 0.5F, 0.4F, 0.2F, 0.6F, 0.5F, 0.6F, 0.8F, 0.2F, 0.6F, 0.8F, 0.2F);
+        joints(HOE, 0.2F, 0.3F, 0.2F, 1.0F, 0.3F, 0.15F, 1.0F, 0.3F, 0.15F);
+        joints(STAB, 1.6F, 0.6F, 0.3F, 0.05F, 0.6F, 0.35F, 0.1F, 0.6F, 0.35F);
+        joints(PLACE, 0.7F, 0.3F, 0.1F, 0.2F, 0.3F, 0.15F, 0.25F, 0.3F, 0.15F);
+        joints(FLICK, 1.2F, 0.3F, 0.1F, 0.3F, 0.3F, 0.1F, 0.35F, 0.3F, 0.1F);
+        joints(TAP, 0.6F, 0.3F, 0.1F, 0.3F, 0.3F, 0.1F, 0.3F, 0.3F, 0.1F);
     }
 
     private static void joints(Key[] keys, float... v) {

@@ -122,7 +122,15 @@ Every movement is animated, even ordinary ones, and players see it **in first pe
   - Elbows coil on wind-ups and snap straight on strikes. Knees fold in the stride, tuck on jumps and give on landings.
   - Held items and gauntlets ride the forearm.
   - New mobs should use the same split. Give the lower box a 1 px overlap so the joint has no gap.
-- First person always shows your arm gripping the held item. Vanilla's item swing is kept for non-blades.
+- First person always shows your arm gripping the held item.
+- **Every item and action has its own swing** (owner rule). `PlayerPoses.forHeld(stack, combo)` picks the keys, in third and first person:
+  - Bare hands box. A guard comes up while you're punching and drops about 2.5 s after the last punch (`MoveState.boxing`). The chain is jab, cross, hook, uppercut. In first person both fists show: the main fist throws the jab and hook, the other fist the cross and uppercut.
+  - Sword: the 4-step blade combo. Axe: a heavy chop, then a rising backhand.
+  - Pickaxe: a short hard peck. Shovel: dig, then scoop. Hoe: reach, then rake back.
+  - Trident: a spear thrust. Mace: an overhead slam. Fishing rod: lift and flick.
+  - Thrown items (snowball, egg, ender pearl, splash potion, XP bottle): an overhand throw. Blocks: a short push to set them down.
+  - Anything else falls back to `TAP`, a light wrist tap. New items must get their own key set and a `forHeld` line instead.
+  - Still vanilla for now: "using" actions (eating, drinking, bow and crossbow draw, shield block, spyglass, horn) and maps.
 - `BladeTrail.styleOf` picks the trail style from the weapon:
   - Material sets the color: netherite violet, diamond cyan, gold yellow, iron white, stone grey, wood tan.
   - Fire Aspect gives embers, Smite gives gold sparks, Bane of Arthropods gives green drips.

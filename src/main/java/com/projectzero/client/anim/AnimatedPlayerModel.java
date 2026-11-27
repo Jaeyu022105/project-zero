@@ -39,27 +39,38 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
             loco = locomotion(player, limbSwing, limbSwingAmount, ageInTicks, partial);
         }
         joints = new Joints.Angles(loco[0], loco[1], loco[2], loco[3]);
+        boolean left = player.getMainArm() == HumanoidArm.LEFT;
+        MoveState st = MoveState.of(player);
+        // Bare hands: a loose boxing guard while you've been punching, under any punch.
+        float guard = st.boxing(partial);
+        if (guard > 0.01F) applyPose(PlayerPoses.BOX_GUARD, 0.5F, guard, left);
         PlayerPoses.Key[] keys = null;
         float t = 0F;
         ClientSkillVisuals.Visual v = ClientSkillVisuals.find(player.getId(), ClientSkillVisuals.Kind.ANIM);
         if (v != null) {
             keys = PlayerPoses.keys(PlayerAnim.byId(v.rgb));
             t = v.progress(partial);
-        } else if (attackTime > 0F && isBlade(player.getMainHandItem()) && !player.isUsingItem()) {
-            keys = PlayerPoses.COMBO[MoveState.of(player).combo];
+        } else if (attackTime > 0F && !player.isUsingItem()) {
+            // Every item family has its own swing (fists box, swords combo, picks peck, shovels scoop...).
+            keys = PlayerPoses.forHeld(player.getMainHandItem(), st.combo);
             t = attackTime;
         }
-        float w = keys == null ? 0F : PlayerPoses.weight(t, keys);
-        if (keys == null || w <= 0F) {
-            copySkins();
-            applyJoints();
-            return;
-        }
+        if (keys != null) applyPose(keys, t, PlayerPoses.weight(t, keys), left);
+        copySkins();
+        applyJoints();
+        if (isBlade(player.getMainHandItem())) BladeTrail.recordWorld(this, player, partial);
+    }
+
+    /** Blends a keyed pose (arms, torso twist, elbows, knees) over the current one with weight w. */
+    private void applyPose(PlayerPoses.Key[] keys, float t, float w, boolean left) {
+        if (w <= 0F) return;
         PlayerPoses.Key p = PlayerPoses.sample(keys, t);
         // Mirror for left-handed players so the main hand leads.
-        boolean left = player.getMainArm() == HumanoidArm.LEFT;
         float m = left ? -1F : 1F;
         ModelPart main = left ? leftArm : rightArm, off = left ? rightArm : leftArm;
+        // Undo the torso-follow from earlier passes before blending, then redo it.
+        rightArm.yRot -= body.yRot;
+        leftArm.yRot -= body.yRot;
         main.xRot = Mth.lerp(w, main.xRot, p.rx());
         main.yRot = Mth.lerp(w, main.yRot, p.ry() * m);
         main.zRot = Mth.lerp(w, main.zRot, p.rz() * m);
@@ -75,7 +86,6 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
         leftArm.x = Mth.cos(by) * 5F;
         rightArm.yRot += by;
         leftArm.yRot += by;
-        // Joints: the pose's elbows and knees, blended with the movement ones.
         float[] j = PlayerPoses.sampleJoints(keys, t);
         float mainElbow = left ? joints.leftElbow() : joints.rightElbow(), offElbow = left ? joints.rightElbow() : joints.leftElbow();
         mainElbow = Mth.lerp(w, mainElbow, j[0]);
@@ -83,9 +93,6 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
         float rk = Mth.lerp(w, joints.rightKnee(), Math.max(joints.rightKnee(), j[2]));
         float lk = Mth.lerp(w, joints.leftKnee(), Math.max(joints.leftKnee(), j[2]));
         joints = left ? new Joints.Angles(offElbow, mainElbow, rk, lk) : new Joints.Angles(mainElbow, offElbow, rk, lk);
-        copySkins();
-        applyJoints();
-        if (isBlade(player.getMainHandItem())) BladeTrail.recordWorld(this, player, partial);
     }
 
     private void applyJoints() {
