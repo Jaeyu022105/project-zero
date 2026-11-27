@@ -82,7 +82,8 @@
       "minecraft:patch_pumpkin",
       "projectzero:boulder_stone_rare",
       "projectzero:snow_scrub",
-      "projectzero:crystal_outcrop"
+      "projectzero:crystal_outcrop",
+      "projectzero:frozen_pond"
     ],
     [
       "minecraft:freeze_top_layer"
