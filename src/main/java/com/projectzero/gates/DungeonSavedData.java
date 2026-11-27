@@ -21,7 +21,7 @@ public class DungeonSavedData extends SavedData {
 
     public static final class DungeonRecord {
         public final int slot;
-        public final GateRank rank;
+        public GateRank rank;
         public final GateSize size;
         public final ResourceLocation originDim;
         public final BlockPos gateAnchor;
@@ -30,6 +30,12 @@ public class DungeonSavedData extends SavedData {
         public boolean cleared;
         /** Sea gate: the dungeon is flooded ruins (see GateDungeonArena). */
         public boolean sea;
+        /** Current surge count (0..3) from gate aging. */
+        public int surges;
+        /** Queued +25% rank-up reinforcement waves to spawn next time a player enters this built dungeon. */
+        public int pendingReinforcements;
+        /** True once a dungeon break has ruptured this gate. */
+        public boolean broken;
 
         public DungeonRecord(int slot, GateRank rank, GateSize size, ResourceLocation originDim,
                              BlockPos gateAnchor, boolean alongX, boolean built, boolean cleared) {
@@ -87,6 +93,23 @@ public class DungeonSavedData extends SavedData {
         }
     }
 
+    public void updateAging(int slot, GateRank rank, int surges) {
+        DungeonRecord r = records.get(slot);
+        if (r != null) {
+            r.rank = rank;
+            r.surges = surges;
+            setDirty();
+        }
+    }
+
+    public void markBroken(int slot) {
+        DungeonRecord r = records.get(slot);
+        if (r != null) {
+            r.broken = true;
+            setDirty();
+        }
+    }
+
     @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         tag.putInt("NextSlot", nextSlot);
@@ -102,6 +125,9 @@ public class DungeonSavedData extends SavedData {
             rt.putBoolean("Built", r.built);
             rt.putBoolean("Cleared", r.cleared);
             rt.putBoolean("Sea", r.sea);
+            rt.putInt("Surges", r.surges);
+            rt.putInt("PendingReinforcements", r.pendingReinforcements);
+            rt.putBoolean("Broken", r.broken);
             list.add(rt);
         }
         tag.put("Records", list);
@@ -126,6 +152,9 @@ public class DungeonSavedData extends SavedData {
                         rt.getBoolean("Built"),
                         rt.getBoolean("Cleared"));
                 rec.sea = rt.getBoolean("Sea");
+                rec.surges = rt.getInt("Surges");
+                rec.pendingReinforcements = rt.getInt("PendingReinforcements");
+                rec.broken = rt.getBoolean("Broken");
                 data.records.put(slot, rec);
             }
         }

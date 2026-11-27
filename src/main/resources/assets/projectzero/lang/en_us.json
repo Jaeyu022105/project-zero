@@ -132,6 +132,8 @@
   "block.projectzero.gate_portal": "Gate Portal",
   "block.projectzero.ancient_gate_stone": "Ancient Gate Stone",
   "gamerule.projectzero:gateSpawning": "Natural Gate Spawning",
+  "gamerule.projectzero:gateAging": "Uncleared Gate Aging",
+  "gamerule.projectzero:dungeonBreaks": "Gate Dungeon Breaks",
   "block.projectzero.mana_crystal": "Mana Crystal",
   "item.projectzero.mana_crystal_shard": "Mana Crystal Shard",
   "key.projectzero.skills": "Open Skills Window",

@@ -1,15 +1,24 @@
 package com.projectzero.gates;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.projectzero.registry.ModBlocks;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +27,8 @@ import java.util.Locale;
 /**
  * Operator commands merged into {@code /pz}:
  *   /pz gate spawn <rank> <size> [sea|ancient]
+ *   /pz gate age <days>
+ *   /pz gate break
  *   /pz gate leave
  */
 public final class GateCommands {
@@ -39,6 +50,13 @@ public final class GateCommands {
                                     ctx.getSource().sendSuccess(() -> Component.literal("Returned from dungeon."), false);
                                     return 1;
                                 }))
+                        .then(Commands.literal("age")
+                                .then(Commands.argument("days", IntegerArgumentType.integer(1, 1000))
+                                        .executes(ctx -> ageLookedAtGate(
+                                                ctx.getSource(),
+                                                IntegerArgumentType.getInteger(ctx, "days")))))
+                        .then(Commands.literal("break")
+                                .executes(ctx -> breakLookedAtGate(ctx.getSource())))
                         .then(Commands.literal("spawn")
                                 .then(Commands.argument("rank", StringArgumentType.word())
                                         .suggests((c, b) -> SharedSuggestionProvider.suggest(RANKS, b))
@@ -60,7 +78,70 @@ public final class GateCommands {
                                                                 StringArgumentType.getString(ctx, "size")))))))));
     }
 
-    /** {@code /pz gate spawn <rank> <size> ancient}: a stone-ringed gate on a dais a few blocks ahead. */
+    private static int ageLookedAtGate(CommandSourceStack source, int days) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        ServerLevel level = player.serverLevel();
+        GateBlockEntity anchorBe = findLookedAtAnchor(player, level);
+        if (anchorBe == null) {
+            source.sendFailure(Component.literal("Look at a Gate within 32 blocks."));
+            return 0;
+        }
+        BlockPos anchorPos = anchorBe.anchorPos();
+        if (!level.getGameRules().getBoolean(GateRules.RULE_GATE_AGING)) {
+            source.sendFailure(Component.literal("Gamerule projectzero:gateAging is currently false."));
+            return 0;
+        }
+        GateService.shiftPortalOpenTime(level, anchorPos, anchorBe, -days * 24000L);
+        GateService.evaluateAging(level, anchorPos, level.getBlockState(anchorPos), anchorBe);
+        source.sendSuccess(() -> Component.literal("Aged gate at " + anchorPos.toShortString() + " by " + days
+                + " day(s) -> " + anchorBe.rank().name() + "-Rank, surges=" + anchorBe.surges()
+                + (anchorBe.isBreaking() ? " [BREAKING]" : "") + "."), false);
+        return 1;
+    }
+
+    private static int breakLookedAtGate(CommandSourceStack source) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        ServerLevel level = player.serverLevel();
+        GateBlockEntity anchorBe = findLookedAtAnchor(player, level);
+        if (anchorBe == null) {
+            source.sendFailure(Component.literal("Look at a Gate within 32 blocks."));
+            return 0;
+        }
+        BlockPos anchorPos = anchorBe.anchorPos();
+        if (!GateService.startDungeonBreak(level, anchorPos, level.getBlockState(anchorPos), anchorBe)) {
+            source.sendFailure(Component.literal("Gate is already breaking or cleared."));
+            return 0;
+        }
+        source.sendSuccess(() -> Component.literal("Started Dungeon Break at " + anchorPos.toShortString() + "."), false);
+        return 1;
+    }
+
+    private static @Nullable GateBlockEntity findLookedAtAnchor(ServerPlayer player, ServerLevel level) {
+        Vec3 eye = player.getEyePosition();
+        Vec3 end = eye.add(player.getLookAngle().normalize().scale(32.0));
+        BlockHitResult hit = level.clip(new ClipContext(eye, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
+        if (hit.getType() == HitResult.Type.MISS) return null;
+
+        BlockPos hitPos = hit.getBlockPos();
+        BlockState hitState = level.getBlockState(hitPos);
+        BlockPos portalPos = null;
+        if (hitState.is(ModBlocks.GATE_PORTAL.get())) {
+            portalPos = hitPos;
+        } else if (hitState.is(ModBlocks.ANCIENT_GATE_STONE.get())) {
+            for (BlockPos p : BlockPos.betweenClosed(hitPos.offset(-4, -4, -4), hitPos.offset(4, 4, 4))) {
+                if (level.getBlockState(p).is(ModBlocks.GATE_PORTAL.get())) {
+                    portalPos = p.immutable();
+                    break;
+                }
+            }
+        }
+        if (portalPos == null) return null;
+        if (!(level.getBlockEntity(portalPos) instanceof GateBlockEntity be)) return null;
+        BlockPos anchor = be.anchorPos();
+        return level.getBlockEntity(anchor) instanceof GateBlockEntity abe ? abe : be;
+    }
+
+    /** {@code /pz gate spawn <rank> <size> ancient}: a stone-ringed gate on the ground ahead. */
     private static int spawnAncient(CommandSourceStack source, String rankRaw, String sizeRaw)
             throws CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
@@ -72,7 +153,6 @@ public final class GateCommands {
         }
         Direction facing = player.getDirection();
         boolean alongX = facing.getAxis() == Direction.Axis.Z;
-        // Far enough ahead that the paving on this side starts in front of the player.
         BlockPos col = player.blockPosition().relative(facing, 6);
         int top = player.serverLevel().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 col.getX(), col.getZ());

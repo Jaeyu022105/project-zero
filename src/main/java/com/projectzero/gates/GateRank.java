@@ -61,6 +61,11 @@ public enum GateRank implements StringRepresentable {
         return minLevel + random.nextInt(Math.max(1, maxLevel - minLevel + 1));
     }
 
+    public GateRank next() {
+        int nextOrd = ordinal() + 1;
+        return nextOrd < values().length ? values()[nextOrd] : this;
+    }
+
     @Override
     public String getSerializedName() {
         return name().toLowerCase(Locale.ROOT);

@@ -509,7 +509,7 @@ public final class AncientGate {
     /** Recolors the runes, e.g. after gate aging ranks the gate up. Safe on non-ancient gates. */
     public static void setRank(LevelAccessor level, BlockPos base, GateSize size, boolean alongX, GateRank rank) {
         forEachStone(level, base, size, alongX, (p, st) ->
-                level.setBlock(p, st.setValue(AncientGateStoneBlock.RANK, rank), Block.UPDATE_CLIENTS));
+                level.setBlock(p, st.setValue(AncientGateStoneBlock.RANK, rank), Block.UPDATE_ALL));
     }
 
     /**

@@ -14,10 +14,34 @@ public final class GateRules {
             GameRules.register("projectzero:gateSpawning", GameRules.Category.SPAWNING,
                     GameRules.BooleanValue.create(false));
 
+    /** Gamerule controlling uncleared Gate aging (surges every 7 days, rank-up every 28 days; on by default). */
+    public static final GameRules.Key<GameRules.BooleanValue> RULE_GATE_AGING =
+            GameRules.register("projectzero:gateAging", GameRules.Category.SPAWNING,
+                    GameRules.BooleanValue.create(true));
+
+    /** Gamerule controlling Dungeon Breaks on the 2nd rank-up or S-rank's next rank-up (on by default). */
+    public static final GameRules.Key<GameRules.BooleanValue> RULE_DUNGEON_BREAKS =
+            GameRules.register("projectzero:dungeonBreaks", GameRules.Category.SPAWNING,
+                    GameRules.BooleanValue.create(true));
+
     public static final int SPAWN_CHECK_INTERVAL_TICKS = 20 * 60; // every 60s
     public static final double SPAWN_CHANCE_PER_CHECK = 0.25;
     public static final int SPAWN_MIN_DISTANCE = 20;
     public static final int SPAWN_MAX_DISTANCE = 44;
+
+    // ---- Gate aging & Dungeon break balance knobs (DESIGN-DOCUMENT.md §9) ----
+    public static final int AGING_CHECK_INTERVAL_TICKS = 1200;       // check once per 60s
+    public static final long AGING_SURGE_TICKS = 7L * 24000L;        // 7 in-game days per surge step
+    public static final int AGING_MAX_SURGES = 3;                    // 3 surges, then rank-up on 4th 7-day mark (28d)
+    public static final int AGING_SURGE_MOB_LEVELS = 3;              // +3 monster levels per surge
+    public static final double AGING_SURGE_LOOT_BONUS = 0.05;        // +5% chest gear/shard roll per surge
+    public static final double AGING_RANKUP_EXTRA_MOBS = 0.25;       // +25% extra mobs when ranking up a built dungeon
+    public static final double AGING_MESSAGE_RADIUS = 128.0;
+
+    public static final int BREAK_AFTER_RANKUPS = 2;                 // break on 2nd rank-up (56d) or S-rank next rank-up
+    public static final int BREAK_WAVES = 5;                         // 5 waves, boss on last wave
+    public static final int BREAK_WAVE_TICKS = 1200;                 // 60s between waves
+    public static final double BREAK_PLAYER_RADIUS = 96.0;           // requires a player within 96 blocks to rupture
 
     /** Share of natural (non-sea) gate spawns that come as ancient gates in a stone ring. */
     public static final double ANCIENT_NATURAL_SHARE = 0.1;

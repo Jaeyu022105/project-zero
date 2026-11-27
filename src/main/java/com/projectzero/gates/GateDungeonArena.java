@@ -31,7 +31,9 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -403,10 +405,14 @@ public final class GateDungeonArena {
     // ---------------------------------------------------------------- build
 
     public static void buildAndPopulate(ServerLevel level, int slot, GateRank rank, GateSize size) {
-        buildAndPopulate(level, slot, rank, size, false);
+        buildAndPopulate(level, slot, rank, size, false, 0);
     }
 
     public static void buildAndPopulate(ServerLevel level, int slot, GateRank rank, GateSize size, boolean sea) {
+        buildAndPopulate(level, slot, rank, size, sea, 0);
+    }
+
+    public static void buildAndPopulate(ServerLevel level, int slot, GateRank rank, GateSize size, boolean sea, int surges) {
         long started = System.nanoTime();
         Layout layout = layout(slot, size, sea);
         RandomSource random = RandomSource.create(slot * 104729L + rank.ordinal());
@@ -418,11 +424,11 @@ public final class GateDungeonArena {
         Grid g = carve(layout, noise);
         int placed = placeShell(level, g, world, noise, random);
         if (sea) placed += flood(level, g, water);
-        decorate(level, g, layout, world, rank, size, random, water);
-        populate(level, slot, layout, g, rank, size, random, sea);
+        decorate(level, g, layout, world, rank, size, random, water, surges);
+        populate(level, slot, layout, g, rank, size, random, sea, surges);
 
-        ProjectZero.LOGGER.info("[Gates] Built {} dungeon slot {} ({} {}): {} blocks in {} ms", world.name, slot,
-                rank, size, placed, (System.nanoTime() - started) / 1_000_000);
+        ProjectZero.LOGGER.info("[Gates] Built {} dungeon slot {} ({} {} surges={}): {} blocks in {} ms", world.name, slot,
+                rank, size, surges, placed, (System.nanoTime() - started) / 1_000_000);
     }
 
     private static BlockState pick(BlockState[] palette, SimplexNoise noise, int x, int y, int z, double scale) {
@@ -471,7 +477,7 @@ public final class GateDungeonArena {
     // ---------------------------------------------------------------- decoration
 
     private static void decorate(ServerLevel level, Grid g, Layout layout, World w, GateRank rank, GateSize size,
-                                 RandomSource random, int water) {
+                                 RandomSource random, int water, int surges) {
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
         Direction[] dirs = Direction.values();
 
@@ -572,10 +578,10 @@ public final class GateDungeonArena {
                 case CHAMBER, SIDE -> {
                     int ruins = 1 + random.nextInt(c.kind == Kind.CHAMBER ? 3 : 2);
                     for (int i = 0; i < ruins; i++) ruin(level, g, c, w, random);
-                    if (random.nextFloat() < (c.kind == Kind.SIDE ? 0.6F : 0.3F)) chestNearWall(level, g, c, rank, random, water);
+                    if (random.nextFloat() < (c.kind == Kind.SIDE ? 0.6F : 0.3F)) chestNearWall(level, g, c, rank, random, water, surges);
                 }
                 case TREASURE -> {
-                    for (int i = 0; i < 2 + random.nextInt(2); i++) chestNearWall(level, g, c, rank, random, water);
+                    for (int i = 0; i < 2 + random.nextInt(2); i++) chestNearWall(level, g, c, rank, random, water, surges);
                     // A treasure cave glitters: extra crystals ring its walls.
                     for (int i = 0; i < 40; i++) {
                         double a = random.nextDouble() * Math.PI * 2;
@@ -593,7 +599,7 @@ public final class GateDungeonArena {
                         }
                     }
                 }
-                case BOSS -> decorateBoss(level, g, c, w, rank, random, water);
+                case BOSS -> decorateBoss(level, g, c, w, rank, random, water, surges);
             }
         }
     }
@@ -661,7 +667,7 @@ public final class GateDungeonArena {
         }
     }
 
-    private static void chestNearWall(ServerLevel level, Grid g, Cave c, GateRank rank, RandomSource random, int water) {
+    private static void chestNearWall(ServerLevel level, Grid g, Cave c, GateRank rank, RandomSource random, int water, int surges) {
         for (int attempt = 0; attempt < 20; attempt++) {
             double a = random.nextDouble() * Math.PI * 2;
             double rr = 0.55 + random.nextDouble() * 0.35;
@@ -669,14 +675,14 @@ public final class GateDungeonArena {
             int y = floorAt(g, x, z, c.floor + 1);
             if (y == Integer.MIN_VALUE || !g.air(x, y + 1, z)) continue;
             Direction facing = Direction.fromYRot(Math.toDegrees(Math.atan2(x - c.x, c.z - z)));   // toward the centre
-            placeChest(level, new BlockPos(x, y, z), facing, rank, random, y <= water);
+            placeChest(level, new BlockPos(x, y, z), facing, rank, random, y <= water, surges);
             g.set(x, y, z, (byte) 0);
             return;
         }
     }
 
     private static void placeChest(ServerLevel level, BlockPos pos, Direction facing, GateRank rank, RandomSource random,
-                                   boolean wet) {
+                                   boolean wet, int surges) {
         level.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing)
                 .setValue(ChestBlock.WATERLOGGED, wet), Block.UPDATE_ALL);
         if (level.getBlockEntity(pos) instanceof ChestBlockEntity chest) {
@@ -685,11 +691,12 @@ public final class GateDungeonArena {
                             ? "chests/stronghold_corridor" : "chests/simple_dungeon"));
             chest.setLootTable(table, random.nextLong());
             Container box = chest;
-            if (random.nextFloat() < 0.40F) {
+            float surgeBonus = (float) (Math.max(0, surges) * GateRules.AGING_SURGE_LOOT_BONUS);
+            if (random.nextFloat() < 0.40F + surgeBonus) {
                 box.setItem(4, EquipmentRules.rollItem(random, EquipmentRules.randomDroppableSlot(random),
                         EquipmentRules.rollStandardRarity(random, false), rank));
             }
-            if (random.nextFloat() < 0.08F + rank.ordinal() * 0.03F) {
+            if (random.nextFloat() < 0.08F + rank.ordinal() * 0.03F + surgeBonus) {
                 box.setItem(13, new ItemStack(ModItems.AWAKENING_SHARD.get()));
             }
             box.setItem(22, new ItemStack(ModItems.MANA_CRYSTAL_SHARD.get(), 1 + random.nextInt(3 + rank.ordinal())));
@@ -714,7 +721,7 @@ public final class GateDungeonArena {
         }
     }
 
-    private static void decorateBoss(ServerLevel level, Grid g, Cave c, World w, GateRank rank, RandomSource random, int water) {
+    private static void decorateBoss(ServerLevel level, Grid g, Cave c, World w, GateRank rank, RandomSource random, int water, int surges) {
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
         // Rank-colored ring in the floor around the centre.
         BlockState glow = rankGlass(rank);
@@ -742,7 +749,7 @@ public final class GateDungeonArena {
                 for (int y = c.floor + 1; y <= daisTop; y++)
                     if (g.air(x, y, z)) { level.setBlock(p.set(x, y, z), w.ruin[0], FLAGS); g.set(x, y, z, (byte) 2); }
         // Reward chest behind the rift.
-        placeChest(level, new BlockPos(exit.getX(), daisTop + 1, exit.getZ() + 3), Direction.NORTH, rank, random, false);
+        placeChest(level, new BlockPos(exit.getX(), daisTop + 1, exit.getZ() + 3), Direction.NORTH, rank, random, false, surges);
     }
 
     private static BlockState rankGlass(GateRank rank) {
@@ -758,28 +765,29 @@ public final class GateDungeonArena {
 
     // ---------------------------------------------------------------- mobs
 
-    private static void populate(ServerLevel level, int slot, Layout layout, Grid g, GateRank rank,
-                                 GateSize size, RandomSource random, boolean sea) {
-        EntityType<?>[] mobs = sea ? new EntityType<?>[]{EntityType.DROWNED, EntityType.DROWNED, EntityType.GUARDIAN} : mobsFor(rank);
-        List<Cave> fights = new ArrayList<>();
-        for (Cave c : layout.caves) if (c.kind == Kind.CHAMBER || c.kind == Kind.SIDE) fights.add(c);
-        int total = size.mobCount() + fights.size() * 3;
-        for (int i = 0; i < total && !fights.isEmpty(); i++) {
-            Cave c = fights.get(i % fights.size());
-            EntityType<?> type = mobs[random.nextInt(mobs.length)];
-            if (!(type.create(level) instanceof Mob mob)) continue;
-            BlockPos spot = spawnSpot(g, c, random);
-            if (spot == null) continue;
-            mob.moveTo(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5, random.nextFloat() * 360.0F, 0.0F);
-            mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), MobSpawnType.EVENT, null);
-            mob.setPersistenceRequired();
-            mob.getPersistentData().putBoolean(MobScaling.GATE_MONSTER_KEY, true);
-            mob.getPersistentData().putInt(DUNGEON_SLOT_KEY, slot);
-            MobScaling.apply(mob, rank, rank.randomLevel(random));
-            level.addFreshEntity(mob);
-        }
+    public static int surgedMobLevel(GateRank rank, int surges, RandomSource random) {
+        return Math.min(rank.maxLevel(), rank.randomLevel(random) + Math.max(0, surges) * GateRules.AGING_SURGE_MOB_LEVELS);
+    }
 
-        Cave bossCave = layout.boss();
+    /** Creates and scales one monster from this gate's pool at {@code pos} (not yet added to level). */
+    public static @Nullable Mob createGateMonster(ServerLevel level, int slot, GateRank rank, int surges,
+                                                  boolean sea, Vec3 pos, RandomSource random) {
+        EntityType<?>[] mobs = sea
+                ? new EntityType<?>[]{EntityType.DROWNED, EntityType.DROWNED, EntityType.GUARDIAN}
+                : mobsFor(rank);
+        EntityType<?> type = mobs[random.nextInt(mobs.length)];
+        if (!(type.create(level) instanceof Mob mob)) return null;
+        mob.moveTo(pos.x, pos.y, pos.z, random.nextFloat() * 360.0F, 0.0F);
+        mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), MobSpawnType.EVENT, null);
+        mob.setPersistenceRequired();
+        mob.getPersistentData().putBoolean(MobScaling.GATE_MONSTER_KEY, true);
+        mob.getPersistentData().putInt(DUNGEON_SLOT_KEY, slot);
+        MobScaling.apply(mob, rank, surgedMobLevel(rank, surges, random));
+        return mob;
+    }
+
+    /** Creates and scales the gate's boss at {@code pos} (not yet added to level). */
+    public static @Nullable Mob createGateBoss(ServerLevel level, int slot, GateRank rank, boolean sea, Vec3 pos) {
         EntityType<? extends Mob> bossType = sea
                 ? (rank.ordinal() >= GateRank.A.ordinal() ? EntityType.ELDER_GUARDIAN : EntityType.DROWNED)
                 : switch (rank) {
@@ -788,29 +796,175 @@ public final class GateDungeonArena {
                     case A, S -> EntityType.WITHER_SKELETON;
                 };
         Mob boss = bossType.create(level);
-        if (boss != null) {
-            boss.moveTo(bossCave.x + 0.5, bossCave.floor + 1.0, bossCave.z + 0.5, 180.0F, 0.0F);
-            boss.finalizeSpawn(level, level.getCurrentDifficultyAt(boss.blockPosition()), MobSpawnType.EVENT, null);
-            boss.setPersistenceRequired();
-            boss.getPersistentData().putBoolean(MobScaling.GATE_MONSTER_KEY, true);
-            boss.getPersistentData().putBoolean(MobScaling.GATE_BOSS_KEY, true);
-            boss.getPersistentData().putInt(DUNGEON_SLOT_KEY, slot);
-            MobScaling.apply(boss, rank, rank.maxLevel());
+        if (boss == null) return null;
+        boss.moveTo(pos.x, pos.y, pos.z, 180.0F, 0.0F);
+        boss.finalizeSpawn(level, level.getCurrentDifficultyAt(boss.blockPosition()), MobSpawnType.EVENT, null);
+        boss.setPersistenceRequired();
+        boss.getPersistentData().putBoolean(MobScaling.GATE_MONSTER_KEY, true);
+        boss.getPersistentData().putBoolean(MobScaling.GATE_BOSS_KEY, true);
+        boss.getPersistentData().putInt(DUNGEON_SLOT_KEY, slot);
+        applyBossRankScaling(boss, rank);
+        return boss;
+    }
 
-            AttributeInstance hp = boss.getAttribute(Attributes.MAX_HEALTH);
-            if (hp != null) {
-                hp.addPermanentModifier(new AttributeModifier(
-                        ProjectZero.id("gate_boss_hp"),
-                        GateRules.BOSS_EXTRA_HEALTH_MULT - 1.0,
-                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
-                boss.setHealth(boss.getMaxHealth());
-            }
-            boss.setCustomName(Component.literal("[" + rank.name() + " · BOSS · Lv " + rank.maxLevel() + "] ")
-                    .withStyle(rank.chatColor(), ChatFormatting.BOLD)
-                    .append(boss.getType().getDescription().copy().withStyle(ChatFormatting.GOLD)));
-            boss.setCustomNameVisible(true);
-            level.addFreshEntity(boss);
+    public static void applyBossRankScaling(Mob boss, GateRank rank) {
+        ResourceLocation bossHpId = ProjectZero.id("gate_boss_hp");
+        AttributeInstance hpBefore = boss.getAttribute(Attributes.MAX_HEALTH);
+        if (hpBefore != null) hpBefore.removeModifier(bossHpId);
+
+        MobScaling.apply(boss, rank, rank.maxLevel());
+
+        AttributeInstance hp = boss.getAttribute(Attributes.MAX_HEALTH);
+        if (hp != null) {
+            hp.addPermanentModifier(new AttributeModifier(
+                    bossHpId,
+                    GateRules.BOSS_EXTRA_HEALTH_MULT - 1.0,
+                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+            boss.setHealth(boss.getMaxHealth());
         }
+        boss.setCustomName(Component.literal("[" + rank.name() + " · BOSS · Lv " + rank.maxLevel() + "] ")
+                .withStyle(rank.chatColor(), ChatFormatting.BOLD)
+                .append(boss.getType().getDescription().copy().withStyle(ChatFormatting.GOLD)));
+        boss.setCustomNameVisible(true);
+    }
+
+    private static void populate(ServerLevel level, int slot, Layout layout, Grid g, GateRank rank,
+                                 GateSize size, RandomSource random, boolean sea, int surges) {
+        List<Cave> fights = new ArrayList<>();
+        for (Cave c : layout.caves) if (c.kind == Kind.CHAMBER || c.kind == Kind.SIDE) fights.add(c);
+        int total = size.mobCount() + fights.size() * 3;
+        for (int i = 0; i < total && !fights.isEmpty(); i++) {
+            Cave c = fights.get(i % fights.size());
+            BlockPos spot = spawnSpot(g, c, random);
+            if (spot == null) continue;
+            Mob mob = createGateMonster(level, slot, rank, surges, sea,
+                    new Vec3(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5), random);
+            if (mob != null) level.addFreshEntity(mob);
+        }
+
+        Cave bossCave = layout.boss();
+        Mob boss = createGateBoss(level, slot, rank, sea,
+                new Vec3(bossCave.x + 0.5, bossCave.floor + 1.0, bossCave.z + 0.5));
+        if (boss != null) level.addFreshEntity(boss);
+    }
+
+    /** Bounding box enclosing all caves of {@code slot}. */
+    public static AABB dungeonBounds(int slot, GateSize size, boolean sea) {
+        Layout layout = layout(slot, size, sea);
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        for (Cave c : layout.caves) {
+            minX = Math.min(minX, c.x - c.rx - 16);
+            maxX = Math.max(maxX, c.x + c.rx + 16);
+            minY = Math.min(minY, c.floor - 12);
+            maxY = Math.max(maxY, c.floor + c.h + 12);
+            minZ = Math.min(minZ, c.z - c.rz - 16);
+            maxZ = Math.max(maxZ, c.z + c.rz + 16);
+        }
+        return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    private static void touchCaveChunks(ServerLevel level, Layout layout) {
+        for (Cave c : layout.caves) {
+            level.getChunk(c.x >> 4, c.z >> 4);
+        }
+    }
+
+    /**
+     * Rescales living gate monsters in an already-built dungeon to {@code rank} and {@code surges}.
+     * Safe to call both on rank-up/surge and when a player re-enters (catching newly loaded entity sections).
+     */
+    public static void syncMonstersInSlot(ServerLevel dungeonLevel, int slot, GateRank rank, GateSize size,
+                                          boolean sea, int surges) {
+        Layout layout = layout(slot, size, sea);
+        touchCaveChunks(dungeonLevel, layout);
+        AABB box = dungeonBounds(slot, size, sea);
+        RandomSource random = dungeonLevel.getRandom();
+        String surgeTag = ProjectZero.MOD_ID + ":applied_surges";
+
+        List<Mob> mobs = dungeonLevel.getEntitiesOfClass(Mob.class, box,
+                m -> m.isAlive()
+                        && m.getPersistentData().getBoolean(MobScaling.GATE_MONSTER_KEY)
+                        && m.getPersistentData().getInt(DUNGEON_SLOT_KEY) == slot);
+
+        for (Mob mob : mobs) {
+            boolean isBoss = mob.getPersistentData().getBoolean(MobScaling.GATE_BOSS_KEY);
+            GateRank curRank = MobScaling.getRank(mob);
+            int prevSurges = mob.getPersistentData().getInt(surgeTag);
+            if (isBoss) {
+                if (curRank != rank) {
+                    applyBossRankScaling(mob, rank);
+                }
+            } else if (curRank != rank) {
+                MobScaling.apply(mob, rank, surgedMobLevel(rank, surges, random));
+                mob.getPersistentData().putInt(surgeTag, surges);
+            } else if (surges > prevSurges) {
+                int delta = (surges - prevSurges) * GateRules.AGING_SURGE_MOB_LEVELS;
+                int nextLvl = Math.min(rank.maxLevel(), MobScaling.effectiveLevel(mob) + delta);
+                MobScaling.apply(mob, rank, nextLvl);
+                mob.getPersistentData().putInt(surgeTag, surges);
+            }
+        }
+    }
+
+    /** Spawns {@link GateRules#AGING_RANKUP_EXTRA_MOBS} (+25%) extra monsters into an already-built dungeon's chambers. */
+    public static int spawnRankUpReinforcements(ServerLevel dungeonLevel, int slot, GateRank rank, GateSize size,
+                                                boolean sea, int surges) {
+        Layout layout = layout(slot, size, sea);
+        touchCaveChunks(dungeonLevel, layout);
+        List<Cave> fights = new ArrayList<>();
+        for (Cave c : layout.caves) if (c.kind == Kind.CHAMBER || c.kind == Kind.SIDE) fights.add(c);
+        if (fights.isEmpty()) return 0;
+
+        int baseTotal = size.mobCount() + fights.size() * 3;
+        int extra = Math.max(1, (int) Math.round(baseTotal * GateRules.AGING_RANKUP_EXTRA_MOBS));
+        RandomSource random = dungeonLevel.getRandom();
+        int spawned = 0;
+
+        for (int i = 0; i < extra; i++) {
+            Cave c = fights.get(i % fights.size());
+            BlockPos spot = liveCaveSpot(dungeonLevel, c, sea, random);
+            if (spot == null) continue;
+            Mob mob = createGateMonster(dungeonLevel, slot, rank, surges, sea,
+                    new Vec3(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5), random);
+            if (mob != null) {
+                mob.getPersistentData().putInt(ProjectZero.MOD_ID + ":applied_surges", surges);
+                dungeonLevel.addFreshEntity(mob);
+                spawned++;
+            }
+        }
+        return spawned;
+    }
+
+    private static @Nullable BlockPos liveCaveSpot(ServerLevel level, Cave c, boolean sea, RandomSource random) {
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        for (int attempt = 0; attempt < 20; attempt++) {
+            double a = random.nextDouble() * Math.PI * 2, rr = random.nextDouble() * 0.65;
+            int x = c.x + (int) Math.round(Math.sin(a) * c.rx * rr);
+            int z = c.z + (int) Math.round(Math.cos(a) * c.rz * rr);
+            for (int y = c.floor - 3; y <= c.floor + 6; y++) {
+                BlockState floor = level.getBlockState(p.set(x, y - 1, z));
+                if (!floor.blocksMotion()) continue;
+                BlockState s1 = level.getBlockState(p.set(x, y, z));
+                BlockState s2 = level.getBlockState(p.set(x, y + 1, z));
+                boolean open1 = s1.isAir() || (sea && s1.is(Blocks.WATER));
+                boolean open2 = s2.isAir() || (sea && s2.is(Blocks.WATER));
+                if (open1 && open2) return new BlockPos(x, y, z);
+            }
+        }
+        return null;
+    }
+
+    /** Removes all living gate monsters in {@code slot} when a Dungeon Break pulls them outside. */
+    public static int clearDungeonMonsters(ServerLevel dungeonLevel, int slot, GateSize size, boolean sea) {
+        Layout layout = layout(slot, size, sea);
+        touchCaveChunks(dungeonLevel, layout);
+        List<Mob> mobs = dungeonLevel.getEntitiesOfClass(Mob.class, dungeonBounds(slot, size, sea),
+                m -> m.isAlive()
+                        && m.getPersistentData().getBoolean(MobScaling.GATE_MONSTER_KEY)
+                        && m.getPersistentData().getInt(DUNGEON_SLOT_KEY) == slot);
+        for (Mob m : mobs) m.discard();
+        return mobs.size();
     }
 
     private static BlockPos spawnSpot(Grid g, Cave c, RandomSource random) {
