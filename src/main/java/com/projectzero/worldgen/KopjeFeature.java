@@ -31,7 +31,10 @@ public class KopjeFeature extends Feature<NoneFeatureConfiguration> {
             double ang = i * Math.PI * 2 / base + r.nextDouble() * 0.6;
             double d = 2 + r.nextDouble() * 2.5;
             double rad = 2.6 + r.nextDouble() * 1.6;
-            boulder(level, o.offset((int) Math.round(Math.cos(ang) * d), -1, (int) Math.round(Math.sin(ang) * d)), rad, rad * 0.8, r);
+            // Sit each base boulder on the ground under it, so on a slope none hangs over the drop.
+            BlockPos at = o.offset((int) Math.round(Math.cos(ang) * d), 0, (int) Math.round(Math.sin(ang) * d));
+            int dy = groundOffset(level, at);
+            boulder(level, at.above(Math.min(dy, 0) - 1), rad, rad * 0.8, r);
             topY = Math.max(topY, rad * 0.8 * 2 - 2);
         }
         // Middle: one or two big ones riding on the base.
@@ -66,6 +69,17 @@ public class KopjeFeature extends Feature<NoneFeatureConfiguration> {
             }
         }
         return true;
+    }
+
+    /** How far the ground under this column is above (+) or below (-) the origin's ground, from -6 to +4. */
+    private static int groundOffset(WorldGenLevel level, BlockPos at) {
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        for (int dy = 4; dy >= -6; dy--) {
+            p.set(at.getX(), at.getY() + dy - 1, at.getZ());
+            BlockState s = level.getBlockState(p);
+            if (s.is(BlockTags.DIRT) || s.is(BlockTags.SAND) || s.is(BlockTags.BASE_STONE_OVERWORLD) || s.is(BlockTags.TERRACOTTA)) return dy;
+        }
+        return -6;
     }
 
     private static boolean isRock(BlockState s) {

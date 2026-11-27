@@ -43,11 +43,12 @@ public class SaltMoundFeature extends Feature<NoneFeatureConfiguration> {
     /** A small cone of salt whose base sits on the flat, standing in the water if there is any. */
     private static void cone(WorldGenLevel level, BlockPos c, double r0, int h, BlockState salt) {
         // Find the flat's surface in this column: the first block that is neither air nor water.
-        int y = c.getY();
+        int y = Integer.MIN_VALUE;
         for (int dy = 2; dy >= -3; dy--) {
             BlockState b = level.getBlockState(c.above(dy));
             if (!b.isAir() && !b.is(Blocks.WATER)) { y = c.getY() + dy + 1; break; }
         }
+        if (y == Integer.MIN_VALUE) return; // deep water or a hole here: no floor to stand on
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
         for (int dy = 0; dy < h; dy++) {
             double rad = r0 * (1 - dy / (double) h) + 0.3;
