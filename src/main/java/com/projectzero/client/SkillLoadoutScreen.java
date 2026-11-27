@@ -166,7 +166,18 @@ public class SkillLoadoutScreen extends Screen {
             }
         }
         String cycle = ModKeyBindings.CYCLE_PRESET.getTranslatedKeyMessage().getString().toUpperCase();
-        small(g, cycle + ": NEXT PRESET IN A FIGHT  ·  SWAPPING LOCKS SKILLS FOR 0.5S", PX, H - 12, MUTED);
+        // The hint is wider than the preset column, so it runs under the whole window, centred.
+        // If it still does not fit (long key names, other fonts) it breaks into two lines.
+        String hintA = cycle + ": NEXT PRESET IN A FIGHT";
+        String hintB = "SWAPPING LOCKS SKILLS FOR 0.5S";
+        String hint = hintA + "  ·  " + hintB;
+        int room = Math.round((W - 2 * LX) / 0.75F);
+        if (font.width(hint) <= room) {
+            small(g, hint, (W - Math.round(font.width(hint) * 0.75F)) / 2, H - 12, MUTED);
+        } else {
+            small(g, hintA, (W - Math.round(font.width(hintA) * 0.75F)) / 2, H - 17, MUTED);
+            small(g, hintB, (W - Math.round(font.width(hintB) * 0.75F)) / 2, H - 10, MUTED);
+        }
         g.pose().popPose();
 
         // The held skill follows the cursor.
