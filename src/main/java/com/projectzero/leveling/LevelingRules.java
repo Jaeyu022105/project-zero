@@ -7,7 +7,9 @@ package com.projectzero.leveling;
 public final class LevelingRules {
     private LevelingRules() {}
 
-    public static final int MAX_LEVEL = 100;
+    public static final int CEILING_LEVEL = 100;
+    /** Raised past 100 for post-ceiling play; owner still has to confirm the real cap. */
+    public static final int MAX_LEVEL = 200;
     public static final int STAT_POINTS_PER_LEVEL = 5;
 
     /**

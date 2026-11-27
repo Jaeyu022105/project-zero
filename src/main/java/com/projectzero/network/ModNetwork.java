@@ -16,7 +16,8 @@ public final class ModNetwork {
     // Bump whenever the packet list or a packet's format changes.
     // 8: skill presets (AssignSkillSlotPacket preset field, SwitchPresetPacket, preset sync).
     // 9: SystemNoticePacket.
-    private static final int PROTOCOL_VERSION = 9;
+    // 10: level ceiling sync (PlayerStats.ceilingBroken + SyncJobPacket.noCeiling).
+    private static final int PROTOCOL_VERSION = 10;
 
     public static final SimpleChannel CHANNEL = ChannelBuilder
             .named(ProjectZero.id("main"))

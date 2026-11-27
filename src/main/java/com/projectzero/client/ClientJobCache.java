@@ -10,6 +10,7 @@ public final class ClientJobCache {
 
     private static PlayerJob job = PlayerJob.NONE;
     private static @Nullable JobRarity rarity;
+    private static boolean noCeiling;
 
     public static PlayerJob get() {
         return job;
@@ -20,8 +21,17 @@ public final class ClientJobCache {
         return rarity;
     }
 
+    public static boolean noCeiling() {
+        return noCeiling;
+    }
+
     public static void set(PlayerJob newJob, @Nullable JobRarity newRarity) {
+        set(newJob, newRarity, false);
+    }
+
+    public static void set(PlayerJob newJob, @Nullable JobRarity newRarity, boolean newNoCeiling) {
         job = newJob;
         rarity = newRarity;
+        noCeiling = newNoCeiling;
     }
 }

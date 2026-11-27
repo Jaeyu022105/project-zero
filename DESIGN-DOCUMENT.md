@@ -31,7 +31,7 @@ Where we branch off from Solo Leveling: **Awakening Stones** in custom villages 
   - Any mob can be given a fixed XP value with `XpRewards.register`.
 - **[Built]** Each level gives **5 ability points**. Leveling up fully heals the player and shows a "LEVEL UP!" title and a [System] message.
 - **[Idea]** Hunter rank (E to S, then National Level) shown on the status window, derived from level. Gates check rank, not level.
-- **[Planned] The level ceiling** (owner decision 2026-11-27): XP stops at **level 100**. To break the ceiling, the player takes a quest from a high-ranked NPC who lives only in an advanced civilization, completes it, and reports back to them. Only then does leveling continue past 100. Monarch-class jobs have **no ceiling** (section 8). The full path is in section 16.
+- **[Built] The level ceiling** (`LevelingRules.CEILING_LEVEL = 100`, `PlayerStats.ceilingBroken`, `LevelingService.breakCeiling`; owner decision 2026-11-27): XP stops at **level 100** (`LEVEL CEILING` on the status window XP bar + one-time warning notice; temporary `MAX_LEVEL = 200` pending owner's final cap). To break the ceiling, the player takes a quest from a high-ranked NPC who lives only in an advanced civilization, completes it, and reports back to them (`LevelingService.breakCeiling` is built; the NPC quest itself is **[Planned]** in section 16). Monarch-class jobs have **no ceiling** (`"no_ceiling": true` in job JSON, section 8). Debug: `/pz ceiling status|break|reset` and `/pz level <n>`.
 
 ## 3. Stats
 
@@ -133,7 +133,7 @@ Our own mechanic, not in Solo Leveling.
 ## 8. Monarch path
 
 - **[Idea]** The very end game. A Legendary job advanced through several trials can become a **Monarch**. Monarchs get domain-style abilities (e.g. raising defeated bosses as allies for a Necromancer → Shadow Monarch path).
-- **[Planned]** Monarch-class jobs have no level ceiling: they never need the ceiling-break quest (section 2).
+- **[Built]** Monarch-class jobs have no level ceiling (`"no_ceiling": true` in job JSON): they never need the ceiling-break quest (section 2).
 - Kept as a long-term goal. Do not build until jobs, skills, gates and bosses exist.
 
 ## 9. Gates and dungeons

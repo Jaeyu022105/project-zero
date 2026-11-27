@@ -86,7 +86,8 @@ public final class JobRegistry extends SimpleJsonResourceReloadListener {
         String rarityName = GsonHelper.getAsString(json, "rarity");
         JobRarity rarity = JobRarity.byName(rarityName);
         if (rarity == null) throw new JsonParseException("unknown rarity '" + rarityName + "'");
-        return new Job(id, rarity, optionalId(json, "upgradesTo"), optionalId(json, "trial"));
+        boolean noCeiling = GsonHelper.getAsBoolean(json, "no_ceiling", false);
+        return new Job(id, rarity, optionalId(json, "upgradesTo"), optionalId(json, "trial"), noCeiling);
     }
 
     private static Optional<ResourceLocation> optionalId(JsonObject json, String field) {

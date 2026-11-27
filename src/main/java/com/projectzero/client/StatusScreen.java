@@ -253,11 +253,12 @@ public class StatusScreen extends Screen {
             bar(g, col1, 60, RW / 2 - 6, "HP", Math.round(player.getHealth()), Math.round(player.getMaxHealth()), HP_FILL);
         }
         bar(g, col2, 60, RW / 2 - 4, "MP", ClientSkillsCache.currentMana(), ClientSkillsCache.maxMana(), MP_FILL);
-        float progress = s.isMaxLevel() ? 1F : (float) s.xp() / s.xpToNext();
+        boolean atCeiling = s.isAtCeiling(ClientJobCache.noCeiling());
+        float progress = (s.isMaxLevel() || atCeiling) ? 1F : (float) s.xp() / s.xpToNext();
         g.fill(col1, 80, RX + RW, 84, BAR_BG);
-        g.fill(col1, 80, col1 + Math.round(RW * Math.min(1F, progress)), 84, XP_FILL);
-        String xpText = s.isMaxLevel() ? "MAX LEVEL" : "XP " + s.xp() + " / " + s.xpToNext();
-        g.drawCenteredString(font, xpText, RX + RW / 2, 87, MUTED);
+        g.fill(col1, 80, col1 + Math.round(RW * Math.min(1F, progress)), 84, atCeiling ? HIGHLIGHT : XP_FILL);
+        String xpText = xpBarLabel(s);
+        g.drawCenteredString(font, xpText, RX + RW / 2, 87, atCeiling ? HIGHLIGHT : MUTED);
 
         g.fill(RX, 98, RX + RW, 99, DIVIDER);
 
@@ -415,6 +416,12 @@ public class StatusScreen extends Screen {
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    public static String xpBarLabel(PlayerStats s) {
+        if (s.isMaxLevel()) return "MAX LEVEL";
+        if (s.isAtCeiling(ClientJobCache.noCeiling())) return "LEVEL CEILING";
+        return "XP " + s.xp() + " / " + s.xpToNext();
     }
 
     @Override

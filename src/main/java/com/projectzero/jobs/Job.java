@@ -13,7 +13,13 @@ import java.util.Optional;
  * @param trial      id of the trial gate that unlocks the upgrade; trials are not built yet
  */
 public record Job(ResourceLocation id, JobRarity rarity,
-                  Optional<ResourceLocation> upgradesTo, Optional<ResourceLocation> trial) {
+                  Optional<ResourceLocation> upgradesTo, Optional<ResourceLocation> trial,
+                  boolean noCeiling) {
+
+    public Job(ResourceLocation id, JobRarity rarity,
+               Optional<ResourceLocation> upgradesTo, Optional<ResourceLocation> trial) {
+        this(id, rarity, upgradesTo, trial, false);
+    }
 
     /** Lang key {@code job.<namespace>.<path>}, resolved on the client. */
     public static String translationKey(ResourceLocation id) {

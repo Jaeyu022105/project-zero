@@ -11,6 +11,8 @@ public final class PlayerStats {
     private int level = 1;
     private long xp = 0;
     private int unspentPoints = 0;
+    private boolean ceilingBroken = false;
+    private boolean ceilingWarned = false;
     private final EnumMap<Stat, Integer> stats = new EnumMap<>(Stat.class);
 
     public PlayerStats() {
@@ -32,23 +34,37 @@ public final class PlayerStats {
     public int level() { return level; }
     public long xp() { return xp; }
     public int unspentPoints() { return unspentPoints; }
+    public boolean ceilingBroken() { return ceilingBroken; }
+    public void setCeilingBroken(boolean ceilingBroken) { this.ceilingBroken = ceilingBroken; }
+    public boolean ceilingWarned() { return ceilingWarned; }
+    public void setCeilingWarned(boolean ceilingWarned) { this.ceilingWarned = ceilingWarned; }
     public int get(Stat stat) { return stats.get(stat); }
     public int bonus(Stat stat) { return get(stat) - Stat.BASE_VALUE; }
     public boolean isMaxLevel() { return level >= LevelingRules.MAX_LEVEL; }
+    public boolean isAtCeiling() { return isAtCeiling(false); }
+    public boolean isAtCeiling(boolean jobNoCeiling) {
+        return !ceilingBroken && !jobNoCeiling && level >= LevelingRules.CEILING_LEVEL && !isMaxLevel();
+    }
     public long xpToNext() { return LevelingRules.xpToNextLevel(level); }
 
-    /** Adds XP and returns how many levels were gained. */
+    /** Adds XP respecting the level 100 ceiling unless {@link #ceilingBroken()} is set. */
     public int addXp(long amount) {
-        if (amount <= 0 || isMaxLevel()) return 0;
+        return addXp(amount, ceilingBroken);
+    }
+
+    /** Adds XP and returns how many levels were gained. */
+    public int addXp(long amount, boolean bypassCeiling) {
+        int cap = bypassCeiling ? LevelingRules.MAX_LEVEL : LevelingRules.CEILING_LEVEL;
+        if (amount <= 0 || level >= cap) return 0;
         xp += amount;
         int gained = 0;
-        while (!isMaxLevel() && xp >= xpToNext()) {
+        while (level < cap && xp >= xpToNext()) {
             xp -= xpToNext();
             level++;
             unspentPoints += LevelingRules.STAT_POINTS_PER_LEVEL;
             gained++;
         }
-        if (isMaxLevel()) xp = 0;
+        if (level >= cap) xp = 0;
         return gained;
     }
 
@@ -67,6 +83,8 @@ public final class PlayerStats {
         tag.putInt("level", level);
         tag.putLong("xp", xp);
         tag.putInt("points", unspentPoints);
+        tag.putBoolean("ceilingBroken", ceilingBroken);
+        if (ceilingWarned) tag.putBoolean("ceilingWarned", true);
         CompoundTag statTag = new CompoundTag();
         for (Map.Entry<Stat, Integer> e : stats.entrySet()) {
             statTag.putInt(e.getKey().key(), e.getValue());
@@ -81,6 +99,8 @@ public final class PlayerStats {
             s.level = Math.max(1, Math.min(LevelingRules.MAX_LEVEL, tag.getInt("level")));
             s.xp = Math.max(0, tag.getLong("xp"));
             s.unspentPoints = Math.max(0, tag.getInt("points"));
+            s.ceilingBroken = tag.getBoolean("ceilingBroken");
+            s.ceilingWarned = tag.getBoolean("ceilingWarned");
             CompoundTag statTag = tag.getCompound("stats");
             for (Stat stat : Stat.values()) {
                 if (statTag.contains(stat.key())) {
@@ -97,6 +117,7 @@ public final class PlayerStats {
         buf.writeVarInt(level);
         buf.writeVarLong(xp);
         buf.writeVarInt(unspentPoints);
+        buf.writeBoolean(ceilingBroken);
         for (Stat stat : Stat.values()) {
             buf.writeVarInt(stats.get(stat));
         }
@@ -107,6 +128,7 @@ public final class PlayerStats {
         s.level = buf.readVarInt();
         s.xp = buf.readVarLong();
         s.unspentPoints = buf.readVarInt();
+        s.ceilingBroken = buf.readBoolean();
         for (Stat stat : Stat.values()) {
             s.stats.put(stat, buf.readVarInt());
         }

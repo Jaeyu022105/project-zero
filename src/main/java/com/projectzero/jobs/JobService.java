@@ -40,6 +40,12 @@ public final class JobService {
         return data.hasJob() ? JobRegistry.get(data.jobId()) : null;
     }
 
+    /** True if the player's current job ignores the level 100 ceiling (Monarch-class jobs, §8). */
+    public static boolean hasNoCeiling(Player player) {
+        Job def = currentJob(player);
+        return def != null && def.noCeiling();
+    }
+
     /** Saves the job data and sends it to the player's client. */
     public static void set(ServerPlayer player, PlayerJob job) {
         player.getPersistentData().put(DATA_KEY, job.save());
@@ -53,7 +59,10 @@ public final class JobService {
 
     private static void sync(ServerPlayer player, PlayerJob job) {
         Job def = job.hasJob() ? JobRegistry.get(job.jobId()) : null;
-        ModNetwork.sendToPlayer(player, new SyncJobPacket(job, def != null ? def.rarity().ordinal() : -1));
+        ModNetwork.sendToPlayer(player, new SyncJobPacket(
+                job,
+                def != null ? def.rarity().ordinal() : -1,
+                def != null && def.noCeiling()));
     }
 
     /**

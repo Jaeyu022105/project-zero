@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Reset backlog Task 1: bottom-right System notices HUD, `ui.noticeChatLines`, and shared notice routing).
+Last caught up: **2026-11-27** (Reset backlog Task 2: level 100 ceiling, `LevelingService.breakCeiling`, `"no_ceiling"` job flag, and `/pz ceiling` + `/pz level`).
 
 ---
 
@@ -67,7 +67,7 @@ The durable project context lives in:
 Version **0.1.0** plus the job system (no new version number yet). Implemented:
 
 - Mod scaffold: Forge 52.1.0 for Minecraft 1.21.1, Java 21, Gradle 8.10.2 wrapper, official Mojang mappings.
-- Leveling: levels 1 to 100, progressively harder XP curve, 5 ability points per level, full heal and "LEVEL UP!" title on level up.
+- Leveling: levels 1 to 200 (`MAX_LEVEL = 200`, pending owner's final cap) with a **level ceiling at 100** (`CEILING_LEVEL = 100`, `PlayerStats.ceilingBroken`, `LevelingService.breakCeiling`, `"no_ceiling"` Monarch job flag), progressively harder XP curve, 5 ability points per level, full heal and "LEVEL UP!" title + notice on level up.
 - XP from kills: every non-player mob gives XP. Vanilla Ã—0.3, other mods Ã—1, gate monsters Ã—3 (`projectzero:gate_monsters` tag or `projectzero:gate_monster` NBT), bosses Ã—10, multiplied by `GateRank` (`Ã—1..Ã—32`) and level-gap penalty (`âˆ’5%` per level past a 5-level gap, `10%` floor).
 - Mob Ranks, Gates, Ancient/Sea Variants, Aging & Dungeon Breaks (`gates/`): `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `MobScaling.apply(entity, rank, level)` (`[C · Lv 34] Zombie` nameplates), free-floating rifts (`GateBlock` + `GateBlockEntity` + `GateRiftRenderer`), sea gates (`GateBlock.SEA`), carved circular stone-ring ancient gates (`AncientGate`, `AncientGateStoneBlock`, `AncientGateFeature` worldgen, `AncientGate.ruin` on clear), `projectzero:dungeon` void dimension (`DungeonSavedData` + multi-chamber remnant-world `GateDungeonArena` with 8 themes, `mana_crystal` clusters dropping `mana_crystal_shard`, scattered chests, return rift on E..A), boss kill loop (drops `Awakening Shard` + 100% rolled accessory, increments `gatesCleared`, opens exit rift, closes overworld gate), gate aging (`projectzero:gateAging` default `true`: surges every 7 days up to 3 for +3 mob levels & +5% chest loot, rank-up at 28 days updating `GateBlock.RANK`, `AncientGate.setRank`, and rescaling built dungeons +25% mobs), dungeon breaks (`projectzero:dungeonBreaks` default `true`: breaks at 2nd rank-up or S-rank's next rank-up within 96 blocks, `BROKEN=true`, clears interior mobs, spawns 5 outdoor waves every 60s + boss on wave 5), `/pz mob spawn <entity> <rank> [level]`, and `/pz gate spawn <rank> <size> [sea|ancient] | leave | age <days> | break`.
 - Stats: Strength, Agility, Vitality, Sense, Intelligence, rebalanced onto diminishing-return soft-cap curves (`LevelingRules.soft(p, k)`).
@@ -161,9 +161,10 @@ Resources:
 
 Player data lives in the player's persistent NBT under `projectzero:stats`:
 
-- `level` (int, 1 to 100)
+- `level` (int, 1 to 200; capped at 100 until `ceilingBroken` is true or job has `no_ceiling`)
 - `xp` (long, progress inside the current level)
 - `points` (int, unspent ability points)
+- `ceilingBroken` (boolean, whether the level 100 ceiling has been broken)
 - `stats` (compound: `strength`, `agility`, `vitality`, `sense`, `intelligence`, ints â‰¥ 10)
 
 It is copied to the new player entity in `PlayerEvent.Clone`, so it survives death and leaving the End. Attribute modifiers are transient and re-applied on login and respawn, so they never pile up in saves.
@@ -838,6 +839,42 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 **Remaining Recommendations**
 
 1. Task 2: Level ceiling at 100 (`PlayerStats.ceilingBroken`, `MAX_LEVEL = 200`, `LevelingService.breakCeiling`, `"no_ceiling"` job JSON flag, `/pz ceiling`).
+
+---
+
+### Session Log — 2026-11-27 (Reset Backlog Task 2: Level ceiling at 100)
+
+**Context & Direction Check**
+
+- Implemented Task 2 of `.agents/prompts/gemini-reset-backlog.md` (`DESIGN-DOCUMENT.md` §2, §8, §16): level ceiling at `100` (`CEILING_LEVEL = 100`, `MAX_LEVEL = 200` pending owner's final cap), `PlayerStats.ceilingBroken`, `StatusScreen` `LEVEL CEILING` bar readout, one-time `WARNING` notice on reaching 100, `LevelingService.breakCeiling`, optional `"no_ceiling": true` Monarch job field, and `/pz ceiling status|break|reset` + `/pz level <n>`.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/leveling/`:
+  - `LevelingRules.java`: added `CEILING_LEVEL = 100` and raised `MAX_LEVEL = 200` (with comment noting owner still has to confirm the real cap).
+  - `PlayerStats.java`: added `ceilingBroken` and `ceilingWarned` (saved to NBT, copied on clone, synced to client), `isAtCeiling(...)`, and `addXp(amount, bypassCeiling)`.
+  - `LevelingService.java`: blocked XP gain at `CEILING_LEVEL` unless `ceilingBroken` or `JobService.hasNoCeiling(player)`, emitted one-time `WARNING` notice on hitting level 100, added `breakCeiling` (`LIMIT BROKEN` center title + `LEVEL_UP` notice), `resetCeiling`, and `setLevel`.
+  - `LevelingCommands.java`: added `/pz level <n>` and `/pz ceiling status|break|reset`.
+- `src/main/java/com/projectzero/jobs/`, `network/`, `client/`:
+  - `Job.java`, `JobRegistry.java`, `JobService.java`, `SyncJobPacket.java`, `ClientJobCache.java`: added optional `"no_ceiling": true` job JSON flag (default `false`) and synced it to the client; bumped `ModNetwork.PROTOCOL_VERSION` to `10`.
+  - `StatusScreen.java` & `SkillHudOverlay.java`: rendered full XP bar with `LEVEL CEILING` label when capped at 100.
+- `DESIGN-DOCUMENT.md` & `HANDOFF.md`: updated §2 and §8 status tags and data model notes.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded `pz_backlog_test` world + death + relog cycle):
+  - Ran `/pz level 99` + `/pz xp 2000000` → capped at `level=100, xp=0`, `StatusScreen.xpBarLabel` = `LEVEL CEILING`, and emitted one-time `WARNING` notice (`Level ceiling reached. Someone of high rank must judge you.`).
+  - Killed a zombie at ceiling → verified `level=100, xp=0` and zero duplicate ceiling warnings.
+  - Ran `/pz ceiling break` + `/pz xp` → verified `ceilingBroken=true`, `level=101, xp=500`, `bar='XP 500 / 408499'`, and `XpRewards.forKill` works cleanly above 100.
+  - Killed and respawned player → verified `level=101, ceilingBroken=true`.
+  - Disconnected to `TitleScreen` and reopened world → verified `serverBroken=true, clientBroken=true, level=101`. Zero mod errors in `run/logs/latest.log`.
+- Placeholders: none added in Task 2.
+- Open question for Jaime: confirm the intended post-ceiling `MAX_LEVEL` (currently `200`).
+
+**Remaining Recommendations**
+
+1. Task 3: Storm the gate (`GateBlockEntity.stormable`, wave clear detection, wave pause while inside dungeon, boss clear inside/outside).
 
 ---
 
