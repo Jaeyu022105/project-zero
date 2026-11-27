@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "projectzero:block/skywood_pressure_plate"
+    },
+    "powered=true": {
+      "model": "projectzero:block/skywood_pressure_plate_down"
+    }
+  }
+}

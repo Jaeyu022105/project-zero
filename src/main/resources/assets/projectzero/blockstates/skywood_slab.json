@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "projectzero:block/skywood_slab"
+    },
+    "type=double": {
+      "model": "projectzero:block/skywood_planks"
+    },
+    "type=top": {
+      "model": "projectzero:block/skywood_slab_top"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "LL",
+    "LL"
+  ],
+  "key": {
+    "L": {
+      "item": "projectzero:skywood_log"
+    }
+  },
+  "result": {
+    "id": "projectzero:skywood_wood",
+    "count": 3
+  }
+}

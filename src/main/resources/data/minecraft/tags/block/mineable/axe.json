@@ -6,6 +6,17 @@
     "projectzero:glowcap_gills",
     "projectzero:skywood_log",
     "projectzero:skywood_planks",
-    "projectzero:violet_cap"
+    "projectzero:violet_cap",
+    "projectzero:stripped_skywood_log",
+    "projectzero:skywood_wood",
+    "projectzero:stripped_skywood_wood",
+    "projectzero:skywood_slab",
+    "projectzero:skywood_stairs",
+    "projectzero:skywood_fence",
+    "projectzero:skywood_fence_gate",
+    "projectzero:skywood_door",
+    "projectzero:skywood_trapdoor",
+    "projectzero:skywood_button",
+    "projectzero:skywood_pressure_plate"
   ]
 }

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "projectzero:block/skywood_planks",
+    "side": "projectzero:block/skywood_planks",
+    "top": "projectzero:block/skywood_planks"
+  }
+}

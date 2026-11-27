@@ -1,6 +1,6 @@
 """Original 16x16 textures for our nature blocks. Run from the repo root: python tools/textures/nature.py"""
 import random
-from PIL import Image
+from PIL import Image, ImageDraw
 
 OUT = "src/main/resources/assets/projectzero/textures/block/"
 
@@ -179,8 +179,89 @@ def mana_crystal_block():
         im.putpixel((r.randrange(16), r.randrange(16)), (224, 248, 255, 255))
     im.save(OUT + "mana_crystal_block.png")
 
+def skywood_stripped_log():
+    """Smooth pale wood, retaining the soft blue grain of Skywood."""
+    r = random.Random(71)
+    im = Image.new("RGBA", (16, 16))
+    for x in range(16):
+        grain = -8 if x % 6 == 0 else (5 if x % 5 == 2 else 0)
+        for y in range(16):
+            n = r.randint(-7, 7) + grain
+            c = (211, 207, 190) if (x + y // 5) % 7 else (166, 191, 208)
+            im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
+    im.save(OUT + "stripped_skywood_log.png")
+
+def skywood_stripped_log_top():
+    r = random.Random(72)
+    im = Image.new("RGBA", (16, 16))
+    for x in range(16):
+        for y in range(16):
+            d = ((x - 7.5) ** 2 + (y - 7.5) ** 2) ** 0.5
+            n = r.randint(-5, 5)
+            c = (187, 185, 171) if d > 7 else ((226, 220, 197) if int(d * 0.8) % 2 == 0 else (207, 204, 185))
+            im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
+    im.save(OUT + "stripped_skywood_log_top.png")
+
+def skywood_door_textures():
+    for part, seed, seam in (("bottom", 73, 14), ("top", 74, 1)):
+        r = random.Random(seed)
+        im = Image.new("RGBA", (16, 16))
+        d = ImageDraw.Draw(im)
+        for y in range(16):
+            for x in range(16):
+                n = r.randint(-6, 6)
+                c = (187, 204, 218) if x in (0, 15) else (202, 216, 226)
+                im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
+        d.rectangle((2, 2, 12, 13), outline=(139, 167, 189, 255))
+        d.line((7, 3, 7, 12), fill=(164, 188, 205, 255))
+        d.rectangle((10, seam, 11, seam + 1), fill=(101, 152, 186, 255))
+        im.save(OUT + f"skywood_door_{part}.png")
+
+def skywood_trapdoor():
+    r = random.Random(75)
+    im = Image.new("RGBA", (16, 16))
+    d = ImageDraw.Draw(im)
+    for y in range(16):
+        for x in range(16):
+            n = r.randint(-7, 7)
+            c = (189, 208, 222)
+            if x in (0, 15) or y in (0, 15): c = (136, 164, 187)
+            if x in (6, 9) or y in (6, 9): c = (153, 178, 198)
+            im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
+    d.rectangle((6, 6, 9, 9), fill=(72, 126, 159, 255))
+    im.save(OUT + "skywood_trapdoor.png")
+
+def skywood_sapling():
+    r = random.Random(76)
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.line((7, 15, 8, 8, 8, 4), fill=(126, 152, 151, 255), width=2)
+    for box in ((2, 2, 8, 7), (7, 0, 13, 5), (5, 5, 11, 9)):
+        base = (124, 190, 197)
+        d.ellipse(box, fill=(base[0] + r.randint(-12, 12), base[1] + r.randint(-12, 12), base[2] + r.randint(-8, 8), 255))
+    d.point((5, 3), fill=(229, 245, 255, 255))
+    d.point((11, 2), fill=(229, 245, 255, 255))
+    im.save(OUT + "skywood_sapling.png")
+
+def skywood_door_item():
+    """Tiny 16x16 inventory pictogram for the tall in-world door texture pair."""
+    r = random.Random(77)
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.rectangle((4, 1, 11, 14), fill=(194, 211, 224, 255), outline=(103, 137, 165, 255))
+    d.rectangle((6, 3, 9, 6), fill=(124, 171, 198, 255), outline=(151, 182, 202, 255))
+    d.rectangle((6, 9, 9, 12), fill=(124, 171, 198, 255), outline=(151, 182, 202, 255))
+    d.point((10, 8), fill=(242, 216, 145, 255))
+    for y in range(2, 14):
+        n = r.randint(0, 2)
+        if n == 0: d.point((5, y), fill=(180, 203, 219, 255))
+    item_out = "src/main/resources/assets/projectzero/textures/item/"
+    im.save(item_out + "skywood_door.png")
+
 if __name__ == "__main__":
     glowcap_gills(); violet_cap()
     skywood_log(); skywood_log_top(); skywood_planks(); skywood_leaves()
     limestone(); baobab_log(); baobab_log_top(); baobab_planks()
     salt_crust(); mana_crystal_block()
+    skywood_stripped_log(); skywood_stripped_log_top(); skywood_door_textures()
+    skywood_trapdoor(); skywood_sapling(); skywood_door_item()

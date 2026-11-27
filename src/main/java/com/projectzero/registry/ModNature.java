@@ -4,11 +4,28 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.FenceBlock;
+import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.PressurePlateBlock;
+import net.minecraft.world.level.block.SaplingBlock;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.block.grower.TreeGrower;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
+import java.util.Optional;
 
 /**
  * Our world-generation blocks (biomes, giant mushrooms, trees). Registered into the shared
@@ -37,6 +54,37 @@ public final class ModNature {
     public static final RegistryObject<Block> SKYWOOD_PLANKS = block("skywood_planks",
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.BIRCH_PLANKS)
                     .mapColor(MapColor.ICE)));
+    public static final RegistryObject<Block> STRIPPED_SKYWOOD_LOG = block("stripped_skywood_log",
+            () -> new net.minecraft.world.level.block.RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_BIRCH_LOG)
+                    .mapColor(MapColor.QUARTZ)));
+    public static final RegistryObject<Block> SKYWOOD_WOOD = block("skywood_wood",
+            () -> new net.minecraft.world.level.block.RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BIRCH_WOOD)
+                    .mapColor(MapColor.QUARTZ)));
+    public static final RegistryObject<Block> STRIPPED_SKYWOOD_WOOD = block("stripped_skywood_wood",
+            () -> new net.minecraft.world.level.block.RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_BIRCH_WOOD)
+                    .mapColor(MapColor.QUARTZ)));
+    public static final RegistryObject<Block> SKYWOOD_SLAB = block("skywood_slab",
+            () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BIRCH_SLAB)));
+    public static final RegistryObject<Block> SKYWOOD_STAIRS = block("skywood_stairs",
+            () -> new StairBlock(SKYWOOD_PLANKS.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.BIRCH_STAIRS)));
+    public static final RegistryObject<Block> SKYWOOD_FENCE = block("skywood_fence",
+            () -> new FenceBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BIRCH_FENCE)));
+    public static final RegistryObject<Block> SKYWOOD_FENCE_GATE = block("skywood_fence_gate",
+            () -> new FenceGateBlock(WoodType.BIRCH, BlockBehaviour.Properties.ofFullCopy(Blocks.BIRCH_FENCE_GATE)));
+    public static final RegistryObject<Block> SKYWOOD_DOOR = block("skywood_door",
+            () -> new DoorBlock(BlockSetType.BIRCH, BlockBehaviour.Properties.ofFullCopy(Blocks.BIRCH_DOOR)));
+    public static final RegistryObject<Block> SKYWOOD_TRAPDOOR = block("skywood_trapdoor",
+            () -> new TrapDoorBlock(BlockSetType.BIRCH, BlockBehaviour.Properties.ofFullCopy(Blocks.BIRCH_TRAPDOOR)));
+    public static final RegistryObject<Block> SKYWOOD_BUTTON = block("skywood_button",
+            () -> new ButtonBlock(BlockSetType.BIRCH, com.projectzero.nature.NatureRules.BUTTON_TICKS,
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.BIRCH_BUTTON)));
+    public static final RegistryObject<Block> SKYWOOD_PRESSURE_PLATE = block("skywood_pressure_plate",
+            () -> new PressurePlateBlock(BlockSetType.BIRCH, BlockBehaviour.Properties.ofFullCopy(Blocks.BIRCH_PRESSURE_PLATE)));
+    private static final ResourceKey<ConfiguredFeature<?, ?>> SKYWOOD_TREE = ResourceKey.create(Registries.CONFIGURED_FEATURE,
+            com.projectzero.ProjectZero.id("skywood"));
+    public static final RegistryObject<Block> SKYWOOD_SAPLING = block("skywood_sapling",
+            () -> new SaplingBlock(new TreeGrower("skywood", Optional.of(SKYWOOD_TREE), Optional.empty(), Optional.empty()),
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.BIRCH_SAPLING)));
     public static final RegistryObject<Block> SKYWOOD_LEAVES = block("skywood_leaves",
             () -> new net.minecraft.world.level.block.LeavesBlock(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.CHERRY_LEAVES)
                     .mapColor(MapColor.COLOR_LIGHT_BLUE)));
@@ -53,7 +101,6 @@ public final class ModNature {
     public static final RegistryObject<Block> BAOBAB_PLANKS = block("baobab_planks",
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.ACACIA_PLANKS)
                     .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)));
-
     // ---- Round 4 ----
     /** White salt crust with hexagon cracks: Salt Mirror Flats ground. */
     public static final RegistryObject<Block> SALT_CRUST = block("salt_crust",

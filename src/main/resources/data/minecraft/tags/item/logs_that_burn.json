@@ -2,6 +2,9 @@
   "replace": false,
   "values": [
     "projectzero:baobab_log",
-    "projectzero:skywood_log"
+    "projectzero:skywood_log",
+    "projectzero:stripped_skywood_log",
+    "projectzero:skywood_wood",
+    "projectzero:stripped_skywood_wood"
   ]
 }

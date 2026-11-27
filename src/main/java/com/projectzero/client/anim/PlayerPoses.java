@@ -150,6 +150,31 @@ public final class PlayerPoses {
             k(0.40F, -1.25F, -0.15F, 0F, -0.10F, 0F, -0.1F, -0.05F, 2F, -0.04F, -0.02F, -0.12F, -20, -5, 0),
             k(0.70F, -1.20F, -0.15F, 0F, -0.10F, 0F, -0.1F, -0.05F, 2F, -0.04F, -0.02F, -0.12F, -20, -5, 0)};
 
+    // Individual placement silhouettes for the new Skywood blocks and sapling.
+    public static final Key[] PLACE_SKYWOOD_STRIPPED_LOG = placement(-0.32F, 0.18F, -3F, 8F);
+    public static final Key[] PLACE_SKYWOOD_WOOD = placement(-0.20F, 0.25F, -2F, 14F);
+    public static final Key[] PLACE_SKYWOOD_STRIPPED_WOOD = placement(-0.10F, 0.14F, -4F, 20F);
+    public static final Key[] PLACE_SKYWOOD_SLAB = placement(0.15F, 0.10F, -1F, 28F);
+    public static final Key[] PLACE_SKYWOOD_STAIRS = placement(0.25F, 0.22F, 2F, 35F);
+    public static final Key[] PLACE_SKYWOOD_FENCE = placement(-0.18F, 0.30F, -2F, 44F);
+    public static final Key[] PLACE_SKYWOOD_FENCE_GATE = placement(-0.28F, 0.35F, -5F, 52F);
+    public static final Key[] PLACE_SKYWOOD_DOOR = placement(0.34F, 0.38F, 4F, 60F);
+    public static final Key[] PLACE_SKYWOOD_TRAPDOOR = placement(0.18F, 0.12F, 1F, 68F);
+    public static final Key[] PLACE_SKYWOOD_BUTTON = placement(-0.40F, 0.08F, -6F, 76F);
+    public static final Key[] PLACE_SKYWOOD_PRESSURE_PLATE = placement(0.42F, 0.09F, 6F, 84F);
+    public static final Key[] PLACE_SKYWOOD_SAPLING = placement(0.05F, 0.04F, 0F, 92F);
+
+    private static Key[] placement(float rx, float rz, float lean, float firstPersonTurn) {
+        return new Key[] {
+                k(0.16F, rx - 0.25F, 0.12F, rz, -0.35F, 0F, -0.12F, 0.12F, -lean * 0.3F,
+                        0.02F, 0.12F, 0.06F, firstPersonTurn * 0.5F, 0, -8),
+                k(0.43F, rx + 0.42F, -0.10F, rz * 0.4F, 0.22F, 0F, -0.08F, -0.18F, lean,
+                        -0.12F, 0.02F, -0.22F, -firstPersonTurn, 4, 12),
+                k(0.76F, rx + 0.38F, -0.08F, rz * 0.35F, 0.20F, 0F, -0.08F, -0.16F, lean * 0.8F,
+                        -0.10F, 0.02F, -0.20F, -firstPersonTurn * 0.8F, 3, 9)
+        };
+    }
+
     /** The swing for whatever is in the main hand, at this step of the chain. */
     public static Key[] forHeld(net.minecraft.world.item.ItemStack stack, int combo) {
         net.minecraft.world.item.Item item = stack.getItem();
@@ -165,6 +190,18 @@ public final class PlayerPoses {
         if (item instanceof net.minecraft.world.item.SnowballItem || item instanceof net.minecraft.world.item.EggItem
                 || item instanceof net.minecraft.world.item.EnderpearlItem || item instanceof net.minecraft.world.item.ThrowablePotionItem
                 || item instanceof net.minecraft.world.item.ExperienceBottleItem) return THROW;
+        if (item == com.projectzero.registry.ModNature.STRIPPED_SKYWOOD_LOG.get().asItem()) return PLACE_SKYWOOD_STRIPPED_LOG;
+        if (item == com.projectzero.registry.ModNature.SKYWOOD_WOOD.get().asItem()) return PLACE_SKYWOOD_WOOD;
+        if (item == com.projectzero.registry.ModNature.STRIPPED_SKYWOOD_WOOD.get().asItem()) return PLACE_SKYWOOD_STRIPPED_WOOD;
+        if (item == com.projectzero.registry.ModNature.SKYWOOD_SLAB.get().asItem()) return PLACE_SKYWOOD_SLAB;
+        if (item == com.projectzero.registry.ModNature.SKYWOOD_STAIRS.get().asItem()) return PLACE_SKYWOOD_STAIRS;
+        if (item == com.projectzero.registry.ModNature.SKYWOOD_FENCE.get().asItem()) return PLACE_SKYWOOD_FENCE;
+        if (item == com.projectzero.registry.ModNature.SKYWOOD_FENCE_GATE.get().asItem()) return PLACE_SKYWOOD_FENCE_GATE;
+        if (item == com.projectzero.registry.ModNature.SKYWOOD_DOOR.get().asItem()) return PLACE_SKYWOOD_DOOR;
+        if (item == com.projectzero.registry.ModNature.SKYWOOD_TRAPDOOR.get().asItem()) return PLACE_SKYWOOD_TRAPDOOR;
+        if (item == com.projectzero.registry.ModNature.SKYWOOD_BUTTON.get().asItem()) return PLACE_SKYWOOD_BUTTON;
+        if (item == com.projectzero.registry.ModNature.SKYWOOD_PRESSURE_PLATE.get().asItem()) return PLACE_SKYWOOD_PRESSURE_PLATE;
+        if (item == com.projectzero.registry.ModNature.SKYWOOD_SAPLING.get().asItem()) return PLACE_SKYWOOD_SAPLING;
         if (item instanceof net.minecraft.world.item.BlockItem) return PLACE;
         return TAP;
     }
@@ -206,6 +243,18 @@ public final class PlayerPoses {
         joints(PLACE, 0.7F, 0.3F, 0.1F, 0.2F, 0.3F, 0.15F, 0.25F, 0.3F, 0.15F);
         joints(FLICK, 1.2F, 0.3F, 0.1F, 0.3F, 0.3F, 0.1F, 0.35F, 0.3F, 0.1F);
         joints(TAP, 0.6F, 0.3F, 0.1F, 0.3F, 0.3F, 0.1F, 0.3F, 0.3F, 0.1F);
+        joints(PLACE_SKYWOOD_STRIPPED_LOG, 0.7F, 0.35F, 0.1F, 0.25F, 0.3F, 0.1F, 0.3F, 0.35F, 0.1F);
+        joints(PLACE_SKYWOOD_WOOD, 0.7F, 0.35F, 0.1F, 0.25F, 0.3F, 0.1F, 0.3F, 0.35F, 0.1F);
+        joints(PLACE_SKYWOOD_STRIPPED_WOOD, 0.7F, 0.35F, 0.1F, 0.25F, 0.3F, 0.1F, 0.3F, 0.35F, 0.1F);
+        joints(PLACE_SKYWOOD_SLAB, 0.65F, 0.3F, 0.1F, 0.2F, 0.35F, 0.1F, 0.2F, 0.3F, 0.1F);
+        joints(PLACE_SKYWOOD_STAIRS, 0.8F, 0.35F, 0.1F, 0.25F, 0.35F, 0.1F, 0.3F, 0.35F, 0.1F);
+        joints(PLACE_SKYWOOD_FENCE, 0.75F, 0.35F, 0.15F, 0.3F, 0.35F, 0.1F, 0.3F, 0.3F, 0.1F);
+        joints(PLACE_SKYWOOD_FENCE_GATE, 0.85F, 0.4F, 0.15F, 0.3F, 0.4F, 0.15F, 0.35F, 0.4F, 0.15F);
+        joints(PLACE_SKYWOOD_DOOR, 0.8F, 0.45F, 0.15F, 0.25F, 0.4F, 0.15F, 0.3F, 0.4F, 0.15F);
+        joints(PLACE_SKYWOOD_TRAPDOOR, 0.6F, 0.3F, 0.1F, 0.2F, 0.3F, 0.1F, 0.2F, 0.3F, 0.1F);
+        joints(PLACE_SKYWOOD_BUTTON, 0.5F, 0.25F, 0.1F, 0.15F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
+        joints(PLACE_SKYWOOD_PRESSURE_PLATE, 0.55F, 0.25F, 0.1F, 0.15F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
+        joints(PLACE_SKYWOOD_SAPLING, 0.45F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
     }
 
     private static void joints(Key[] keys, float... v) {

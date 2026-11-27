@@ -40,6 +40,18 @@ public final class ModCreativeTabs {
                         output.accept(ModNature.VIOLET_CAP.get());
                         output.accept(ModNature.SKYWOOD_LOG.get());
                         output.accept(ModNature.SKYWOOD_PLANKS.get());
+                        output.accept(ModNature.STRIPPED_SKYWOOD_LOG.get());
+                        output.accept(ModNature.SKYWOOD_WOOD.get());
+                        output.accept(ModNature.STRIPPED_SKYWOOD_WOOD.get());
+                        output.accept(ModNature.SKYWOOD_SLAB.get());
+                        output.accept(ModNature.SKYWOOD_STAIRS.get());
+                        output.accept(ModNature.SKYWOOD_FENCE.get());
+                        output.accept(ModNature.SKYWOOD_FENCE_GATE.get());
+                        output.accept(ModNature.SKYWOOD_DOOR.get());
+                        output.accept(ModNature.SKYWOOD_TRAPDOOR.get());
+                        output.accept(ModNature.SKYWOOD_BUTTON.get());
+                        output.accept(ModNature.SKYWOOD_PRESSURE_PLATE.get());
+                        output.accept(ModNature.SKYWOOD_SAPLING.get());
                         output.accept(ModNature.SKYWOOD_LEAVES.get());
                         output.accept(ModNature.LIMESTONE.get());
                         output.accept(ModNature.BAOBAB_LOG.get());

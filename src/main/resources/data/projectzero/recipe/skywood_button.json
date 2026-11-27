@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "skywood_planks"
+    }
+  ],
+  "result": {
+    "id": "projectzero:skywood_button",
+    "count": 1
+  }
+}

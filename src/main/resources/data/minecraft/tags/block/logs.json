@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "projectzero:skywood_log",
+    "projectzero:stripped_skywood_log",
+    "projectzero:skywood_wood",
+    "projectzero:stripped_skywood_wood"
+  ]
+}
