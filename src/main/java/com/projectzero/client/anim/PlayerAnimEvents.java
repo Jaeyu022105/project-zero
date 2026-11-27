@@ -237,44 +237,78 @@ public final class PlayerAnimEvents {
         float g = st.boxing(pt);
         float swing = player.getAttackAnim(pt);
         int punch = st.combo % PlayerPoses.FIST_COMBO.length;
-        // Fast out (30%), slower back: the snap of a punch.
-        float e = swing <= 0F ? 0F : swing < 0.3F ? swing / 0.3F : Math.max(0F, 1F - (swing - 0.3F) / 0.45F);
-        e = e * e * (3F - 2F * e);
-        float wind = swing <= 0F ? 0F : swing < 0.12F ? swing / 0.12F : Math.max(0F, 1F - (swing - 0.12F) / 0.18F);
-        boolean throwing = swing > 0F && (punch % 2 == 0) == main;
-        float x = 0.64F, y = -0.6F - dip * 0.6F * (1F - g), z = -0.72F;
-        float rx = 0F, ry = 0F, rz = 0F;
-        // Guard, not a mirror: the main fist leads (out front, near eye level, forearm upright);
-        // the other fist is the rear hand, tucked in low by the chin and angled across the face.
-        if (main) { x -= 0.10F * g; y += 0.17F * g; z -= 0.06F * g; rz -= 4F * g; rx -= 14F * g; }
-        else      { x -= 0.22F * g; y += 0.06F * g; z += 0.14F * g; rz -= 24F * g; ry -= 14F * g; rx -= 2F * g; }
-        if (throwing) {
-            switch (punch) {
-                case 0 -> { x -= 0.12F * e; y += 0.04F * e; z -= 0.34F * e; }                       // jab: straight
-                case 1 -> { x -= 0.30F * e; y += 0.06F * e; z -= 0.38F * e; ry -= 12F * e; }        // cross: across the middle
-                case 2 -> { x += 0.08F * wind - 0.40F * e; y += 0.10F * e;                            // hook: wide arc, elbow up
-                            z -= 0.20F * Mth.sin(e * Mth.PI) + 0.06F * e; rz += 30F * e; ry -= 25F * e; }
-                default -> { y += -0.10F * wind + 0.30F * e; x -= 0.14F * e; z -= 0.16F * e; rx -= 25F * e; } // uppercut
-            }
-        } else if (swing > 0F) {
-            z += 0.05F * e; y += 0.02F * e;                                                          // tuck in
-        }
+        float[] q = fistPose(main, g, swing, punch);
+        q[1] -= dip * 0.6F * (1F - g);
         pose.pushPose();
-        pose.translate(f * x, y, z);
-        pose.mulPose(Axis.YP.rotationDegrees(f * 45F));
-        pose.mulPose(Axis.XP.rotationDegrees(rx));
-        pose.mulPose(Axis.YP.rotationDegrees(f * ry));
-        pose.mulPose(Axis.ZP.rotationDegrees(f * rz));
-        // Vanilla's arm-mesh placement (ItemInHandRenderer.renderPlayerArm).
-        pose.translate(f * -1F, 3.6F, 3.5F);
-        pose.mulPose(Axis.ZP.rotationDegrees(f * 120F));
-        pose.mulPose(Axis.XP.rotationDegrees(200F));
-        pose.mulPose(Axis.YP.rotationDegrees(f * -135F));
-        pose.translate(f * 5.6F, 0F, 0F);
+        // Put the fist itself at q, then aim the forearm back toward the elbow: the arm's long axis
+        // starts pointing up, tips forward by the pitch and turns in by the yaw; roll twists the fist.
+        pose.translate(f * q[0], q[1], q[2]);
+        pose.mulPose(Axis.YP.rotationDegrees(f * q[3]));
+        pose.mulPose(Axis.XP.rotationDegrees(-q[4]));
+        pose.mulPose(Axis.YP.rotationDegrees(f * q[5]));
+        // The arm mesh hangs from the shoulder pivot (5 px out, 2 down) and is 12 px long: move its
+        // hand end onto the origin.
+        pose.translate(f * 6F / 16F, -12F / 16F, 0F);
         com.projectzero.client.GauntletLayer.renderFirstPerson(pose, buffers, light, player, arm);
         if (arm == HumanoidArm.RIGHT) renderer.renderRightHand(pose, buffers, light, player);
         else renderer.renderLeftHand(pose, buffers, light, player);
         pose.popPose();
+    }
+
+    // Fist poses for the right hand (the left mirrors x, yaw and roll): {x, y, z, yaw in, pitch forward, roll}.
+    // Worked out by projecting the arm mesh through the hand camera (70 degree FOV) frame by frame.
+    private static final float[] FIST_REST = {0.56F, -0.42F, -0.80F, -6F, 42F, 0F};
+    /** Main fist leads: further out, forearm tipped forward. Off fist is the rear hand, upright by the chin. */
+    private static final float[] LEAD_GUARD = {0.20F, -0.20F, -0.80F, 14F, 35F, 0F};
+    private static final float[] REAR_GUARD = {0.24F, -0.22F, -0.64F, 14F, 22F, 0F};
+    /** Where the idle fist pulls to while its partner throws (the shoulder turns it in). */
+    private static final float[] LEAD_TUCK = {0.23F, -0.22F, -0.70F, 18F, 32F, 0F};
+    private static final float[] REAR_TUCK = {0.22F, -0.24F, -0.58F, 16F, 18F, 0F};
+    /** Load-up before each punch (null: straight from the guard) and where it lands. Jab, cross, hook, uppercut. */
+    private static final float[][] FIST_WIND = {null, null,
+            {0.46F, -0.14F, -0.78F, -10F, 78F, -20F},        // hook: elbow swings out wide
+            {0.20F, -0.42F, -0.66F, 18F, 30F, 0F}};          // uppercut: dip low
+    private static final float[][] FIST_HIT = {
+            {0.07F, -0.11F, -1.25F, 6F, 84F, -25F},          // jab: dead straight at the crosshair, fist turns over
+            {0.05F, -0.11F, -1.25F, 8F, 84F, 25F},           // cross: rear hand across the middle
+            {0.03F, -0.10F, -0.78F, 62F, 86F, -70F},         // hook: forearm flat, sweeping across
+            {0.06F, -0.12F, -0.86F, 12F, 28F, 20F}};         // uppercut: rises upright under the chin line
+
+    /**
+     * Where one fist is this frame. A punch snaps out (wind 0-12%, drive 12-32% easing out), holds
+     * on the hit (to 45%), then glides back to the guard. The fist not throwing tucks in.
+     */
+    private static float[] fistPose(boolean main, float g, float swing, int punch) {
+        float[] q = lerp6(FIST_REST, main ? LEAD_GUARD : REAR_GUARD, g);
+        if (swing <= 0F) return q;
+        boolean throwing = (punch % 2 == 0) == main;
+        if (!throwing) {
+            float k = swing < 0.45F ? smooth(swing / 0.25F) : 1F - smooth((swing - 0.45F) / 0.55F);
+            return lerp6(q, main ? LEAD_TUCK : REAR_TUCK, k * Math.max(g, 0.5F));
+        }
+        float[] wind = FIST_WIND[punch] == null ? q : FIST_WIND[punch];
+        float[] hit = FIST_HIT[punch];
+        if (swing < 0.12F) return lerp6(q, wind, smooth(swing / 0.12F));
+        if (swing < 0.32F) {
+            float k = (swing - 0.12F) / 0.20F;
+            k = 1F - (1F - k) * (1F - k) * (1F - k);
+            float[] r = lerp6(wind, hit, k);
+            if (punch == 2) r[2] -= 0.16F * Mth.sin(k * Mth.PI);   // the hook travels on an arc
+            return r;
+        }
+        if (swing < 0.45F) return hit.clone();
+        return lerp6(hit, q, smooth((swing - 0.45F) / 0.55F));
+    }
+
+    private static float[] lerp6(float[] a, float[] b, float t) {
+        float[] r = new float[6];
+        for (int n = 0; n < 6; n++) r[n] = a[n] + (b[n] - a[n]) * t;
+        return r;
+    }
+
+    private static float smooth(float t) {
+        t = Mth.clamp(t, 0F, 1F);
+        return t * t * (3F - 2F * t);
     }
 
     /** Vanilla's empty-arm spot relative to the held-item spot, plus the shift that puts the fist on the grip. */
