@@ -254,3 +254,10 @@ Our own mechanic, not in Solo Leveling.
 - **Data-driven content where it is cheap.** Jobs, skills, titles and gate types should end up as JSON data (datapack folders) so new content does not need Java changes. Behaviour (what a skill does) stays in Java, referenced by id.
 - **Balance numbers live in one place** per system (`LevelingRules` now; a config file later).
 - **Player data** is stored in the player's persistent NBT under `projectzero:stats` and copied on death. If it grows, move to a Forge capability.
+
+## 15. Biomes and world ambience
+
+These are for when we make our own biomes.
+
+- **[Planned] Falling leaves:** trees with leaves shed slow, drifting leaves. They're tinted to the leaf block and biome, and sway as they fall.
+- **[Planned] Leaves pulled into gates:** near an open gate portal, some falling leaves curve toward the rift and get sucked in. This shows the pull of the gate without needing a warning overlay.
