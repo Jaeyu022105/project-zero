@@ -23,6 +23,7 @@ public final class ClientEvents {
         ClientBonusCache.reset();
         VisionOverlayState.reset();
         ClientWornGear.clear();
+        ClientSkillVisuals.clear();
         GauntletLayer.clearCache();
     }
 

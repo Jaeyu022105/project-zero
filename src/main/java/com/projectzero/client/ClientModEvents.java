@@ -38,6 +38,7 @@ public final class ClientModEvents {
         event.registerSpriteSet(ModParticles.SHARD.get(), ManaParticle.Provider::new);
         event.registerSpriteSet(ModParticles.MOTE.get(), ManaParticle.Provider::new);
         event.registerSpriteSet(ModParticles.STREAK.get(), ManaParticle.Provider::new);
+        event.registerSpriteSet(ModParticles.INFLOW.get(), ManaParticle.Provider::new);
     }
 
     @SubscribeEvent

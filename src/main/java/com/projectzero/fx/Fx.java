@@ -11,5 +11,12 @@ public final class Fx {
     public static ParticleOptions rune(int rgb, float size) { return new ManaParticleOptions(ModParticles.RUNE.get(), rgb, size); }
     public static ParticleOptions shard(int rgb, float size) { return new ManaParticleOptions(ModParticles.SHARD.get(), rgb, size); }
     public static ParticleOptions mote(int rgb, float size) { return new ManaParticleOptions(ModParticles.MOTE.get(), rgb, size); }
+    /**
+     * Spawn with velocity = (target - start) / {@link #INFLOW_DIVISOR} and it lands on the target:
+     * it lives {@link #INFLOW_TICKS} ticks and speeds up 4% a tick (sum of 1.04^k for 22 ticks).
+     */
+    public static ParticleOptions inflow(int rgb, float size) { return new ManaParticleOptions(ModParticles.INFLOW.get(), rgb, size); }
+    public static final int INFLOW_TICKS = 22;
+    public static final double INFLOW_DIVISOR = 34.25;
     public static ParticleOptions streak(int rgb, float size) { return new ManaParticleOptions(ModParticles.STREAK.get(), rgb, size); }
 }

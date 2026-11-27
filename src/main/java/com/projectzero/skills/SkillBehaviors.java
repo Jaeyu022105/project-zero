@@ -3,8 +3,16 @@ package com.projectzero.skills;
 import com.google.gson.JsonObject;
 import com.projectzero.ProjectZero;
 import net.minecraft.ChatFormatting;
+import com.projectzero.client.ClientSkillVisuals;
 import com.projectzero.fx.Fx;
+import com.projectzero.network.ModNetwork;
+import com.projectzero.network.SkillVisualPacket;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -249,10 +257,14 @@ public final class SkillBehaviors {
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F);
         SkillFx.sigil(level, player.position(), 1.8, SkillFx.AEGIS);
+        // The shield emblem flashes up in front, then a hex bubble stays around you while the buff lasts.
+        ModNetwork.sendToTrackingAndSelf(player, new SkillVisualPacket(player.getId(),
+                ClientSkillVisuals.Kind.SHIELD_POP.ordinal(), SkillFx.AEGIS, 16));
+        ModNetwork.sendToTrackingAndSelf(player, new SkillVisualPacket(player.getId(),
+                ClientSkillVisuals.Kind.BUBBLE.ordinal(), SkillFx.AEGIS, duration));
         ParticleOptions shell = SkillFx.dust(SkillFx.AEGIS, 1.1F);
         Vec3 at = player.position();
-        SkillFx.dome(level, at, 1.8, 90, shell);
-        SkillFx.later(6, () -> SkillFx.dome(level, at, 1.9, 70, shell));
+        SkillFx.dome(level, at, 1.8, 40, shell);
         SkillFx.shockwave(level, at.add(0, 0.1, 0), 1.0, tauntRadius, 8, SkillFx.dust(0xFF5050, 0.8F));
         return true;
     }
@@ -275,7 +287,7 @@ public final class SkillBehaviors {
             level.sendParticles(Fx.glow(0x2A1040, 1.6F), p.x, p.y - 0.2, p.z, 2, 0.25, 0.1, 0.25, 0.01);
             for (LivingEntity target : hostilesNear(player, p, 1.8)) {
                 if (struck.add(target)) {
-                    target.hurt(player.damageSources().magic(), damage);
+                    target.hurt(player.damageSources().indirectMagic(player, player), damage);
                     target.addEffect(new MobEffectInstance(MobEffects.WITHER, witherTicks, 1));
                 }
             }
@@ -349,7 +361,7 @@ public final class SkillBehaviors {
             for (int i = 0; i < Math.min(maxTargets, targets.size()); i++) {
                 LivingEntity t = targets.get(i);
                 spawnVisualBolt(level, t.position());
-                t.hurt(player.damageSources().lightningBolt(), damage);
+                t.hurt(skillDamage(player, DamageTypes.LIGHTNING_BOLT), damage);
             }
         }
         level.sendParticles(Fx.spark(SkillFx.STORM, 1.5F), player.getX(), player.getY() + 1.0, player.getZ(),
@@ -415,7 +427,7 @@ public final class SkillBehaviors {
         ServerLevel level = player.serverLevel();
         float totalDealt = 0.0F;
         for (LivingEntity target : hostilesNear(player, player.position(), radius)) {
-            target.hurt(player.damageSources().magic(), damage);
+            target.hurt(player.damageSources().indirectMagic(player, player), damage);
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, rootTicks, 5));
             totalDealt += damage;
             level.sendParticles(Fx.rune(SkillFx.SOUL, 1F), target.getX(), target.getY() + 0.8, target.getZ(),
@@ -451,7 +463,7 @@ public final class SkillBehaviors {
         ServerLevel level = player.serverLevel();
         for (LivingEntity target : hostilesNear(player, player.position(), radius)) {
             target.igniteForSeconds(burnSeconds);
-            target.hurt(player.damageSources().onFire(), damage);
+            target.hurt(skillDamage(player, DamageTypes.IN_FIRE), damage);
         }
 
         List<MobEffectInstance> harmful = new ArrayList<>();
@@ -570,5 +582,11 @@ public final class SkillBehaviors {
         // Glowing tracer and a spark burst where it lands.
         SkillFx.line(level, from, to, 0.25, SkillFx.dust(SkillFx.GOLD, 0.7F));
         level.sendParticles(Fx.spark(SkillFx.GOLD, 1.4F), to.x, to.y, to.z, 8, 0.15, 0.15, 0.15, 0.2);
+    }
+
+    /** A damage source of {@code type} credited to {@code player}, so skill kills give XP and count for milestones. */
+    private static DamageSource skillDamage(ServerPlayer player, ResourceKey<DamageType> type) {
+        return new DamageSource(player.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE)
+                .getHolderOrThrow(type), player);
     }
 }

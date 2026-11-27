@@ -47,10 +47,15 @@ public final class GateCommands {
                                                 .executes(ctx -> spawnGate(
                                                         ctx.getSource(),
                                                         StringArgumentType.getString(ctx, "rank"),
-                                                        StringArgumentType.getString(ctx, "size"))))))));
+                                                        StringArgumentType.getString(ctx, "size"), false))
+                                                .then(Commands.literal("sea")
+                                                        .executes(ctx -> spawnGate(
+                                                                ctx.getSource(),
+                                                                StringArgumentType.getString(ctx, "rank"),
+                                                                StringArgumentType.getString(ctx, "size"), true))))))));
     }
 
-    private static int spawnGate(CommandSourceStack source, String rankRaw, String sizeRaw)
+    private static int spawnGate(CommandSourceStack source, String rankRaw, String sizeRaw, boolean sea)
             throws CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
         GateRank rank = GateRank.byName(rankRaw);
@@ -68,13 +73,13 @@ public final class GateCommands {
         boolean alongX = (facing.getAxis() == Direction.Axis.Z);
         BlockPos base = player.blockPosition().relative(facing, 4).above(1);
 
-        var rec = GateService.spawnGate(player.serverLevel(), base, rank, size, alongX);
+        var rec = GateService.spawnGate(player.serverLevel(), base, rank, size, alongX, sea);
         if (rec == null) {
             source.sendFailure(Component.literal("Failed to spawn gate (missing projectzero:dungeon dimension)."));
             return 0;
         }
         source.sendSuccess(() -> Component.literal("Spawned " + rank.name() + "-Rank (" + size.name()
-                + ") Gate at " + base.toShortString() + " [slot " + rec.slot + "]."), false);
+                + ") " + (sea ? "Sea Gate" : "Gate") + " at " + base.toShortString() + " [slot " + rec.slot + "]."), false);
         return 1;
     }
 }

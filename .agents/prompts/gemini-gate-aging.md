@@ -14,9 +14,12 @@ Read `AGENTS.md`, `GEMINI.md`, `HANDOFF.md` and **DESIGN-DOCUMENT.md §9 "Gate a
 5. Messages: [System] line to players within 128 blocks on a surge, title + subtitle on rank-up (see `GateService.system`).
 6. Command `/pz gate age <days>`: on the gate block the player is looking at (raycast 32 blocks), move `openTime` back by `days * 24000` and run the check now.
 
+7. **Dungeon breaks** (DESIGN-DOCUMENT §9 "Dungeon breaks", owner approved): gamerule `projectzero:dungeonBreaks` default **true**. On the 2nd rank-up (or an S gate's next rank-up time) and only with a player within 96 blocks: set `GateBlock.BROKEN=true` on every portal block (the visuals already exist), block entry, remove living monsters of that slot inside the dungeon, then run 5 waves (one per 60 s) of `size.mobCount() / 2 + 2` monsters around the rift using the same mob pools and scaling as `GateDungeonArena.populate` (sea gates: drowned/guardians), boss on the last wave with the `gate_boss` tag and dungeon slot. Killing it runs the normal clear (`GateService.onDungeonBossKilled` path) and closes the gate. Save wave progress in the block entity so a reload resumes the break. `/pz gate break` on the looked-at gate starts a break now (debug).
+
 ## Test
 
 - `/pz gate spawn e small`, look at it, `/pz gate age 7` → surge message. `/pz gate age 21` → rank-up to D, ring turns green.
 - Enter it before aging, leave, age it 28 days, re-enter: monsters show higher levels, more of them.
 - `/gamerule projectzero:gateAging false` stops it.
+- `/pz gate spawn c small`, `/pz gate break`: red flickering rift, title, 5 waves, boss last; kill it and the gate closes. Reload the world mid-break and it resumes.
 - HANDOFF entry, mark §9 "Gate aging" `[Built]`.

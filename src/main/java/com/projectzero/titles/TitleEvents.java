@@ -34,7 +34,7 @@ public final class TitleEvents {
             MilestoneTracker.recordDeath(deadPlayer);
             return;
         }
-        if (event.getSource().getEntity() instanceof ServerPlayer killer) {
+        if (com.projectzero.leveling.KillCredit.of(event) instanceof ServerPlayer killer) {
             MilestoneTracker.recordKill(killer, event.getEntity());
         }
     }

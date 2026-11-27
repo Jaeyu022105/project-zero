@@ -26,6 +26,8 @@ public final class ModParticles {
     public static final RegistryObject<ManaParticleType> SHARD = PARTICLES.register("shard", ManaParticleType::new);
     /** A slow mote that spirals inward: gates and rifts. */
     public static final RegistryObject<ManaParticleType> MOTE = PARTICLES.register("rift_mote", ManaParticleType::new);
+    /** A mote that flies straight into a point over 22 ticks and shrinks: rifts sucking things in. */
+    public static final RegistryObject<ManaParticleType> INFLOW = PARTICLES.register("inflow", ManaParticleType::new);
     /** A thin streak stretched along its motion: slashes and dashes. */
     public static final RegistryObject<ManaParticleType> STREAK = PARTICLES.register("streak", ManaParticleType::new);
 }

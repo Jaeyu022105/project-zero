@@ -16,7 +16,7 @@ import net.minecraft.util.Mth;
  * the options color; each family moves and fades in its own way.
  */
 public class ManaParticle extends TextureSheetParticle {
-    private enum Style { GLOW, SPARK, RUNE, SHARD, MOTE, STREAK }
+    private enum Style { GLOW, SPARK, RUNE, SHARD, MOTE, STREAK, INFLOW }
 
     private final Style style;
     private final SpriteSet sprites;
@@ -50,6 +50,7 @@ public class ManaParticle extends TextureSheetParticle {
                             hasPhysics = true; xd += (random.nextDouble() - 0.5) * 0.12; yd += 0.12;
                             zd += (random.nextDouble() - 0.5) * 0.12; friction = 0.96F; }
             case MOTE -> { lifetime = 40 + random.nextInt(30); baseSize = 0.07F * size; friction = 0.98F; }
+            case INFLOW -> { lifetime = com.projectzero.fx.Fx.INFLOW_TICKS; baseSize = 0.08F * size; friction = 1F; }
             default -> { lifetime = 6 + random.nextInt(3); baseSize = 0.13F * size; friction = 0.7F; }
         }
         this.quadSize = baseSize;
@@ -63,6 +64,7 @@ public class ManaParticle extends TextureSheetParticle {
         if (type == ModParticles.SHARD.get()) return Style.SHARD;
         if (type == ModParticles.MOTE.get()) return Style.MOTE;
         if (type == ModParticles.STREAK.get()) return Style.STREAK;
+        if (type == ModParticles.INFLOW.get()) return Style.INFLOW;
         return Style.GLOW;
     }
 
@@ -82,6 +84,12 @@ public class ManaParticle extends TextureSheetParticle {
                 xd += -dz * 0.01 - dx * 0.004;
                 zd += dx * 0.01 - dz * 0.004;
                 alpha = Mth.sin(life * Mth.PI);
+            }
+            case INFLOW -> {
+                // Speeds up as it nears the core, fades in, shrinks to nothing at the end.
+                xd *= 1.04; yd *= 1.04; zd *= 1.04;
+                alpha = Math.min(1F, life * 4F);
+                quadSize = baseSize * (1F - life * life);
             }
             default -> { quadSize = baseSize * (1F - life); alpha = 1F - life; }
         }

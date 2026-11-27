@@ -50,6 +50,12 @@ public final class GateService {
     /** Spawns a framed Gate structure at {@code basePos} linked to a fresh slot in {@code projectzero:dungeon}. */
     public static @Nullable DungeonSavedData.DungeonRecord spawnGate(
             ServerLevel originLevel, BlockPos basePos, GateRank rank, GateSize size, boolean alongX) {
+        return spawnGate(originLevel, basePos, rank, size, alongX, false);
+    }
+
+    /** As above; {@code sea} makes a sea gate (teal rift, flooded dungeon). */
+    public static @Nullable DungeonSavedData.DungeonRecord spawnGate(
+            ServerLevel originLevel, BlockPos basePos, GateRank rank, GateSize size, boolean alongX, boolean sea) {
         MinecraftServer server = originLevel.getServer();
         ServerLevel dungeonLevel = server.getLevel(DUNGEON);
         if (dungeonLevel == null) {
@@ -59,7 +65,7 @@ public final class GateService {
 
         DungeonSavedData data = DungeonSavedData.get(dungeonLevel);
         DungeonSavedData.DungeonRecord record = data.allocate(
-                rank, size, originLevel.dimension().location(), basePos, alongX);
+                rank, size, originLevel.dimension().location(), basePos, alongX, sea);
 
         int pw = size.portalWidth();
         int ph = size.portalHeight();
@@ -67,7 +73,8 @@ public final class GateService {
 
         BlockState portalState = ModBlocks.GATE_PORTAL.get().defaultBlockState()
                 .setValue(GateBlock.RANK, rank)
-                .setValue(GateBlock.EXIT, false);
+                .setValue(GateBlock.EXIT, false)
+                .setValue(GateBlock.SEA, sea);
 
         // No frame: a gate is a rift hanging in the air (drawn by GateRiftRenderer).
         // Clear a little room around it so the ring is not buried in terrain.
@@ -112,7 +119,8 @@ public final class GateService {
         int slot = be.dungeonSlot();
         DungeonSavedData.DungeonRecord rec = slot >= 0 ? data.record(slot) : null;
         if (rec == null) {
-            rec = data.allocate(be.rank(), be.size(), player.level().dimension().location(), be.anchorPos(), true);
+            rec = data.allocate(be.rank(), be.size(), player.level().dimension().location(), be.anchorPos(), true,
+                    state.getValue(GateBlock.SEA));
             slot = rec.slot;
             be.configure(be.rank(), be.size(), be.openTime(), slot, be.anchorPos());
         }
@@ -121,7 +129,7 @@ public final class GateService {
             return;
         }
         if (!rec.built) {
-            GateDungeonArena.buildAndPopulate(dungeonLevel, slot, rec.rank, rec.size);
+            GateDungeonArena.buildAndPopulate(dungeonLevel, slot, rec.rank, rec.size, rec.sea);
             data.markBuilt(slot);
         }
 
@@ -132,6 +140,12 @@ public final class GateService {
         player.teleportTo(dungeonLevel, target.x, target.y, target.z, 0.0F, 0.0F);
         player.getPersistentData().putLong(COOLDOWN_KEY, dungeonLevel.getGameTime() + GateRules.PORTAL_COOLDOWN_TICKS);
 
+        if (rec.sea) {
+            player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.WATER_BREATHING, GateRules.SEA_GATE_BREATHING_TICKS, 0, false, true));
+            system(player, Component.literal("Sea gate. The System grants you water breathing for "
+                    + GateRules.SEA_GATE_BREATHING_TICKS / 20 + " seconds.").withStyle(ChatFormatting.WHITE));
+        }
         player.connection.send(new ClientboundSetTitleTextPacket(
                 Component.literal(rec.rank.name() + "-RANK GATE").withStyle(rec.rank.chatColor(), ChatFormatting.BOLD)));
         player.connection.send(new ClientboundSetSubtitleTextPacket(
@@ -157,7 +171,7 @@ public final class GateService {
         if (rec == null || rec.cleared) return;
 
         data.markCleared(slot);
-        GateDungeonArena.openExitPortal(dungeonLevel, slot, rec.size, rec.rank);
+        GateDungeonArena.openExitPortal(dungeonLevel, slot, rec.size, rec.rank, rec.sea);
 
         // Guaranteed Awakening Shard drop from Gate Boss (DESIGN-DOCUMENT.md §6)
         ItemEntity shardDrop = new ItemEntity(level, boss.getX(), boss.getY() + 0.5, boss.getZ(),
@@ -258,15 +272,18 @@ public final class GateService {
         int gx = (int) Math.round(anchor.getX() + Math.cos(angle) * dist);
         int gz = (int) Math.round(anchor.getZ() + Math.sin(angle) * dist);
         int gy = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, gx, gz) + 1;
+        boolean sea = level.getBiome(new BlockPos(gx, gy, gz)).is(net.minecraft.tags.BiomeTags.IS_OCEAN)
+                && level.getFluidState(new BlockPos(gx, gy - 1, gz)).is(net.minecraft.tags.FluidTags.WATER);
+        if (sea) gy += 1;   // hang just above the waves
         if (gy <= level.getMinBuildHeight() + 2 || gy >= level.getMaxBuildHeight() - 10) return;
 
         GateRank rank = GateRules.randomRank(random);
         GateSize size = GateRules.randomSize(random);
         BlockPos pos = new BlockPos(gx, gy, gz);
-        if (spawnGate(level, pos, rank, size, random.nextBoolean()) != null) {
+        if (spawnGate(level, pos, rank, size, random.nextBoolean(), sea) != null) {
             system(anchor, Component.literal("A ")
                     .withStyle(ChatFormatting.WHITE)
-                    .append(Component.literal(rank.name() + "-Rank Gate").withStyle(rank.chatColor()))
+                    .append(Component.literal(rank.name() + "-Rank " + (sea ? "Sea Gate" : "Gate")).withStyle(rank.chatColor()))
                     .append(Component.literal(" has opened nearby!").withStyle(ChatFormatting.WHITE)));
         }
     }

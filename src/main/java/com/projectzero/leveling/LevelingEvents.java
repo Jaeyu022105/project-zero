@@ -53,7 +53,7 @@ public final class LevelingEvents {
     @SubscribeEvent
     public static void onKill(LivingDeathEvent event) {
         if (event.getEntity().level().isClientSide()) return;
-        if (event.getSource().getEntity() instanceof ServerPlayer player) {
+        if (KillCredit.of(event) instanceof ServerPlayer player) {
             int killerLevel = LevelingService.get(player).level();
             long rawXp = XpRewards.forKill(event.getEntity(), killerLevel);
             long playerXp = ShardVesselService.divertKillXp(player, rawXp);

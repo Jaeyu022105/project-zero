@@ -30,10 +30,15 @@ public class GateBlock extends Block implements EntityBlock {
     public static final MapCodec<GateBlock> CODEC = simpleCodec(GateBlock::new);
     public static final EnumProperty<GateRank> RANK = EnumProperty.create("rank", GateRank.class);
     public static final BooleanProperty EXIT = BooleanProperty.create("exit");
+    /** Sea gate: leads to a flooded dungeon; the rift swirls teal. */
+    public static final BooleanProperty SEA = BooleanProperty.create("sea");
+    /** Dungeon break in progress: the rift cracks and flickers red (set by gate aging, see §9). */
+    public static final BooleanProperty BROKEN = BooleanProperty.create("broken");
 
     public GateBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(RANK, GateRank.E).setValue(EXIT, false));
+        registerDefaultState(stateDefinition.any().setValue(RANK, GateRank.E).setValue(EXIT, false)
+                .setValue(SEA, false).setValue(BROKEN, false));
     }
 
     @Override
@@ -43,7 +48,7 @@ public class GateBlock extends Block implements EntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(RANK, EXIT);
+        builder.add(RANK, EXIT, SEA, BROKEN);
     }
 
     /** Drawn by GateRiftRenderer as a swirling ring; the blocks themselves are invisible. */

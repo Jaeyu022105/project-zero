@@ -20,6 +20,8 @@ public final class GateRules {
     public static final int SPAWN_MAX_DISTANCE = 44;
 
     public static final int PORTAL_COOLDOWN_TICKS = 40;
+    /** Water breathing granted on entering a sea gate. Air pockets in the chambers cover the rest. */
+    public static final int SEA_GATE_BREATHING_TICKS = 20 * 180;
     public static final int DUNGEON_SLOT_STRIDE = 512;
     public static final int DUNGEON_FLOOR_Y = 64;
 

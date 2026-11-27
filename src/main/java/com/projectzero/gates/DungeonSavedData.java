@@ -28,6 +28,8 @@ public class DungeonSavedData extends SavedData {
         public final boolean alongX;
         public boolean built;
         public boolean cleared;
+        /** Sea gate: the dungeon is flooded ruins (see GateDungeonArena). */
+        public boolean sea;
 
         public DungeonRecord(int slot, GateRank rank, GateSize size, ResourceLocation originDim,
                              BlockPos gateAnchor, boolean alongX, boolean built, boolean cleared) {
@@ -52,8 +54,14 @@ public class DungeonSavedData extends SavedData {
     }
 
     public DungeonRecord allocate(GateRank rank, GateSize size, ResourceLocation originDim, BlockPos gateAnchor, boolean alongX) {
+        return allocate(rank, size, originDim, gateAnchor, alongX, false);
+    }
+
+    public DungeonRecord allocate(GateRank rank, GateSize size, ResourceLocation originDim, BlockPos gateAnchor,
+                                  boolean alongX, boolean sea) {
         int slot = nextSlot++;
         DungeonRecord rec = new DungeonRecord(slot, rank, size, originDim, gateAnchor, alongX, false, false);
+        rec.sea = sea;
         records.put(slot, rec);
         setDirty();
         return rec;
@@ -93,6 +101,7 @@ public class DungeonSavedData extends SavedData {
             rt.putBoolean("AlongX", r.alongX);
             rt.putBoolean("Built", r.built);
             rt.putBoolean("Cleared", r.cleared);
+            rt.putBoolean("Sea", r.sea);
             list.add(rt);
         }
         tag.put("Records", list);
@@ -110,12 +119,14 @@ public class DungeonSavedData extends SavedData {
             GateSize size = GateSize.byName(rt.getString("Size"));
             ResourceLocation dim = ResourceLocation.tryParse(rt.getString("OriginDim"));
             if (rank != null && size != null && dim != null) {
-                data.records.put(slot, new DungeonRecord(
+                DungeonRecord rec = new DungeonRecord(
                         slot, rank, size, dim,
                         BlockPos.of(rt.getLong("GateAnchor")),
                         rt.getBoolean("AlongX"),
                         rt.getBoolean("Built"),
-                        rt.getBoolean("Cleared")));
+                        rt.getBoolean("Cleared"));
+                rec.sea = rt.getBoolean("Sea");
+                data.records.put(slot, rec);
             }
         }
         return data;

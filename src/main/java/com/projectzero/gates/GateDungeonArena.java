@@ -89,6 +89,15 @@ public final class GateDungeonArena {
     }
 
     static Layout layout(int slot, GateSize size) {
+        return layout(slot, size, false);
+    }
+
+    /**
+     * Sea dungeons: same plan, but every cave floor sits below the entrance floor and the whole
+     * dungeon is flooded up to it (see {@link #waterLevel}); chambers keep an air pocket under
+     * their domes to come up for breath.
+     */
+    static Layout layout(int slot, GateSize size, boolean sea) {
         RandomSource random = RandomSource.create(slot * 7919L + size.ordinal() * 31L + 17L);
         BlockPos o = origin(slot);
         int chain = switch (size) { case SMALL -> 4; case MEDIUM -> 6; case LARGE -> 8; };
@@ -116,9 +125,10 @@ public final class GateDungeonArena {
                 double dist = prev.reach() + r + 10 + random.nextInt(10);
                 int nx = (int) Math.round(prev.x + Math.sin(h) * dist);
                 int nz = (int) Math.round(prev.z + Math.cos(h) * dist);
-                int floor = Math.max(o.getY() - 8, Math.min(o.getY() + 10, prev.floor + random.nextInt(9) - 4));
-                Cave c = new Cave(Kind.CHAMBER, nx, floor, nz, r + random.nextInt(3) - 1, r + random.nextInt(3) - 1,
-                        9 + random.nextInt(8));
+                int floor = sea ? o.getY() - 6 - random.nextInt(8)
+                        : Math.max(o.getY() - 8, Math.min(o.getY() + 10, prev.floor + random.nextInt(9) - 4));
+                int h = sea ? (o.getY() - floor) + 5 + random.nextInt(6) : 9 + random.nextInt(8);
+                Cave c = new Cave(Kind.CHAMBER, nx, floor, nz, r + random.nextInt(3) - 1, r + random.nextInt(3) - 1, h);
                 if (fits(caves, c, 6)) { next = c; heading = h * 0.6; }
             }
             if (next == null) continue;
@@ -134,8 +144,8 @@ public final class GateDungeonArena {
             double h = (random.nextDouble() - 0.5) * 0.6;
             int r = 22 + random.nextInt(4);
             double dist = prev.reach() + r + 12 + attempt * 2;
-            Cave c = new Cave(Kind.BOSS, (int) Math.round(prev.x + Math.sin(h) * dist), prev.floor,
-                    (int) Math.round(prev.z + Math.cos(h) * dist), r, r, 20);
+            Cave c = new Cave(Kind.BOSS, (int) Math.round(prev.x + Math.sin(h) * dist), sea ? o.getY() - 10 : prev.floor,
+                    (int) Math.round(prev.z + Math.cos(h) * dist), r, r, sea ? 22 : 20);
             if (fits(caves, c, 6)) boss = c;
         }
         if (boss == null) {
@@ -152,8 +162,10 @@ public final class GateDungeonArena {
                 double a = (random.nextBoolean() ? 1 : -1) * (Math.PI / 2 + (random.nextDouble() - 0.5) * 0.9);
                 int r = kind == Kind.TREASURE ? 7 + random.nextInt(3) : 9 + random.nextInt(5);
                 double dist = host.reach() + r + 9 + random.nextInt(8);
-                Cave c = new Cave(kind, (int) Math.round(host.x + Math.sin(a) * dist), host.floor + random.nextInt(5) - 2,
-                        (int) Math.round(host.z + Math.cos(a) * dist), r, r, kind == Kind.TREASURE ? 7 : 9 + random.nextInt(5));
+                int floor = sea ? o.getY() - 5 - random.nextInt(6) : host.floor + random.nextInt(5) - 2;
+                int h = sea ? (o.getY() - floor) + 4 + random.nextInt(4) : kind == Kind.TREASURE ? 7 : 9 + random.nextInt(5);
+                Cave c = new Cave(kind, (int) Math.round(host.x + Math.sin(a) * dist), floor,
+                        (int) Math.round(host.z + Math.cos(a) * dist), r, r, h);
                 if (fits(caves, c, 6)) {
                     caves.add(c);
                     tunnels.add(tunnel(host, c, random));
@@ -186,8 +198,18 @@ public final class GateDungeonArena {
 
     /** Bottom-left block of the 2x3 exit rift, near the far side of the boss cavern. */
     public static BlockPos exitPortalCenter(int slot, GateSize size) {
-        Cave b = layout(slot, size).boss();
-        return new BlockPos(b.x, b.floor + 2, b.z + b.rz - 7);
+        return exitPortalCenter(slot, size, false);
+    }
+
+    public static BlockPos exitPortalCenter(int slot, GateSize size, boolean sea) {
+        Cave b = layout(slot, size, sea).boss();
+        // Sea: on top of the island that rises out of the water.
+        return new BlockPos(b.x, sea ? waterLevel(slot) + 1 : b.floor + 2, b.z + b.rz - 7);
+    }
+
+    /** Sea dungeons are flooded up to (and including) this Y: the entrance floor. */
+    static int waterLevel(int slot) {
+        return origin(slot).getY();
     }
 
     // ---------------------------------------------------------------- worlds
@@ -381,17 +403,23 @@ public final class GateDungeonArena {
     // ---------------------------------------------------------------- build
 
     public static void buildAndPopulate(ServerLevel level, int slot, GateRank rank, GateSize size) {
+        buildAndPopulate(level, slot, rank, size, false);
+    }
+
+    public static void buildAndPopulate(ServerLevel level, int slot, GateRank rank, GateSize size, boolean sea) {
         long started = System.nanoTime();
-        Layout layout = layout(slot, size);
+        Layout layout = layout(slot, size, sea);
         RandomSource random = RandomSource.create(slot * 104729L + rank.ordinal());
         int[] pool = worldsFor(rank);
-        World world = world(pool[Math.floorMod(slot * 31 + 7, pool.length)]);
+        World world = world(sea ? 1 : pool[Math.floorMod(slot * 31 + 7, pool.length)]);
         SimplexNoise noise = new SimplexNoise(RandomSource.create(slot * 13L + 5L));
+        int water = sea ? waterLevel(slot) : Integer.MIN_VALUE;
 
         Grid g = carve(layout, noise);
         int placed = placeShell(level, g, world, noise, random);
-        decorate(level, g, layout, world, rank, size, random);
-        populate(level, slot, layout, g, rank, size, random);
+        if (sea) placed += flood(level, g, water);
+        decorate(level, g, layout, world, rank, size, random, water);
+        populate(level, slot, layout, g, rank, size, random, sea);
 
         ProjectZero.LOGGER.info("[Gates] Built {} dungeon slot {} ({} {}): {} blocks in {} ms", world.name, slot,
                 rank, size, placed, (System.nanoTime() - started) / 1_000_000);
@@ -428,10 +456,22 @@ public final class GateDungeonArena {
         return count;
     }
 
+    /** Fills every cave cell at or below {@code water} with still water. */
+    private static int flood(ServerLevel level, Grid g, int water) {
+        BlockState w = Blocks.WATER.defaultBlockState();
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        int n = 0;
+        for (int x = g.x0; x < g.x0 + g.sx; x++)
+            for (int z = g.z0; z < g.z0 + g.sz; z++)
+                for (int y = g.y0; y <= Math.min(water, g.y0 + g.sy - 1); y++)
+                    if (g.air(x, y, z)) { level.setBlock(p.set(x, y, z), w, FLAGS); n++; }
+        return n;
+    }
+
     // ---------------------------------------------------------------- decoration
 
     private static void decorate(ServerLevel level, Grid g, Layout layout, World w, GateRank rank, GateSize size,
-                                 RandomSource random) {
+                                 RandomSource random, int water) {
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
         Direction[] dirs = Direction.values();
 
@@ -441,7 +481,34 @@ public final class GateDungeonArena {
             for (int z = g.z0; z < g.z0 + g.sz; z++) {
                 for (int y = g.y0; y < g.y0 + g.sy; y++) {
                     if (!g.air(x, y, z)) continue;
+                    boolean wet = y <= water;
                     boolean floorBelow = g.solid(x, y - 1, z);
+                    if (wet) {
+                        // Underwater: seagrass, kelp and sea pickles on the floor, nothing on walls.
+                        if (floorBelow) {
+                            int roll = random.nextInt(1000);
+                            if (roll < 12) {
+                                level.setBlock(p.set(x, y, z), Blocks.SEA_PICKLE.defaultBlockState()
+                                        .setValue(net.minecraft.world.level.block.SeaPickleBlock.PICKLES, 1 + random.nextInt(4)), FLAGS);
+                            } else if (roll < 140) {
+                                level.setBlock(p.set(x, y, z), Blocks.SEAGRASS.defaultBlockState(), FLAGS);
+                            } else if (roll < 175) {
+                                int top = y;
+                                while (top + 1 <= water - 1 && g.air(x, top + 1, z) && top - y < 6) top++;
+                                for (int ky = y; ky < top; ky++) level.setBlock(p.set(x, ky, z), Blocks.KELP_PLANT.defaultBlockState(), FLAGS);
+                                level.setBlock(p.set(x, top, z), Blocks.KELP.defaultBlockState(), FLAGS);
+                            }
+                        }
+                        if (random.nextInt(10000) < 15 * w.crystals) {
+                            for (Direction d : dirs) {
+                                if (d.getAxis() != Direction.Axis.Y && g.solid(x + d.getStepX(), y, z + d.getStepZ())) {
+                                    crystalSeeds.add(new BlockPos(x, y, z));
+                                    break;
+                                }
+                            }
+                        }
+                        continue;
+                    }
                     boolean ceilingAbove = g.solid(x, y + 1, z);
                     int roll = random.nextInt(1000);
                     if (ceilingAbove && !floorBelow) {
@@ -449,7 +516,7 @@ public final class GateDungeonArena {
                             level.setBlock(p.set(x, y + 1, z), w.ceilingLight, FLAGS);
                         } else if (roll < 14 && w.hanging != null && g.air(x, y - 1, z)) {
                             level.setBlock(p.set(x, y, z), w.hanging, FLAGS);
-                        } else if (roll < 22 && g.air(x, y - 1, z) && g.air(x, y - 2, z)) {
+                        } else if (roll < 22 && g.air(x, y - 1, z) && g.air(x, y - 2, z) && y - 2 > water) {
                             level.setBlock(p.set(x, y, z), Blocks.CHAIN.defaultBlockState(), FLAGS);
                             level.setBlock(p.set(x, y - 1, z), hangingLantern(w), FLAGS);
                         }
@@ -486,7 +553,8 @@ public final class GateDungeonArena {
                 if (!g.air(x, y, z)) continue;
                 for (Direction d : dirs) {
                     if (!g.solid(x - d.getStepX(), y - d.getStepY(), z - d.getStepZ())) continue;
-                    level.setBlock(p.set(x, y, z), crystal.setValue(AmethystClusterBlock.FACING, d), FLAGS);
+                    level.setBlock(p.set(x, y, z), crystal.setValue(AmethystClusterBlock.FACING, d)
+                            .setValue(AmethystClusterBlock.WATERLOGGED, y <= water), FLAGS);
                     g.set(x, y, z, (byte) 0);   // occupied
                     // The rock it grows from turns to calcite, like a geode lining.
                     level.setBlock(p.set(x - d.getStepX(), y - d.getStepY(), z - d.getStepZ()),
@@ -504,10 +572,10 @@ public final class GateDungeonArena {
                 case CHAMBER, SIDE -> {
                     int ruins = 1 + random.nextInt(c.kind == Kind.CHAMBER ? 3 : 2);
                     for (int i = 0; i < ruins; i++) ruin(level, g, c, w, random);
-                    if (random.nextFloat() < (c.kind == Kind.SIDE ? 0.6F : 0.3F)) chestNearWall(level, g, c, rank, random);
+                    if (random.nextFloat() < (c.kind == Kind.SIDE ? 0.6F : 0.3F)) chestNearWall(level, g, c, rank, random, water);
                 }
                 case TREASURE -> {
-                    for (int i = 0; i < 2 + random.nextInt(2); i++) chestNearWall(level, g, c, rank, random);
+                    for (int i = 0; i < 2 + random.nextInt(2); i++) chestNearWall(level, g, c, rank, random, water);
                     // A treasure cave glitters: extra crystals ring its walls.
                     for (int i = 0; i < 40; i++) {
                         double a = random.nextDouble() * Math.PI * 2;
@@ -516,7 +584,8 @@ public final class GateDungeonArena {
                         if (g.air(x, y, z)) {
                             for (Direction d : dirs) {
                                 if (g.solid(x - d.getStepX(), y - d.getStepY(), z - d.getStepZ())) {
-                                    level.setBlock(p.set(x, y, z), crystal.setValue(AmethystClusterBlock.FACING, d), FLAGS);
+                                    level.setBlock(p.set(x, y, z), crystal.setValue(AmethystClusterBlock.FACING, d)
+                                            .setValue(AmethystClusterBlock.WATERLOGGED, y <= water), FLAGS);
                                     g.set(x, y, z, (byte) 0);
                                     break;
                                 }
@@ -524,7 +593,7 @@ public final class GateDungeonArena {
                         }
                     }
                 }
-                case BOSS -> decorateBoss(level, g, c, w, rank, random);
+                case BOSS -> decorateBoss(level, g, c, w, rank, random, water);
             }
         }
     }
@@ -592,7 +661,7 @@ public final class GateDungeonArena {
         }
     }
 
-    private static void chestNearWall(ServerLevel level, Grid g, Cave c, GateRank rank, RandomSource random) {
+    private static void chestNearWall(ServerLevel level, Grid g, Cave c, GateRank rank, RandomSource random, int water) {
         for (int attempt = 0; attempt < 20; attempt++) {
             double a = random.nextDouble() * Math.PI * 2;
             double rr = 0.55 + random.nextDouble() * 0.35;
@@ -600,14 +669,16 @@ public final class GateDungeonArena {
             int y = floorAt(g, x, z, c.floor + 1);
             if (y == Integer.MIN_VALUE || !g.air(x, y + 1, z)) continue;
             Direction facing = Direction.fromYRot(Math.toDegrees(Math.atan2(x - c.x, c.z - z)));   // toward the centre
-            placeChest(level, new BlockPos(x, y, z), facing, rank, random);
+            placeChest(level, new BlockPos(x, y, z), facing, rank, random, y <= water);
             g.set(x, y, z, (byte) 0);
             return;
         }
     }
 
-    private static void placeChest(ServerLevel level, BlockPos pos, Direction facing, GateRank rank, RandomSource random) {
-        level.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing), Block.UPDATE_ALL);
+    private static void placeChest(ServerLevel level, BlockPos pos, Direction facing, GateRank rank, RandomSource random,
+                                   boolean wet) {
+        level.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing)
+                .setValue(ChestBlock.WATERLOGGED, wet), Block.UPDATE_ALL);
         if (level.getBlockEntity(pos) instanceof ChestBlockEntity chest) {
             ResourceKey<LootTable> table = ResourceKey.create(Registries.LOOT_TABLE,
                     ResourceLocation.withDefaultNamespace(rank.ordinal() >= GateRank.B.ordinal()
@@ -643,7 +714,7 @@ public final class GateDungeonArena {
         }
     }
 
-    private static void decorateBoss(ServerLevel level, Grid g, Cave c, World w, GateRank rank, RandomSource random) {
+    private static void decorateBoss(ServerLevel level, Grid g, Cave c, World w, GateRank rank, RandomSource random, int water) {
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
         // Rank-colored ring in the floor around the centre.
         BlockState glow = rankGlass(rank);
@@ -662,13 +733,16 @@ public final class GateDungeonArena {
                 if (g.air(x, c.floor + dy, z)) level.setBlock(p.set(x, c.floor + dy, z), w.ruin[dy == 1 ? 0 : random.nextInt(w.ruin.length)], FLAGS);
             }
         }
-        // Dais where the exit rift will open.
-        BlockPos exit = new BlockPos(c.x, c.floor + 2, c.z + c.rz - 7);
+        // Dais where the exit rift will open. In a sea dungeon it is an island rising out of the water.
+        boolean sea = water != Integer.MIN_VALUE;
+        int daisTop = sea ? water : c.floor + 1;
+        BlockPos exit = new BlockPos(c.x, daisTop + 1, c.z + c.rz - 7);
         for (int x = exit.getX() - 3; x <= exit.getX() + 4; x++)
             for (int z = exit.getZ() - 3; z <= exit.getZ() + 3; z++)
-                if (g.air(x, c.floor + 1, z)) level.setBlock(p.set(x, c.floor + 1, z), w.ruin[0], FLAGS);
-        // Reward chest behind the dais.
-        placeChest(level, new BlockPos(exit.getX(), c.floor + 2, exit.getZ() + 3), Direction.NORTH, rank, random);
+                for (int y = c.floor + 1; y <= daisTop; y++)
+                    if (g.air(x, y, z)) { level.setBlock(p.set(x, y, z), w.ruin[0], FLAGS); g.set(x, y, z, (byte) 2); }
+        // Reward chest behind the rift.
+        placeChest(level, new BlockPos(exit.getX(), daisTop + 1, exit.getZ() + 3), Direction.NORTH, rank, random, false);
     }
 
     private static BlockState rankGlass(GateRank rank) {
@@ -685,8 +759,8 @@ public final class GateDungeonArena {
     // ---------------------------------------------------------------- mobs
 
     private static void populate(ServerLevel level, int slot, Layout layout, Grid g, GateRank rank,
-                                 GateSize size, RandomSource random) {
-        EntityType<?>[] mobs = mobsFor(rank);
+                                 GateSize size, RandomSource random, boolean sea) {
+        EntityType<?>[] mobs = sea ? new EntityType<?>[]{EntityType.DROWNED, EntityType.DROWNED, EntityType.GUARDIAN} : mobsFor(rank);
         List<Cave> fights = new ArrayList<>();
         for (Cave c : layout.caves) if (c.kind == Kind.CHAMBER || c.kind == Kind.SIDE) fights.add(c);
         int total = size.mobCount() + fights.size() * 3;
@@ -706,11 +780,13 @@ public final class GateDungeonArena {
         }
 
         Cave bossCave = layout.boss();
-        EntityType<? extends Mob> bossType = switch (rank) {
-            case E, D -> EntityType.HUSK;
-            case C, B -> EntityType.VINDICATOR;
-            case A, S -> EntityType.WITHER_SKELETON;
-        };
+        EntityType<? extends Mob> bossType = sea
+                ? (rank.ordinal() >= GateRank.A.ordinal() ? EntityType.ELDER_GUARDIAN : EntityType.DROWNED)
+                : switch (rank) {
+                    case E, D -> EntityType.HUSK;
+                    case C, B -> EntityType.VINDICATOR;
+                    case A, S -> EntityType.WITHER_SKELETON;
+                };
         Mob boss = bossType.create(level);
         if (boss != null) {
             boss.moveTo(bossCave.x + 0.5, bossCave.floor + 1.0, bossCave.z + 0.5, 180.0F, 0.0F);
@@ -748,7 +824,11 @@ public final class GateDungeonArena {
     }
 
     public static void openExitPortal(ServerLevel level, int slot, GateSize size, GateRank rank) {
-        BlockPos exitBase = exitPortalCenter(slot, size);
+        openExitPortal(level, slot, size, rank, false);
+    }
+
+    public static void openExitPortal(ServerLevel level, int slot, GateSize size, GateRank rank, boolean sea) {
+        BlockPos exitBase = exitPortalCenter(slot, size, sea);
         BlockState portal = ModBlocks.GATE_PORTAL.get().defaultBlockState()
                 .setValue(GateBlock.RANK, rank)
                 .setValue(GateBlock.EXIT, true);
