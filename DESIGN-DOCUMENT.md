@@ -31,7 +31,7 @@ Where we branch off from Solo Leveling: **Awakening Stones** in custom villages 
   - Any mob can be given a fixed XP value with `XpRewards.register`.
 - **[Built]** Each level gives **5 ability points**. Leveling up fully heals the player and shows a "LEVEL UP!" title and a [System] message.
 - **[Idea]** Hunter rank (E to S, then National Level) shown on the status window, derived from level. Gates check rank, not level.
-- **[Idea]** Level cap beyond 100 after the Monarch path (section 8).
+- **[Planned] The level ceiling** (owner decision 2026-11-27): XP stops at **level 100**. To break the ceiling, the player takes a quest from a high-ranked NPC who lives only in an advanced civilization, completes it, and reports back to them. Only then does leveling continue past 100. Monarch-class jobs have **no ceiling** (section 8). The full path is in section 16.
 
 ## 3. Stats
 
@@ -133,6 +133,7 @@ Our own mechanic, not in Solo Leveling.
 ## 8. Monarch path
 
 - **[Idea]** The very end game. A Legendary job advanced through several trials can become a **Monarch**. Monarchs get domain-style abilities (e.g. raising defeated bosses as allies for a Necromancer → Shadow Monarch path).
+- **[Planned]** Monarch-class jobs have no level ceiling: they never need the ceiling-break quest (section 2).
 - Kept as a long-term goal. Do not build until jobs, skills, gates and bosses exist.
 
 ## 9. Gates and dungeons
@@ -270,3 +271,18 @@ These are for when we make our own biomes.
 
 - **[Planned] Falling leaves:** trees with leaves shed slow, drifting leaves. They're tinted to the leaf block and biome, and sway as they fall.
 - **[Planned] Leaves pulled into gates:** near an open gate portal, some falling leaves curve toward the rift and get sucked in. This shows the pull of the gate without needing a warning overlay.
+
+## 16. Progression and the main path
+
+**[Planned]** (owner direction 2026-11-27): the mod should have a direction, not just random adventure. Civilizations, biomes, NPCs and quests give the player a road to follow. Gates and dungeons are the danger along that road.
+
+- **Civilizations:** a few distinct peoples, each with its own home biome, building style, culture and NPCs. They range from small frontier camps to **advanced civilizations** (large cities with guilds, ranked hunters and rare services). Original designs only.
+- **NPCs:** quest givers, traders, trainers and guild staff. **High-ranked NPCs** (top hunters, guild masters, elders) appear only in advanced civilizations. They are the gatekeepers of the late game.
+- **Quests:** a main questline that leads the player from camp to city, and side quests per civilization. Quests use the System's quest windows (section 11). Rewards include XP, gear, reputation and access to new areas or services.
+- **Main path outline (draft):**
+  1. Awaken, level up and change job at level 10 (built).
+  2. Find the first settlement and get registered as a hunter. Gates near settlements become the main source of work.
+  3. Earn rank and reputation, which opens the road to the advanced civilizations.
+  4. At level 100, a high-ranked NPC there gives the ceiling-break quest. Report back to them to break the level ceiling (section 2).
+  5. Past the ceiling: S-rank gates, dungeon breaks that threaten cities, and the Monarch path (section 8) for the few who reach it.
+- **Open questions for the owner:** how many civilizations to start with, whether they can be hostile or at war, and whether reputation can be lost.
