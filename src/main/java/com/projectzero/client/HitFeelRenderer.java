@@ -41,7 +41,7 @@ public final class HitFeelRenderer {
 
     private static <T extends LivingEntity, M extends EntityModel<T>> void rerender(RenderLivingEvent.Pre<T, M> event,
                                                                                   ClientSkillVisuals.Visual v) {
-        T e = event.getEntity();
+        @SuppressWarnings("unchecked") T e = (T) event.getEntity();
         float partial = event.getPartialTick();
         PoseStack pose = event.getPoseStack();
         float t = v.age + partial;
