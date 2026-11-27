@@ -1,6 +1,7 @@
 package com.projectzero.materials;
 
 import com.projectzero.registry.ModMaterials;
+import com.projectzero.gates.GateRank;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.RegistryObject;
@@ -24,8 +25,13 @@ public final class MaterialRules {
     public static final float MAX_LOOTING_BONUS = 0.15F;
     public static final float MAX_PART_CHANCE = 0.70F;
     public static final int BASE_PART_ROLLS = 1;
+    public static final int EXTRA_PART_ROLLS_PER_RANK = 1;
+    public static final float PART_CHANCE_PER_RANK = 0.04F;
     public static final int MINIMUM_DROP_COUNT = 1;
     public static final int MAXIMUM_DROP_COUNT = 1;
+    public static final int CRYSTAL_DROP_BASE_PERCENT = 20;
+    public static final int CRYSTAL_DROP_PERCENT_PER_RANK = 8;
+    public static final int MAX_CRYSTAL_DROP_PERCENT = 60;
     public static final int RAW_MEAT_NUTRITION = 3;
     public static final float RAW_MEAT_SATURATION = 0.3F;
     public static final int COOKED_MEAT_NUTRITION = 9;
@@ -57,5 +63,10 @@ public final class MaterialRules {
 
     public static List<PartDrop> partDrops(EntityType<?> type) {
         return PART_DROPS.getOrDefault(type, List.of());
+    }
+
+    public static int crystalChancePercent(GateRank rank) {
+        return Math.min(MAX_CRYSTAL_DROP_PERCENT,
+                CRYSTAL_DROP_BASE_PERCENT + rank.ordinal() * CRYSTAL_DROP_PERCENT_PER_RANK);
     }
 }
