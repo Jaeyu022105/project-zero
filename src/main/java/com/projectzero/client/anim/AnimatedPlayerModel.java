@@ -119,7 +119,12 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
         MoveState st = MoveState.of(player);
         float sprint = st.sprint(pt), air = st.air(pt), land = st.land(pt) * st.landPower, crouch = st.crouch(pt);
         float phase = limbSwing * 0.6662F;
-        float move = Mth.clamp(amount, 0F, 1F) * (1F - air);
+        float fly = st.fly(pt), flySpeed = st.flySpeed(pt);
+        // Flying is not running: fade the walk cycle out and float instead.
+        float walkKeep = 1F - fly;
+        rightLeg.xRot *= walkKeep; leftLeg.xRot *= walkKeep;
+        rightArm.xRot *= walkKeep; leftArm.xRot *= walkKeep;
+        float move = Mth.clamp(amount, 0F, 1F) * (1F - air) * walkKeep;
         float ground = 1F - air;
 
         // Stride: the body dips twice per cycle (each footfall) and twists against the legs.
@@ -148,7 +153,22 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
         rightLeg.xRot -= land * 0.35F * (1F - crouch);
         leftLeg.xRot -= land * 0.35F * (1F - crouch);
 
-        float dy = bob + breathe * 0.5F + dip;
+        // Flight: legs trail together and drift, arms hang back with speed, a slow float bob.
+        if (fly > 0.01F) {
+            float drift = Mth.sin(age * 0.09F);
+            float up = Math.max(0F, st.rise), down = Math.max(0F, -st.rise);
+            rightLeg.xRot += fly * (0.20F + flySpeed * 0.35F + drift * 0.06F + down * 0.2F);
+            leftLeg.xRot += fly * (0.32F + flySpeed * 0.35F - drift * 0.06F + down * 0.3F);
+            rightLeg.zRot += fly * 0.04F;
+            leftLeg.zRot -= fly * 0.04F;
+            rightArm.xRot += fly * (flySpeed * 0.55F + drift * 0.05F - up * 0.1F);
+            leftArm.xRot += fly * (flySpeed * 0.55F - drift * 0.05F - up * 0.1F);
+            rightArm.zRot += fly * (0.15F + up * 0.15F);
+            leftArm.zRot -= fly * (0.15F + up * 0.15F);
+        }
+        float floatBob = fly * Mth.sin(age * 0.09F) * 0.5F;
+
+        float dy = bob + breathe * 0.5F + dip + floatBob;
         head.y += dy;
         body.y += dy;
         rightArm.y += dy + breathe * 0.4F;
@@ -166,15 +186,15 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
         hat.copyFrom(head);
 
         // Elbows: loose at rest, bent when walking, tucked when sprinting; a forward swing bends more.
-        float elbowBase = 0.12F * idle + move * (0.25F + sprint * 0.85F) + air * 0.4F + land * 0.3F;
+        float elbowBase = 0.12F * idle + move * (0.25F + sprint * 0.85F) + air * 0.4F + land * 0.3F + fly * 0.3F;
         float rElbow = elbowBase + Math.max(0F, -rightArm.xRot) * 0.3F;
         float lElbow = elbowBase + Math.max(0F, -leftArm.xRot) * 0.3F;
         // Knees: the leg swinging forward folds; jumping tucks; landing and crouching give.
         float kneeK = move * (0.6F + sprint * 0.7F);
         float rKnee = 0.08F * move + Math.max(0F, Mth.sin(phase)) * kneeK;
         float lKnee = 0.08F * move + Math.max(0F, -Mth.sin(phase)) * kneeK;
-        rKnee += air * (1.1F * rise + 0.3F * fall) + land * 0.9F + crouch * 0.45F;
-        lKnee += air * (0.4F * rise + 0.3F * fall) + land * 0.9F + crouch * 0.45F;
+        rKnee += air * (1.1F * rise + 0.3F * fall) + land * 0.9F + crouch * 0.45F + fly * (0.25F + 0.2F * fall);
+        lKnee += air * (0.4F * rise + 0.3F * fall) + land * 0.9F + crouch * 0.45F + fly * (0.45F + 0.2F * fall);
         return new float[] {rElbow, lElbow, rKnee, lKnee};
     }
 

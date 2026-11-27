@@ -83,7 +83,9 @@ public final class PlayerAnimEvents {
         float[] cur = LEAN.computeIfAbsent(p, k -> new float[1]);
         float target = p.isSprinting() && p.onGround() && !p.isSwimming() ? SPRINT_LEAN : 0F;
         cur[0] += (target - cur[0]) * 0.12F;
-        float lean = cur[0] + AnimatedPlayerModel.animLean(p, partial);
+        MoveState ms = MoveState.of(p);
+        // Flight leans into the direction of travel, harder the faster you go.
+        float lean = cur[0] + AnimatedPlayerModel.animLean(p, partial) + ms.fly(partial) * ms.flySpeed(partial) * 22F;
         PoseStack pose = event.getPoseStack();
         pose.pushPose();
         if (Math.abs(lean) > 0.05F) {
@@ -140,11 +142,13 @@ public final class PlayerAnimEvents {
         if (!player.isUsingItem()) locomotion(pose, player, partial, i, mainHand);
 
         if (!mainHand) return;
-        BladeTrail.renderHand(event.getMultiBufferSource());   // the fading tail, even after the swing ends
         ItemStack stack = event.getItemStack();
         // Vanilla keeps: empty hand (it draws the arm itself), using items (bows, shields, food), maps.
         if (stack.isEmpty() || player.isUsingItem() || player.isInvisible()
-                || stack.getItem() instanceof net.minecraft.world.item.MapItem) return;
+                || stack.getItem() instanceof net.minecraft.world.item.MapItem) {
+            BladeTrail.renderHand(event.getMultiBufferSource());   // let any tail or motes finish
+            return;
+        }
         PlayerPoses.Key[] keys = null;
         float t = 0F;
         ClientSkillVisuals.Visual v = ClientSkillVisuals.find(player.getId(), ClientSkillVisuals.Kind.ANIM);
@@ -183,7 +187,9 @@ public final class PlayerAnimEvents {
                 i > 0 ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
                 i < 0, pose, event.getMultiBufferSource(), event.getPackedLight());
         if (keys != null && AnimatedPlayerModel.isBlade(stack)) BladeTrail.recordHand(pose, player, stack, i < 0);
+        else if (AnimatedPlayerModel.isBlade(stack)) BladeTrail.idleHand(pose, player, stack, i < 0);
         pose.popPose();
+        BladeTrail.renderHand(event.getMultiBufferSource());
     }
 
     /**
@@ -233,6 +239,11 @@ public final class PlayerAnimEvents {
         // Jump lifts the hands, falling lets them float up a bit more, landing pushes them down.
         ty += air * (0.05F * Math.max(0F, st.rise) + 0.07F * Math.max(0F, -st.rise)) - land * 0.12F;
         rx += air * -4F + land * 6F;
+        // Flight: hands float on a slow bob and trail a little with speed.
+        float fly = st.fly(pt), flySpeed = st.flySpeed(pt);
+        ty += fly * (Mth.sin(age * 0.09F + (main ? 0F : 0.8F)) * 0.012F - flySpeed * 0.04F);
+        tz += fly * flySpeed * 0.05F;
+        rx -= fly * flySpeed * 6F;
         // Crouch: hands sink and pull in.
         ty -= crouch * 0.05F;
         tx -= i * crouch * 0.03F;

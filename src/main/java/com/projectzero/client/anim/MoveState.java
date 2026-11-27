@@ -20,6 +20,8 @@ public final class MoveState {
     public float land, landO;        // 1 on the landing tick, decays to 0
     public float landPower = 0.5F;   // 0.3 small hop .. 1 big drop
     public float turn, turnO;        // smoothed yaw speed (deg/tick), signed
+    public float fly, flyO;          // 0 .. 1 creative/ability flight (not elytra)
+    public float flySpeed, flySpeedO; // 0 .. 1 horizontal flight speed
     public float rise;               // + going up, - falling (for jump vs fall poses)
     /** Blade combo step (index into PlayerPoses.COMBO) and the tick its swing started. */
     public int combo;
@@ -42,7 +44,11 @@ public final class MoveState {
     }
 
     private void tick(AbstractClientPlayer p) {
-        airO = air; sprintO = sprint; crouchO = crouch; landO = land; turnO = turn;
+        airO = air; sprintO = sprint; crouchO = crouch; landO = land; turnO = turn; flyO = fly; flySpeedO = flySpeed;
+        boolean flying = p.getAbilities().flying && !p.onGround() && !p.isPassenger();
+        fly += ((flying ? 1F : 0F) - fly) * 0.2F;
+        float hs = (float) p.getDeltaMovement().horizontalDistance();
+        flySpeed += (Mth.clamp(hs / 0.5F, 0F, 1F) - flySpeed) * 0.2F;
         boolean ground = p.onGround() || p.isPassenger() || p.isInWater() || p.getAbilities().flying || p.onClimbable();
         air += ((ground ? 0F : 1F) - air) * (ground ? 0.6F : 0.35F);
         sprint += ((p.isSprinting() && !p.isSwimming() ? 1F : 0F) - sprint) * 0.25F;
@@ -79,4 +85,6 @@ public final class MoveState {
     public float crouch(float pt) { return Mth.lerp(pt, crouchO, crouch); }
     public float land(float pt) { return Mth.lerp(pt, landO, land); }
     public float turn(float pt) { return Mth.lerp(pt, turnO, turn); }
+    public float fly(float pt) { return Mth.lerp(pt, flyO, fly); }
+    public float flySpeed(float pt) { return Mth.lerp(pt, flySpeedO, flySpeed); }
 }

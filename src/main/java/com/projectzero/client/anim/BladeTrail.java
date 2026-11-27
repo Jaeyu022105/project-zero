@@ -123,8 +123,95 @@ public final class BladeTrail {
         itemTransform(pose, stack, p, leftHand ? ItemDisplayContext.FIRST_PERSON_LEFT_HAND : ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, leftHand);
         Matrix4f m = pose.last().pose();
         Style style = styleOf(stack);
-        add(HAND, point(m, HILT), point(m, reach(style)), style);
+        Vec3 hilt = point(m, HILT), tip = point(m, reach(style));
+        add(HAND, hilt, tip, style);
+        shedHand(hilt, tip, style, true);
         pose.popPose();
+    }
+
+    /** First person, not swinging: enchanted blades still smolder or glint a little. */
+    static void idleHand(PoseStack pose, AbstractClientPlayer p, ItemStack stack, boolean leftHand) {
+        Style style = styleOf(stack);
+        if (style.shed() == Style.SHED_NONE) return;
+        pose.pushPose();
+        itemTransform(pose, stack, p, leftHand ? ItemDisplayContext.FIRST_PERSON_LEFT_HAND : ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, leftHand);
+        Matrix4f m = pose.last().pose();
+        shedHand(point(m, HILT), point(m, reach(style)), style, false);
+        pose.popPose();
+    }
+
+    // ---- first-person motes: tiny particles living in hand space, drawn with the hand ----
+
+    private static final ResourceLocation MOTE_TEX = ProjectZero.id("textures/particle/mana_glow_0.png");
+    private static final java.util.List<HandMote> MOTES = new java.util.ArrayList<>();
+    private static long motesAt;
+
+    private static final class HandMote {
+        double x, y, z, vx, vy, vz, gravity;
+        float age, life, size;
+        int rgb;
+    }
+
+    private static void shedHand(Vec3 hilt, Vec3 tip, Style style, boolean swinging) {
+        if (style.shed() == Style.SHED_NONE || MOTES.size() > 80) return;
+        java.util.Random r = java.util.concurrent.ThreadLocalRandom.current();
+        float chance = swinging ? 0.9F : (style.shed() == Style.SHED_EMBER ? 0.18F : 0.04F);
+        int n = swinging ? 2 : 1;
+        for (int k = 0; k < n; k++) {
+            if (r.nextFloat() > chance) continue;
+            double along = 0.35 + r.nextDouble() * 0.65;
+            HandMote m = new HandMote();
+            m.x = Mth.lerp(along, hilt.x, tip.x);
+            m.y = Mth.lerp(along, hilt.y, tip.y);
+            m.z = Mth.lerp(along, hilt.z, tip.z);
+            switch (style.shed()) {
+                case Style.SHED_EMBER -> {
+                    m.rgb = r.nextInt(4) == 0 ? 0xFFD070 : 0xFF6A18;
+                    m.vx = (r.nextDouble() - 0.5) * 0.08; m.vy = 0.10 + r.nextDouble() * 0.12; m.vz = (r.nextDouble() - 0.5) * 0.08;
+                    m.life = 0.45F + r.nextFloat() * 0.45F; m.size = 0.010F + r.nextFloat() * 0.010F;
+                }
+                case Style.SHED_HOLY -> {
+                    m.rgb = 0xFFE070;
+                    m.vx = (r.nextDouble() - 0.5) * 0.2; m.vy = (r.nextDouble() - 0.3) * 0.2; m.vz = (r.nextDouble() - 0.5) * 0.2;
+                    m.life = 0.25F; m.size = 0.012F;
+                }
+                case Style.SHED_VENOM -> {
+                    m.rgb = 0x9AD84A; m.gravity = -0.7; m.life = 0.5F; m.size = 0.010F;
+                }
+                default -> { m.rgb = 0xFFFFFF; m.life = 0.15F; m.size = 0.022F; }
+            }
+            MOTES.add(m);
+        }
+    }
+
+    private static void drawMotes(MultiBufferSource buffers) {
+        long now = System.nanoTime();
+        float dt = motesAt == 0 ? 0F : Math.min(0.05F, (now - motesAt) / 1.0E9F);
+        motesAt = now;
+        if (MOTES.isEmpty()) return;
+        VertexConsumer vc = buffers.getBuffer(RenderType.eyes(MOTE_TEX));
+        PoseStack.Pose p = new PoseStack().last();
+        for (Iterator<HandMote> it = MOTES.iterator(); it.hasNext(); ) {
+            HandMote m = it.next();
+            m.age += dt;
+            if (m.age >= m.life) { it.remove(); continue; }
+            m.vy += m.gravity * dt;
+            m.x += m.vx * dt; m.y += m.vy * dt; m.z += m.vz * dt;
+            float k = 1F - m.age / m.life;
+            float s = m.size * (0.6F + 0.4F * k);
+            float r = ((m.rgb >> 16) & 0xFF) / 255F * k, g = ((m.rgb >> 8) & 0xFF) / 255F * k, b = (m.rgb & 0xFF) / 255F * k;
+            // Hand space looks down -Z, so a quad in the XY plane faces the camera.
+            float x = (float) m.x, y = (float) m.y, z = (float) m.z;
+            mote(vc, p, x - s, y - s, z, 0, 1, r, g, b);
+            mote(vc, p, x + s, y - s, z, 1, 1, r, g, b);
+            mote(vc, p, x + s, y + s, z, 1, 0, r, g, b);
+            mote(vc, p, x - s, y + s, z, 0, 0, r, g, b);
+        }
+    }
+
+    private static void mote(VertexConsumer vc, PoseStack.Pose p, float x, float y, float z, float u, float v, float r, float g, float b) {
+        vc.addVertex(p, x, y, z).setColor(r, g, b, 1F).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(0xF000F0).setNormal(p, 0, 0, 1);
     }
 
     private static void itemTransform(PoseStack pose, ItemStack stack, AbstractClientPlayer p, ItemDisplayContext ctx, boolean left) {
@@ -186,6 +273,7 @@ public final class BladeTrail {
 
     /** The first-person trail, in hand space (identity pose), drawn with the hand. */
     static void renderHand(MultiBufferSource buffers) {
+        drawMotes(buffers);
         long now = System.nanoTime();
         prune(HAND, now);
         if (HAND.size() < 2) return;
