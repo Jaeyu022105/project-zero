@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Task 7: Gate backend skeleton + full 12h backend sprint complete).
+Last caught up: **2026-11-27** (Merged `claude/visual-pass`, ancient gates, gate aging, and dungeon breaks).
 
 ---
 
@@ -29,7 +29,7 @@ Last caught up: **2026-11-27** (Task 7: Gate backend skeleton + full 12h backend
 - A job system: Job Change Quest at level 10 (auto-complete for now), weighted random jobs by rarity loaded from JSON.
 - Basic skills, job signature skills, milestone titles and milestone skills, and skillbooks.
 - Awakening Stones & Awakening Shards: two-block crystal block, crystal formations, shard item + Shard Vessel, real job reroll backend, and Gate boss shard drops (custom village worldgen still planned).
-- Gates & Dungeons (backend skeleton): rank-colored `GateBlock` + `GateBlockEntity` (`E..S`, `SMALL`/`MEDIUM`/`LARGE`), `projectzero:dungeon` void dimension with code-built placeholder chambers, rank-scaled gate monsters & boss, boss exit portal + overworld gate closure, and `projectzero:gateSpawning` gamerule (multi-room template generator and Souls-like boss state machines still planned).
+- Gates & Dungeons: free-floating rank-colored rifts (`GateBlock`, `GateBlockEntity`, `GateRiftRenderer`; `E..S`, `SMALL`/`MEDIUM`/`LARGE`), sea gates, carved stone-ring ancient gates (`AncientGate`, 1/700 chunk worldgen + 10% natural share + ruin on clear), `projectzero:dungeon` void dimension with multi-chamber remnant-world cave dungeons (8 themes + flooded sea caves, `mana_crystal` clusters, scattered loot chests, return/exit rifts), gate aging surges & rank-ups (`projectzero:gateAging`, `AncientGate.setRank`), and 5-wave + boss dungeon breaks (`projectzero:dungeonBreaks`).
 - (Long term) A Monarch path.
 
 **What Project Zero is not** (see Exclusions section below).
@@ -69,7 +69,7 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Mod scaffold: Forge 52.1.0 for Minecraft 1.21.1, Java 21, Gradle 8.10.2 wrapper, official Mojang mappings.
 - Leveling: levels 1 to 100, progressively harder XP curve, 5 ability points per level, full heal and "LEVEL UP!" title on level up.
 - XP from kills: every non-player mob gives XP. Vanilla Ã—0.3, other mods Ã—1, gate monsters Ã—3 (`projectzero:gate_monsters` tag or `projectzero:gate_monster` NBT), bosses Ã—10, multiplied by `GateRank` (`Ã—1..Ã—32`) and level-gap penalty (`âˆ’5%` per level past a 5-level gap, `10%` floor).
-- Mob Ranks, Gates & Dungeon Skeleton (`gates/`): `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `MobScaling.apply(entity, rank, level)` (`[C Â· Lv 34] Zombie` nameplates), `GateBlock` + `GateBlockEntity` (stores rank, size, open time, dungeon slot, anchor pos), `projectzero:dungeon` void dimension (`DungeonSavedData` + placeholder `GateDungeonArena`), boss kill loop (drops `Awakening Shard` + 100% rolled accessory, increments `gatesCleared` milestone, opens Dungeon Exit portal, seals overworld Gate), `projectzero:gateSpawning` gamerule (default `false`), `/pz mob spawn <entity> <rank> [level]`, and `/pz gate spawn <rank> <size> | leave`.
+- Mob Ranks, Gates, Ancient/Sea Variants, Aging & Dungeon Breaks (`gates/`): `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `MobScaling.apply(entity, rank, level)` (`[C · Lv 34] Zombie` nameplates), free-floating rifts (`GateBlock` + `GateBlockEntity` + `GateRiftRenderer`), sea gates (`GateBlock.SEA`), carved circular stone-ring ancient gates (`AncientGate`, `AncientGateStoneBlock`, `AncientGateFeature` worldgen, `AncientGate.ruin` on clear), `projectzero:dungeon` void dimension (`DungeonSavedData` + multi-chamber remnant-world `GateDungeonArena` with 8 themes, `mana_crystal` clusters dropping `mana_crystal_shard`, scattered chests, return rift on E..A), boss kill loop (drops `Awakening Shard` + 100% rolled accessory, increments `gatesCleared`, opens exit rift, closes overworld gate), gate aging (`projectzero:gateAging` default `true`: surges every 7 days up to 3 for +3 mob levels & +5% chest loot, rank-up at 28 days updating `GateBlock.RANK`, `AncientGate.setRank`, and rescaling built dungeons +25% mobs), dungeon breaks (`projectzero:dungeonBreaks` default `true`: breaks at 2nd rank-up or S-rank's next rank-up within 96 blocks, `BROKEN=true`, clears interior mobs, spawns 5 outdoor waves every 60s + boss on wave 5), `/pz mob spawn <entity> <rank> [level]`, and `/pz gate spawn <rank> <size> [sea|ancient] | leave | age <days> | break`.
 - Stats: Strength, Agility, Vitality, Sense, Intelligence, rebalanced onto diminishing-return soft-cap curves (`LevelingRules.soft(p, k)`).
 - Jobs & Library Domain: at level 10 the System opens the **Library domain** (`projectzero:library` void dimension) where 7 face-down `JobCardEntity` cards orbit the frozen player; right-clicking one (or waiting out the 90s timeout) flips it, burns the others away, assigns the pre-rolled job, and returns the player home. Jobs are JSON data in `data/projectzero/jobs/` (10 placeholder jobs, 2 per rarity).
 - Awakening Stones, Crystal Formations & Reawakening Vision: small two-block crystal (`awakening_stone`), glassy shell `awakening_crystal`, opaque interior `awakening_crystal_deep`, glowing `awakening_core` veins, surface `awakening_cluster` spikes, procedural `CrystalFormation` (`small`, `large`, `colossal`), and `awakening_shard`. Offering a shard applies `JobService.awakeningRerollQuiet` immediately (logout-safe) and plays the ~14s `ReawakeningVision` (eyelid overlay `VisionOverlayRenderer`, mirror `void_sea` + `void_mote`, 64 drifting cards, rising card with heartbeat, reveal, return home, and rarity-colored particle aura burst).
@@ -79,7 +79,7 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Equipment & Accessories (`equipment/`): 8 active custom slots (`gauntlets`, `ring` Ã—2, `amulet`, `earrings`, `belt`, `charm` Ã—2) + 1 spare locked `relic` slot (`PlayerAccessories` in `projectzero:accessories` NBT; copied on clone, dropped on death only when `keepInventory` is false). 9 starter `AccessoryItem`s (`iron_gauntlets`, `copper_ring`, `silver_ring`, `gold_ring`, `bone_amulet`, `obsidian_earrings`, `leather_belt`, `hunter_charm`, `mana_charm`) with rolled `AccessoryData` component (rarity, `GateRank` E..S, flat stats, optional `crit_chance`/`mana_regen`/`lifesteal`/`xp_bonus`/`damage_vs_undead` affix), `AccessoryMenu` + `AccessoryScreen`, and `AccessoryLootModifier` (1.5% vanilla hostile, 3% modded, 8% gate monster, 100% boss).
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
 - Data saved with the player and kept on death (accessories follow `keepInventory`).
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`, `/pz gate spawn <rank> <size>`, `/pz gate leave`.
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`, `/pz gate spawn <rank> <size> [sea|ancient]`, `/pz gate leave`, `/pz gate age <days>`, `/pz gate break`.
 
 **Built and verified in a loaded world (`gradlew runClient`).**
 
@@ -117,15 +117,17 @@ Package layout (`src/main/java/com/projectzero/`):
   - `JobCommands.java`: `/pz job set|reroll|clear` (merged into the `/pz` node).
 - `registry/`
   - `ModDataComponents.java`: MC 1.21+ data components (`SHARD_CHARGE`, `SHARD_CHARGE_TIER`, `SKILL_ID`, `ACCESSORY_DATA`).
-  - `ModBlocks.java` & `ModBlockEntities.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL`, `AWAKENING_CORE`, `AWAKENING_CRYSTAL_DEEP`, `AWAKENING_CLUSTER`, `VOID_SEA`, `VOID_MOTE`, `GATE_PORTAL` (`GateBlockEntity`).
-  - `ModItems.java`: block items, `AWAKENING_SHARD`, `SHARD_VESSEL`, `SKILLBOOK`, and 9 starter `AccessoryItem`s.
+  - `ModBlocks.java` & `ModBlockEntities.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL`, `AWAKENING_CORE`, `AWAKENING_CRYSTAL_DEEP`, `AWAKENING_CLUSTER`, `VOID_SEA`, `VOID_MOTE`, `GATE_PORTAL` (`GateBlockEntity`), `MANA_CRYSTAL`, `ANCIENT_GATE_STONE`.
+  - `ModItems.java`: block items, `AWAKENING_SHARD`, `SHARD_VESSEL`, `SKILLBOOK`, `MANA_CRYSTAL_SHARD`, and 9 starter `AccessoryItem`s.
   - `ModEntities.java`: `JOB_CARD` (`JobCardEntity`).
+  - `ModFeatures.java`: `ANCIENT_GATE` (`AncientGateFeature` worldgen).
   - `ModMenus.java` & `ModLootModifiers.java`: `ACCESSORIES` (`AccessoryMenu`) and `ACCESSORY_DROPS` (`AccessoryLootModifier`).
   - `ModCreativeTabs.java`: `projectzero` creative tab.
 - `skills/`: `SkillRules`, `SkillType`, `SkillSource`, `Skill`, `SkillBehavior`, `SkillBehaviors`, `SkillEffects`, `SkillRegistry` (`data/<ns>/skills/*.json`), `PlayerSkills` (`projectzero:skills`), `SkillService`, `SkillbookItem`, `SkillCommands`, `SkillEvents`.
 - `titles/`: `MilestoneTracker` (`projectzero:milestones`), `Title`, `TitleRegistry` (`data/<ns>/titles/*.json`), `PlayerTitles` (`projectzero:titles`), `TitleService`, `TitleCommands`, `TitleEvents`.
 - `equipment/`: `AccessorySlotType`, `AccessoryData`, `EquipmentRules`, `AccessoryItem`, `PlayerAccessories` (`projectzero:accessories`), `EquipmentService`, `AccessoryMenu`, `AccessoryLootModifier`, `EquipmentCommands`, `EquipmentEvents`.
-- `gates/`: `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `GateRules` (`projectzero:gateSpawning` gamerule), `MobScaling`, `GateBlock`, `GateBlockEntity`, `DungeonSavedData`, `GateDungeonArena`, `GateService`, `MobCommands`, `GateCommands`, `MobEvents`.
+- `combat/`: `BossAffinity` (boss elemental weaknesses/resistances), hit feedback, player movement/action poses (`PlayerPoses`).
+- `gates/`: `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `GateRules` (`projectzero:gateSpawning`, `projectzero:gateAging`, `projectzero:dungeonBreaks` gamerules + aging/break constants), `MobScaling`, `GateBlock`, `GateBlockEntity`, `RiftShape`, `AncientGate`, `AncientGateStoneBlock`, `AncientStonePiece`, `AncientGateFeature`, `ManaCrystalBlock`, `DungeonSavedData`, `GateDungeonArena`, `GateService`, `MobCommands`, `GateCommands`, `MobEvents`.
 - `awakening/`
   - `AwakeningRules.java`: `VESSEL_DIVERT = 0.5`, `VESSEL_TIER_FRACTION = 0.6`, `MAX_SHARD_TIER = 5`, tier threshold/name/color helpers.
   - `ShardCharge.java`: `(hasShard, chargeXp, tier)` data component record with Codec + StreamCodec.
@@ -198,9 +200,10 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ### High Priority
 
-- Visual polish pass by Claude on all `TODO(claude-art)` placeholders (HUD bars/icons, System skills & accessories frames, item icons, worn gauntlet arm model, skill VFX, gate portal shader/model, golden sea shimmer in `ReawakeningVision` for charged shards).
-- Multi-room template dungeon generator (replacing `GateDungeonArena`), dungeon loot chests with `Skillbook` drops, original gate monster models, and Souls-like boss state machines (`DESIGN-DOCUMENT.md` Â§9â€“10).
-- Deeper job skill trees, job leveling XP, and job advancement trials (Â§5).
+- Original gate monster models & animations, Souls-like boss attack state machines (`DESIGN-DOCUMENT.md` §10), and custom overworld fantasy biomes via TerraBlender (§15).
+- Surge visual spin/mote speed-up in `client/GateRiftRenderer` reading `GateBlockEntity#surges` (synced in the block entity update tag/packet).
+- Uses for `mana_crystal_shard` (vessel fuel, crafting, trading) and skillbook drops in dungeon loot chests.
+- Deeper job skill trees, job leveling XP, and job advancement trials (§5).
 
 ### Medium Priority
 
@@ -726,4 +729,50 @@ What changed (Claude, uncommitted in the Downloads clone on top of `claude/visua
 Revised the same day at the owner's request: no dais or steps. The ring stands on the ground clinging to the rift's glowing line (`ring.py` `band()`: from 0.9 R out to about R + 0.5, wobbling with the angle), with worn `plate_high` (4 px) and `plate_low` (2 px) paving, many plates missing, 25% of upper ring stones pre-fallen.
 
 Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runClient is run by the owner). To check: `/pz gate spawn c medium ancient` in a jungle, desert, snowy and swamp biome; walk through it; kill the boss and look at the ruin; make a new world and fly around to find a generated one (rare by design).
+
+---
+
+### Session Log — 2026-11-27 (Merge visual-pass, ancient gates, gate aging, and dungeon breaks)
+
+**Context & Direction Check**
+
+- Owner requested:
+  1. Merge `claude/visual-pass` into `main`, preserving **both** the local ancient-gate edits and `§15 Biomes and world ambience` in `DESIGN-DOCUMENT.md`, and commit all untracked art/model files and the ancient gate code (`gates/AncientGate*.java`, `AncientStonePiece.java`, `registry/ModFeatures.java`, worldgen JSON, `tools/ancient_gate/`) in small, clean commits under the owner's name with zero AI or co-author lines.
+  2. Implement `.agents/prompts/gemini-gate-aging.md` (gate aging surges/rank-ups and 5-wave dungeon breaks), calling `AncientGate.setRank` when a gate ranks up so ancient gate runes recolor, test in a loaded world, and update `HANDOFF.md` + `DESIGN-DOCUMENT.md`.
+- Kept `GateRiftRenderer` and `GateDungeonArena` cave layout generation untouched per prompt rules; synced `Surges` in `GateBlockEntity`'s update tag/packet so client renderers can read `be.surges()` directly. Ignored the local `learning sets/` video folder in `.gitignore`.
+
+**Changes Made**
+
+- **Merge & Art / Ancient Gate Commits (`9a89d1b`, `2b420cf`, `66675b3`)**:
+  - Fast-forwarded `main` onto `origin/claude/visual-pass` (`9ade9c0`) while preserving local ancient-gate docs + `§15 Biomes and world ambience` in `DESIGN-DOCUMENT.md`.
+  - Committed `.gitignore` (`learning sets/`), updated item/skill/slot/portal textures, and committed `AncientGate`, `AncientGateStoneBlock`, `AncientStonePiece`, `AncientGateFeature`, `ModFeatures`, 684 generated stone ring models + blockstate JSON, worldgen JSONs, and `tools/ancient_gate/`.
+- **Gate Aging & Dungeon Breaks (`gates/` + `en_us.json`)**:
+  - `src/main/java/com/projectzero/gates/GateRank.java`: added `next()`.
+  - `src/main/java/com/projectzero/gates/AncientGate.java`: updated `setRank(...)` to use `Block.UPDATE_ALL` so client rune block colors and light redraw immediately on rank-up.
+  - `src/main/java/com/projectzero/gates/GateRules.java`: registered `RULE_GATE_AGING` (`projectzero:gateAging`, default `true`) and `RULE_DUNGEON_BREAKS` (`projectzero:dungeonBreaks`, default `true`), plus `AGING_CHECK_INTERVAL_TICKS`, `AGING_SURGE_TICKS`, `AGING_MAX_SURGES`, `AGING_SURGE_MOB_LEVELS`, `AGING_SURGE_LOOT_BONUS`, `AGING_RANKUP_EXTRA_MOBS`, `AGING_MESSAGE_RADIUS`, `BREAK_AFTER_RANKUPS`, `BREAK_WAVES`, `BREAK_WAVE_TICKS`, and `BREAK_PLAYER_RADIUS`.
+  - `src/main/java/com/projectzero/gates/GateBlock.java` & `GateBlockEntity.java`: persisted `surges`, `lastAgeCheck`, `rankUps`, `breaking`, `breakWave`, `nextWaveTime`; synced `Surges` (and portal state) via `getUpdateTag` / `getUpdatePacket`; wired `EntityBlock#getTicker` so only the anchor block runs `GateBlockEntity.serverTick`.
+  - `src/main/java/com/projectzero/gates/DungeonSavedData.java`: made `DungeonRecord.rank` mutable and persisted `surges`, `pendingReinforcements`, and `broken`.
+  - `src/main/java/com/projectzero/gates/GateDungeonArena.java`: threaded `surges` into `buildAndPopulate`, `placeChest` (`+5%` gear & shard chance per surge), and `populate` (`+3` levels per surge capped at `rank.maxLevel()`); added helpers `surgedMobLevel`, `createGateMonster`, `createGateBoss`, `applyBossRankScaling`, `dungeonBounds`, `syncMonstersInSlot`, `spawnRankUpReinforcements`, and `clearDungeonMonsters`.
+  - `src/main/java/com/projectzero/gates/GateService.java`: implemented `tickAnchorGate` (pauses `openTime` drift when `gateAging=false`, checks every 1200 ticks), `evaluateAging` (surges every 7d up to 3 with `[System]` message within 128 blocks; rank-ups at 28d updating `GateBlock.RANK`, `GateBlockEntity`s, `AncientGate.setRank`, `DungeonSavedData`, built-dungeon monster rescaling & `+25%` reinforcements, and rank-up title), and `startDungeonBreak` / `tickDungeonBreak` (breaks at 2nd rank-up or S-rank's next rank-up when a player is within 96 blocks; sets `BROKEN=true`, blocks entry, clears dungeon monsters, spawns 5 outdoor waves every 60s within 6 blocks hunting nearest player, and spawns the linked gate boss on wave 5 so killing it grants normal boss clear rewards and closes/ruins the gate).
+  - `src/main/java/com/projectzero/gates/MobEvents.java`: added `onEntityJoinLevel` catch-up hook in `projectzero:dungeon` so monsters in unloaded cave sections rescale to `rec.rank` / `rec.surges` (or are removed if `rec.broken`) as soon as their chunk loads.
+  - `src/main/java/com/projectzero/gates/GateCommands.java` & `src/main/resources/assets/projectzero/lang/en_us.json`: added `/pz gate age <days>` and `/pz gate break` (32-block raycast onto `GateBlock` or adjacent `AncientGateStoneBlock`) and gamerule translations.
+  - `DESIGN-DOCUMENT.md`, `ROADMAP.md`, `HANDOFF.md`: marked Gate aging and Dungeon breaks `[Built]` and updated reference sections.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL** before pushing Part 1 and after completing Part 2.
+- `gradlew.bat runClient --no-daemon` (loaded world + mid-break save/reopen cycle):
+  - Spawned E-rank Ancient Gate (`/pz gate spawn e small ancient`), ran `/pz gate age 7` → verified `surges=1`, `[System]` instability message, and `updateTagSurges=1` client sync.
+  - Ran `/pz gate age 21` (28 days total) → verified `rank=D`, `surges=0`, `GateBlock.RANK=D`, and `AncientGateStoneBlock` runes recolored to `D`.
+  - Verified `/gamerule projectzero:gateAging false` pauses aging and keeps `openTime` offset stable.
+  - Built an E-rank dungeon (`18` non-boss mobs, `maxLevel=15`), aged the gate 28 days in the Overworld, and re-entered → verified all interior monsters rescaled to `D` (`minLevel=15`, `allDRank=true`) and `+25%` reinforcements spawned (`23` non-boss mobs).
+  - Triggered a dungeon break (56 days / `/pz gate break`), verified `GateBlock.BROKEN=true` and portal entry blocked, saved and reopened the world mid-break at wave 2 (`breaking=true, wave=2` persisted), completed all 5 waves (`21` outdoor break monsters + `[C · BOSS · Lv 50] Vindicator`), and killed the boss outside → verified `gateClosed=true`, `shardDrops=1`, and `gatesCleared=1`. Zero errors or exceptions in `run/logs/latest.log`.
+
+**Remaining Recommendations**
+
+1. Hook `GateBlockEntity#surges` (`0..3`) in `client/GateRiftRenderer` so surging rifts spin faster and emit extra motes visually.
+2. Add gameplay uses for `mana_crystal_shard` (Shard Vessel charging fuel, crafting, or NPC trading) and add `SkillbookItem` rolls to `GateDungeonArena` treasure chests.
+3. Begin Phase 2/3 custom gate monster models and Souls-like boss state machines (`DESIGN-DOCUMENT.md` §10).
+
+---
 

@@ -21,8 +21,8 @@ Status: ✅ done · 🔨 in progress · ⏳ next · ⬜ later
 
 ## Phase 2: The world
 5. ⬜ **New terrain:** medieval to comic-fantasy biomes (e.g. banner-dotted highlands, giant-mushroom woods, floating-rock fields, crystal tundra). Claude. *Needs the owner's OK on a biome library (TerraBlender), see Open decisions.*
-6. ✅ **Gates (backend skeleton):** `GateBlock` + `GateBlockEntity` by color (`E..S`) and size (`SMALL`/`MEDIUM`/`LARGE`), `GateRank` & `MobScaling`, `XpRewards` rank & level-gap formula, `projectzero:gateSpawning` gamerule (default `false`), `/pz gate spawn|leave` & `/pz mob spawn` built & verified (Claude rift shader/model later).
-7. 🔨 **First dungeon:** `projectzero:dungeon` void dimension, `DungeonSavedData` instance slots, placeholder `GateDungeonArena` hall with scaled gate monsters + boss + Awakening Shard drop + exit portal + overworld gate closure ✅ built; Claude's room-template generator & skillbook chests next.
+6. ✅ **Gates, ancient/sea variants, aging & dungeon breaks:** free-floating rank-colored rifts (`GateRiftRenderer`), sea gates, carved stone-ring ancient gates (`AncientGate` + worldgen), `GateRank` & `MobScaling`, `XpRewards` rank & level-gap formula, gate aging surges/rank-ups (`projectzero:gateAging`, `AncientGate.setRank`), 5-wave + boss dungeon breaks (`projectzero:dungeonBreaks`), `/pz gate spawn|leave|age|break` & `/pz mob spawn`.
+7. ✅ **First dungeon:** `projectzero:dungeon` void dimension, `DungeonSavedData` instance slots, multi-chamber remnant-world cave networks (`GateDungeonArena`, 8 world themes + flooded sea caves, mana crystal clusters, scattered chests, entrance return rift except S-rank, boss exit rift, and overworld gate closure / ancient ruin).
 8. ⬜ **First gate monsters** (2-3 original mobs, models + animation). Claude.
 9. ⬜ **Hidden ruins and hidden dungeons:** ruins in the overworld that hide a sealed dungeon, and "a dungeon inside the dungeon": a secret second dungeon behind a normal one, far more dangerous. Claude: structures. Gemini: triggers and seals.
 10. ⬜ **Civilizations:** two village styles, *medieval* and *new/fantasy*, every town built around its Awakening Stone formation (bigger town, bigger stone). Claude: buildings and layouts.
@@ -39,7 +39,7 @@ Status: ✅ done · 🔨 in progress · ⏳ next · ⬜ later
 17. ⬜ **Summons and pets**, DESIGN-DOCUMENT.md §13. Pets can start with the first gate monsters (Phase 2); job summons after the skills foundation and first mobs. Gemini: roster, AI, leveling, saving. Claude: creature models, summon sigil effects.
 
 ## Later
-- Job trials and job upgrades, gate breaks (monsters spill out), more jobs, bosses and biomes, the Monarch path.
+- Job trials and job upgrades, more jobs, bosses and biomes, mana crystal shard uses, the Monarch path.
 
 ## Open decisions (owner)
 - ✅ **Accessory slots:** owner approved Curios 2026-11-26, but Curios for 1.21.1 is NeoForge-only, so we build our own 8 slots (saved with the player). Revisit if we ever move to NeoForge.
