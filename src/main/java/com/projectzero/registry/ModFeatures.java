@@ -39,6 +39,9 @@ public final class ModFeatures {
     /** Floating islands with hanging vines and waterfalls (Skyfall Isles). */
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> FLOATING_ISLAND =
             FEATURES.register("floating_island", com.projectzero.worldgen.FloatingIslandFeature::new);
+    /** Banded natural arches with mossy valley-floor boulder heaps (Sky Pillars). */
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> SKY_ARCH =
+            FEATURES.register("sky_arch", com.projectzero.worldgen.SkyArchFeature::new);
 
     // Round 3 biomes.
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> BAOBAB =

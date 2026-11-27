@@ -55,6 +55,9 @@ def features():
     placed("baobab", "projectzero:baobab", rarity=2)
     configured("termite_mound", {"type": "projectzero:termite_mound", "config": {}})
     placed("termite_mound", "projectzero:termite_mound", rarity=3)
+    # Sky Pillars arch and its valley-floor boulder detail.
+    configured("sky_arch", {"type": "projectzero:sky_arch", "config": {}})
+    placed("sky_arch", "projectzero:sky_arch", rarity=6)
     # Tsingy.
     configured("tsingy", {"type": "projectzero:tsingy", "config": {}})
     placed("tsingy", "projectzero:tsingy", rarity=2)
