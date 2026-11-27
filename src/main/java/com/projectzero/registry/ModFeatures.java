@@ -55,6 +55,12 @@ public final class ModFeatures {
             FEATURES.register("tsingy", com.projectzero.worldgen.TsingyFeature::new);
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> KARST_TOWER =
             FEATURES.register("karst_tower", com.projectzero.worldgen.KarstTowerFeature::new);
+    /** Low limestone islets with sand coves in the Karst Tower Bay. */
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> KARST_ISLET =
+            FEATURES.register("karst_islet", com.projectzero.worldgen.KarstIsletFeature::new);
+    /** Occasional sea arches rising from the shallow bay floor. */
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> KARST_SEA_ARCH =
+            FEATURES.register("karst_sea_arch", com.projectzero.worldgen.KarstSeaArchFeature::new);
 
     // Round 4 biomes.
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> SALT_POOL =

@@ -66,6 +66,10 @@ def features():
     # Karst Tower Bay: towers stand on the sea floor.
     configured("karst_tower", {"type": "projectzero:karst_tower", "config": {}})
     placed("karst_tower", "projectzero:karst_tower", rarity=3, heightmap="OCEAN_FLOOR_WG", water=False)
+    configured("karst_islet", {"type": "projectzero:karst_islet", "config": {}})
+    placed("karst_islet", "projectzero:karst_islet", rarity=5, heightmap="OCEAN_FLOOR_WG", water=False)
+    configured("karst_sea_arch", {"type": "projectzero:karst_sea_arch", "config": {}})
+    placed("karst_sea_arch", "projectzero:karst_sea_arch", rarity=10, heightmap="OCEAN_FLOOR_WG", water=False)
 
     # Round 4.
     for n in ["salt_pool", "geyser", "ice_arch", "crystal_outcrop"]:
@@ -137,7 +141,7 @@ BIOMES = {
          "grass_color": 9470285, "foliage_color": 10387789}}),
     "karst_bay": ("warm_ocean", [],
         [],
-        {VEG: ["projectzero:karst_tower"]},
+        {VEG: ["projectzero:karst_tower", "projectzero:karst_islet", "projectzero:karst_sea_arch"]},
         {"temperature": 0.8, "downfall": 0.85, "effects": {"fog_color": 13952736, "sky_color": 9224424, "water_color": 3126682,
          "water_fog_color": 1797978, "grass_color": 6074954, "foliage_color": 4169802}}),
     # Round 4.
