@@ -23,6 +23,8 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.AWAKENING_SHARD.get());
                         output.accept(ModItems.SHARD_VESSEL.get());
                         output.accept(ModItems.SKILLBOOK.get());
+                        output.accept(ModItems.MANA_CRYSTAL_BLOCK.get());
+                        output.accept(ModItems.MANA_CRYSTAL_SHARD.get());
                         output.accept(ModItems.AWAKENING_CRYSTAL.get());
                         output.accept(ModItems.AWAKENING_CORE.get());
                         output.accept(ModItems.AWAKENING_CRYSTAL_DEEP.get());

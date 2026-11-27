@@ -127,11 +127,24 @@ Our own mechanic, not in Solo Leveling.
 
 ## 9. Gates and dungeons
 
-- **[Built] (backend skeleton; custom portal art & room-template dungeon generator [Planned] for Claude)** Gates (`GateBlock` + `GateBlockEntity`, `/pz gate spawn <rank> <size>`, natural spawning gated by `projectzero:gateSpawning` gamerule, default `false`) are portals that spawn in the world. Two things show how dangerous a gate is:
+- **[Built]** Gates (`GateBlock` + `GateBlockEntity`, `/pz gate spawn <rank> <size>`, natural spawning gated by `projectzero:gateSpawning` gamerule, default `false`) are portals that spawn in the world. Two things show how dangerous a gate is:
   - **Color** sets the rank (`E..S`: blue E, green D, yellow C, orange B, purple A, **red** S).
   - **Size** (`SMALL`, `MEDIUM`, `LARGE`) sets the portal frame scale, hall size, and monster count.
 - **[Built]** Entering a gate teleports the player into a linked instance slot in the `projectzero:dungeon` void dimension (`GateDungeonArena`, placeholder deepslate hall), populated with rank-scaled gate monsters (`MobScaling` + `projectzero:gate_monster` NBT) and a scaled Dungeon Boss (`projectzero:gate_boss` NBT). Killing the boss drops an **Awakening Shard** (+ guaranteed accessory via `AccessoryLootModifier`), increments `gatesCleared`, opens the Dungeon Exit portal, and seals the overworld gate. Multi-room template generation and Souls-like boss attack state machines are **[Planned]**.
-- A gate that stays uncleared for too long can **break**: its monsters spill into the overworld. **[Idea]**
+- **Look [Built, Claude 2026-11-27]:** a gate is a free-floating rift: a thin bright ring in the rank color around a dark swirling core (`client/GateRiftRenderer`), no frame. Exit rifts are pale cyan.
+- **Dungeons are remnants of other worlds [Built, Claude 2026-11-27]** (`GateDungeonArena`). Every dungeon is big regardless of rank: a cave system of domed chambers joined by winding tunnels, entrance cavern → chain of chambers → huge boss cavern, with side caves and treasure caves. Small is about 4 chambers (~130 blocks end to end), Medium 6, Large 8.
+  - Each dungeon rolls a world, weighted by rank: Crystal Grotto, Sunken Ruins, Fungal Hollow, Frozen Tomb, Ember Depths, Bone Ossuary, Sculk Abyss, Mossy Crypt. The world sets the rock, floor, lights, flora and the broken ruins (pillars, arches, wall pieces) left by whoever lived there.
+  - **Mana crystals** grow in clusters on the walls (`mana_crystal` block). Mining one drops 1-3 **Mana Crystal Shards** (Fortune works, Silk Touch gives the block) and a little XP. Uses for the shards are **[Planned]** (Gemini): vessel fuel, crafting, trading.
+  - **Chests are scattered**: some chambers have one near a wall, side caves are likelier, treasure caves hold 2-3 and glitter with crystals, and the boss dais has a reward chest. Loot: vanilla dungeon table plus a chance of rolled gear, an Awakening Shard, and mana crystal shards.
+  - Normal gates have a return rift in the entrance cavern (retreat allowed); **S-rank (red) gates have none** until the boss dies. The exit rift opens on the boss dais.
+  - Monsters are vanilla placeholders until our own mobs exist (§10, roadmap).
+- **Gate aging [Planned, Gemini]** (owner request 2026-11-27): the longer a gate stays open and uncleared, the stronger it gets, slowly and in steps. Numbers in `GateRules`:
+  - Age is server game time since the gate opened (`GateBlockEntity.openTime`), so it only grows while the server runs. No offline growth.
+  - Every **7 in-game days** uncleared (about 2 h 20 min of play) the gate **surges** once: its monsters get **+3 levels** (still capped at the rank's max level), chests roll **+5%** better, and the rift spins faster and throws more motes. Up to **3 surges** per rank.
+  - After the 3rd surge plus another 7 days (**28 in-game days**, about 9 h 20 min of play) the gate **ranks up** one step (E→D→C→B→A→S): its `RANK` blockstate changes (the ring color changes), surges reset. A dungeon that was already built keeps its layout; its living monsters are rescaled to the new rank, and 25% more are added.
+  - An E gate needs about 140 in-game days (~47 h of play) to reach S. That is the "long, long time".
+  - An S gate at 3 surges is ripe for a **Dungeon Break** (monsters spill into the overworld). **[Idea]**, behind the gamerule `projectzero:dungeonBreaks`, default off, owner decides later.
+  - [System] message to players within 128 blocks on a surge ("The C-Rank gate grows unstable.") and a title on rank-up. Gamerule `projectzero:gateAging` (default on). Debug: `/pz gate age <days>` on the gate you are looking at.
 - Gate monsters go in the `projectzero:gate_monsters` entity tag so they give the ×3 XP.
 - Loot: skillbooks, gear, Awakening Shards, mana crystals.
 - **Mob scaling [Built]** (owner decision 2026-11-26; `GateRank`, `MobScaling`, `XpRewards`). Vanilla mobs never scale: you outgrow them, like E-rank mobs. Gate monsters scale **by gate rank**; each rank doubles health, damage, and XP, and has a target player level:

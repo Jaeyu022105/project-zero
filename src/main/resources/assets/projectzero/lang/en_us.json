@@ -130,5 +130,7 @@
   "item.projectzero.hunter_charm": "Hunter Charm",
   "item.projectzero.mana_charm": "Mana Charm",
   "block.projectzero.gate_portal": "Gate Portal",
-  "gamerule.projectzero:gateSpawning": "Natural Gate Spawning"
+  "gamerule.projectzero:gateSpawning": "Natural Gate Spawning",
+  "block.projectzero.mana_crystal": "Mana Crystal",
+  "item.projectzero.mana_crystal_shard": "Mana Crystal Shard"
 }

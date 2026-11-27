@@ -21,55 +21,66 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.AmethystClusterBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.LanternBlock;
+import net.minecraft.world.level.block.MultifaceBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
- * Builds a gate's dungeon in {@code projectzero:dungeon}: a chain of rooms on a grid, joined by
- * corridors, from an entrance room to a boss hall, with side treasure rooms. Each rank has its
- * own look (mossy crypt, root hollow, deep vault, basalt forge, drowned sanctum, crimson throne).
+ * Builds a gate's dungeon in {@code projectzero:dungeon} (DESIGN-DOCUMENT.md §9).
  *
- * The room layout is deterministic from the slot and size, so {@link #exitPortalCenter} and
- * {@link #entranceSpawn} can recompute positions without saving the layout. Slots are never
- * reused (see {@link DungeonSavedData#allocate}), so nothing needs clearing first.
+ * A dungeon is a remnant of another world: a big cave system of domed chambers joined by
+ * winding tunnels, from an entrance cavern to a huge boss cavern, with side caves. Each dungeon
+ * rolls a "world" (crystal grotto, sunken ruins, fungal hollow, frozen tomb, ember depths, bone
+ * ossuary, sculk abyss, mossy crypt) weighted by rank. Walls carry mineable mana crystals,
+ * chambers hold broken ruins of whatever lived there, and chests are scattered around.
+ *
+ * Even a small gate is big: 4 chambers and a boss cavern, roughly 130 blocks end to end.
+ *
+ * The layout is deterministic from the slot and size, so {@link #exitPortalCenter} and
+ * {@link #entranceSpawn} recompute positions without saving anything. The world type also
+ * comes from the slot, so a gate keeps its look. Slots are never reused.
+ *
+ * Only a 3-block shell around the caves is placed (the dimension is a void), which keeps a
+ * large dungeon to a few hundred thousand block writes on first entry.
  */
 public final class GateDungeonArena {
     private GateDungeonArena() {}
 
     public static final String DUNGEON_SLOT_KEY = ProjectZero.MOD_ID + ":dungeon_slot";
 
-    private static final int CELL = 26;
-    private static final int MAX_LATERAL_CELLS = 5;
-    private static final int FLAGS = Block.UPDATE_CLIENTS;
+    /** Bulk writes: tell clients, skip neighbour shape updates (we place whole shapes at once). */
+    private static final int FLAGS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
+    private static final int SHELL = 3;
+    private static final int ENTRANCE_Z = 18;
 
     // ---------------------------------------------------------------- layout
 
-    enum Kind { ENTRANCE, COMBAT, TREASURE, BOSS }
+    enum Kind { ENTRANCE, CHAMBER, SIDE, TREASURE, BOSS }
 
-    /** A room in absolute block coordinates: walls at x0/x1/z0/z1, floor at y0, ceiling at y0 + height. */
-    record Room(Kind kind, int cx, int cz, int x0, int z0, int x1, int z1, int y0, int height) {
-        int midX() { return (x0 + x1) / 2; }
-        int midZ() { return (z0 + z1) / 2; }
+    /** A domed cave: floor at {@code floor}, horizontal radii rx/rz, dome height h. */
+    record Cave(Kind kind, int x, int floor, int z, int rx, int rz, int h) {
+        double reach() { return Math.max(rx, rz); }
     }
 
-    record Corridor(Room a, Room b) {}
+    /** A tunnel from a to b through a bend point, radius w, height hgt. */
+    record Tunnel(Cave a, Cave b, double bendX, double bendZ, int w, int hgt) {}
 
-    record Layout(List<Room> rooms, List<Corridor> corridors) {
-        Room entrance() { return rooms.get(0); }
-        Room boss() {
-            for (Room r : rooms) if (r.kind == Kind.BOSS) return r;
-            return rooms.get(rooms.size() - 1);
+    record Layout(List<Cave> caves, List<Tunnel> tunnels) {
+        Cave entrance() { return caves.get(0); }
+        Cave boss() {
+            for (Cave c : caves) if (c.kind == Kind.BOSS) return c;
+            return caves.get(caves.size() - 1);
         }
     }
 
@@ -80,347 +91,584 @@ public final class GateDungeonArena {
     static Layout layout(int slot, GateSize size) {
         RandomSource random = RandomSource.create(slot * 7919L + size.ordinal() * 31L + 17L);
         BlockPos o = origin(slot);
-        int combat = switch (size) { case SMALL -> 3; case MEDIUM -> 5; case LARGE -> 7; };
-        int treasure = switch (size) { case SMALL -> 1; case MEDIUM -> 2; case LARGE -> 3; };
+        int chain = switch (size) { case SMALL -> 4; case MEDIUM -> 6; case LARGE -> 8; };
+        int sides = switch (size) { case SMALL -> 1; case MEDIUM -> 2; case LARGE -> 4; };
+        int treasures = switch (size) { case SMALL -> 1; case MEDIUM -> 2; case LARGE -> 3; };
+        int maxR = switch (size) { case SMALL -> 13; case MEDIUM -> 15; case LARGE -> 18; };
 
-        List<Room> rooms = new ArrayList<>();
-        List<Corridor> corridors = new ArrayList<>();
-        Set<Long> used = new HashSet<>();
+        List<Cave> caves = new ArrayList<>();
+        List<Tunnel> tunnels = new ArrayList<>();
+        Cave entrance = new Cave(Kind.ENTRANCE, o.getX(), o.getY(), o.getZ() + ENTRANCE_Z, 10, 10, 9);
+        caves.add(entrance);
 
-        Room entrance = room(o, Kind.ENTRANCE, 0, 0, 9, 9, 6);
-        rooms.add(entrance);
-        used.add(key(0, 0));
-
-        // Main path: forward (+z) or sideways, never back, so the boss cell ahead is always free.
-        Room prev = entrance;
-        int cx = 0, cz = 0;
-        List<Room> path = new ArrayList<>();
-        for (int i = 0; i < combat; i++) {
-            int nx = cx, nz = cz + 1;
-            int roll = random.nextInt(5);
-            if (roll == 0 && cx > -MAX_LATERAL_CELLS && !used.contains(key(cx - 1, cz))) { nx = cx - 1; nz = cz; }
-            else if (roll == 1 && cx < MAX_LATERAL_CELLS && !used.contains(key(cx + 1, cz))) { nx = cx + 1; nz = cz; }
-            cx = nx; cz = nz;
-            used.add(key(cx, cz));
-            int w = 9 + 2 * random.nextInt(4);      // 9..15
-            int l = 9 + 2 * random.nextInt(4);
-            Room r = room(o, Kind.COMBAT, cx, cz, w, l, 7 + random.nextInt(2));
-            rooms.add(r);
-            path.add(r);
-            corridors.add(new Corridor(prev, r));
-            prev = r;
+        // Main chain winding forward (+z), up and down a little.
+        Cave prev = entrance;
+        double heading = 0;
+        List<Cave> chainCaves = new ArrayList<>();
+        for (int i = 0; i < chain; i++) {
+            int r = 9 + random.nextInt(maxR - 8);
+            Cave next = null;
+            for (int attempt = 0; attempt < 12 && next == null; attempt++) {
+                double h = Math.max(-1.0, Math.min(1.0, heading + (random.nextDouble() - 0.5) * 1.4));
+                // Stay inside this slot's lane (slots are 512 apart on X).
+                if (prev.x - o.getX() > 110) h = -Math.abs(h);
+                else if (prev.x - o.getX() < -110) h = Math.abs(h);
+                double dist = prev.reach() + r + 10 + random.nextInt(10);
+                int nx = (int) Math.round(prev.x + Math.sin(h) * dist);
+                int nz = (int) Math.round(prev.z + Math.cos(h) * dist);
+                int floor = Math.max(o.getY() - 8, Math.min(o.getY() + 10, prev.floor + random.nextInt(9) - 4));
+                Cave c = new Cave(Kind.CHAMBER, nx, floor, nz, r + random.nextInt(3) - 1, r + random.nextInt(3) - 1,
+                        9 + random.nextInt(8));
+                if (fits(caves, c, 6)) { next = c; heading = h * 0.6; }
+            }
+            if (next == null) continue;
+            caves.add(next);
+            chainCaves.add(next);
+            tunnels.add(tunnel(prev, next, random));
+            prev = next;
         }
 
-        // Boss hall straight ahead.
-        cz += 1;
-        used.add(key(cx, cz));
-        Room boss = room(o, Kind.BOSS, cx, cz, 21, 21, 12);
-        rooms.add(boss);
-        corridors.add(new Corridor(prev, boss));
+        // Boss cavern straight-ish ahead.
+        Cave boss = null;
+        for (int attempt = 0; attempt < 20 && boss == null; attempt++) {
+            double h = (random.nextDouble() - 0.5) * 0.6;
+            int r = 22 + random.nextInt(4);
+            double dist = prev.reach() + r + 12 + attempt * 2;
+            Cave c = new Cave(Kind.BOSS, (int) Math.round(prev.x + Math.sin(h) * dist), prev.floor,
+                    (int) Math.round(prev.z + Math.cos(h) * dist), r, r, 20);
+            if (fits(caves, c, 6)) boss = c;
+        }
+        if (boss == null) {
+            boss = new Cave(Kind.BOSS, prev.x, prev.floor, (int) (prev.z + prev.reach() + 48), 22, 22, 20);
+        }
+        caves.add(boss);
+        tunnels.add(tunnel(prev, boss, random));
 
-        // Treasure rooms off the side of combat rooms.
-        for (int i = 0; i < treasure && !path.isEmpty(); i++) {
-            Room host = path.get(random.nextInt(path.size()));
-            int side = random.nextBoolean() ? 1 : -1;
-            for (int attempt = 0; attempt < 2; attempt++, side = -side) {
-                int tx = host.cx + side;
-                if (Math.abs(tx) > MAX_LATERAL_CELLS || used.contains(key(tx, host.cz))) continue;
-                used.add(key(tx, host.cz));
-                Room t = room(o, Kind.TREASURE, tx, host.cz, 9, 9, 6);
-                rooms.add(t);
-                corridors.add(new Corridor(host, t));
-                break;
+        // Side caves and treasure caves branch off the chain.
+        for (int i = 0; i < sides + treasures && !chainCaves.isEmpty(); i++) {
+            Kind kind = i < treasures ? Kind.TREASURE : Kind.SIDE;
+            Cave host = chainCaves.get(random.nextInt(chainCaves.size()));
+            for (int attempt = 0; attempt < 10; attempt++) {
+                double a = (random.nextBoolean() ? 1 : -1) * (Math.PI / 2 + (random.nextDouble() - 0.5) * 0.9);
+                int r = kind == Kind.TREASURE ? 7 + random.nextInt(3) : 9 + random.nextInt(5);
+                double dist = host.reach() + r + 9 + random.nextInt(8);
+                Cave c = new Cave(kind, (int) Math.round(host.x + Math.sin(a) * dist), host.floor + random.nextInt(5) - 2,
+                        (int) Math.round(host.z + Math.cos(a) * dist), r, r, kind == Kind.TREASURE ? 7 : 9 + random.nextInt(5));
+                if (fits(caves, c, 6)) {
+                    caves.add(c);
+                    tunnels.add(tunnel(host, c, random));
+                    break;
+                }
             }
         }
-        return new Layout(rooms, corridors);
+        return new Layout(caves, tunnels);
     }
 
-    private static Room room(BlockPos o, Kind kind, int cx, int cz, int w, int l, int h) {
-        int midX = o.getX() + cx * CELL;
-        int midZ = o.getZ() + cz * CELL + CELL / 2;
-        return new Room(kind, cx, cz, midX - w / 2, midZ - l / 2, midX + w / 2, midZ + l / 2, o.getY(), h);
+    private static boolean fits(List<Cave> caves, Cave c, int gap) {
+        for (Cave o : caves) {
+            double d = Math.hypot(o.x - c.x, o.z - c.z);
+            if (d < o.reach() + c.reach() + gap) return false;
+        }
+        return true;
     }
 
-    private static long key(int cx, int cz) {
-        return ((long) cx << 32) ^ (cz & 0xFFFFFFFFL);
+    private static Tunnel tunnel(Cave a, Cave b, RandomSource random) {
+        double mx = (a.x + b.x) / 2.0, mz = (a.z + b.z) / 2.0;
+        double dx = b.x - a.x, dz = b.z - a.z, len = Math.max(1, Math.hypot(dx, dz));
+        double off = (random.nextDouble() - 0.5) * Math.min(16, len * 0.35);
+        return new Tunnel(a, b, mx - dz / len * off, mz + dx / len * off, 3 + random.nextInt(2), 5 + random.nextInt(2));
     }
 
     public static Vec3 entranceSpawn(int slot) {
-        // Size does not move the entrance (always cell 0,0).
-        Room e = layout(slot, GateSize.SMALL).entrance();
-        return new Vec3(e.midX() + 0.5, e.y0 + 1.0, e.midZ() + 0.5);
+        BlockPos o = origin(slot);
+        return new Vec3(o.getX() + 0.5, o.getY() + 1.0, o.getZ() + ENTRANCE_Z + 0.5);
     }
 
-    /** Bottom middle of the exit frame, against the far wall of the boss hall. */
+    /** Bottom-left block of the 2x3 exit rift, near the far side of the boss cavern. */
     public static BlockPos exitPortalCenter(int slot, GateSize size) {
-        Room b = layout(slot, size).boss();
-        return new BlockPos(b.midX(), b.y0 + 1, b.z1 - 2);
+        Cave b = layout(slot, size).boss();
+        return new BlockPos(b.x, b.floor + 2, b.z + b.rz - 7);
     }
 
-    // ---------------------------------------------------------------- themes
+    // ---------------------------------------------------------------- worlds
 
-    private record Theme(BlockState[] walls, BlockState[] floors, BlockState ceiling, BlockState pillar,
-                         BlockState accent, BlockState light, boolean hanging, BlockState rug,
-                         EntityType<?>[] mobs) {
-        BlockState wall(RandomSource r) { return pick(walls, r); }
-        BlockState floor(RandomSource r) { return pick(floors, r); }
-        private static BlockState pick(BlockState[] a, RandomSource r) {
-            // First entry is the main block; the rest are rarer variants.
-            return a.length == 1 || r.nextInt(100) < 75 ? a[0] : a[1 + r.nextInt(a.length - 1)];
-        }
-    }
+    /** One "other world" look. Blocks are picked with noise so patches read as strata. */
+    private record World(String name, BlockState[] walls, BlockState[] floors, BlockState ceiling, BlockState deep,
+                         BlockState[] ruin, BlockState ceilingLight, BlockState floorLight, BlockState hanging,
+                         BlockState[] flora, BlockState wallGrowth, double crystals) {}
 
-    private static Theme theme(GateRank rank) {
-        return switch (rank) {
-            case E -> new Theme( // mossy crypt
-                    states(Blocks.STONE_BRICKS, Blocks.MOSSY_STONE_BRICKS, Blocks.CRACKED_STONE_BRICKS),
-                    states(Blocks.COBBLESTONE, Blocks.MOSSY_COBBLESTONE, Blocks.GRAVEL),
-                    Blocks.STONE_BRICKS.defaultBlockState(), Blocks.MOSSY_STONE_BRICK_WALL.defaultBlockState(),
-                    Blocks.CHISELED_STONE_BRICKS.defaultBlockState(), Blocks.LANTERN.defaultBlockState(), true,
-                    Blocks.MOSS_CARPET.defaultBlockState(),
-                    new EntityType<?>[]{EntityType.ZOMBIE, EntityType.SPIDER, EntityType.SKELETON});
-            case D -> new Theme( // root hollow
-                    states(Blocks.MUD_BRICKS, Blocks.PACKED_MUD, Blocks.MUD_BRICKS),
-                    states(Blocks.PACKED_MUD, Blocks.COARSE_DIRT, Blocks.ROOTED_DIRT),
-                    Blocks.DARK_OAK_PLANKS.defaultBlockState(), Blocks.MUD_BRICK_WALL.defaultBlockState(),
-                    Blocks.STRIPPED_DARK_OAK_LOG.defaultBlockState(), Blocks.LANTERN.defaultBlockState(), true,
-                    Blocks.BROWN_CARPET.defaultBlockState(),
-                    new EntityType<?>[]{EntityType.ZOMBIE, EntityType.SKELETON, EntityType.SPIDER, EntityType.CAVE_SPIDER});
-            case C -> new Theme( // deep vault
-                    states(Blocks.DEEPSLATE_BRICKS, Blocks.CRACKED_DEEPSLATE_BRICKS, Blocks.DEEPSLATE_TILES),
-                    states(Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_TILES, Blocks.COBBLED_DEEPSLATE),
-                    Blocks.DEEPSLATE_TILES.defaultBlockState(), Blocks.DEEPSLATE_TILE_WALL.defaultBlockState(),
-                    Blocks.CHISELED_DEEPSLATE.defaultBlockState(), Blocks.SOUL_LANTERN.defaultBlockState(), true,
-                    Blocks.CYAN_CARPET.defaultBlockState(),
-                    new EntityType<?>[]{EntityType.SKELETON, EntityType.ZOMBIE, EntityType.VINDICATOR, EntityType.SPIDER});
-            case B -> new Theme( // basalt forge
-                    states(Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS, Blocks.BLACKSTONE),
-                    states(Blocks.POLISHED_BLACKSTONE, Blocks.SMOOTH_BASALT, Blocks.MAGMA_BLOCK),
-                    Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState(), Blocks.POLISHED_BASALT.defaultBlockState(),
-                    Blocks.GILDED_BLACKSTONE.defaultBlockState(), Blocks.LANTERN.defaultBlockState(), true,
-                    Blocks.ORANGE_CARPET.defaultBlockState(),
-                    new EntityType<?>[]{EntityType.VINDICATOR, EntityType.SKELETON, EntityType.STRAY, EntityType.HUSK});
-            case A -> new Theme( // drowned sanctum
-                    states(Blocks.PRISMARINE_BRICKS, Blocks.PRISMARINE, Blocks.DARK_PRISMARINE),
-                    states(Blocks.DARK_PRISMARINE, Blocks.PRISMARINE_BRICKS),
-                    Blocks.DARK_PRISMARINE.defaultBlockState(), Blocks.PRISMARINE_WALL.defaultBlockState(),
-                    Blocks.PRISMARINE.defaultBlockState(), Blocks.SEA_LANTERN.defaultBlockState(), false,
-                    Blocks.LIGHT_BLUE_CARPET.defaultBlockState(),
-                    new EntityType<?>[]{EntityType.DROWNED, EntityType.STRAY, EntityType.VINDICATOR, EntityType.EVOKER});
-            case S -> new Theme( // crimson throne
-                    states(Blocks.RED_NETHER_BRICKS, Blocks.NETHER_BRICKS, Blocks.CRACKED_NETHER_BRICKS),
-                    states(Blocks.NETHER_BRICKS, Blocks.RED_NETHER_BRICKS, Blocks.CRYING_OBSIDIAN),
-                    Blocks.RED_NETHER_BRICKS.defaultBlockState(), Blocks.RED_NETHER_BRICK_WALL.defaultBlockState(),
-                    Blocks.CRYING_OBSIDIAN.defaultBlockState(), Blocks.SHROOMLIGHT.defaultBlockState(), false,
-                    Blocks.RED_CARPET.defaultBlockState(),
-                    new EntityType<?>[]{EntityType.WITHER_SKELETON, EntityType.VINDICATOR, EntityType.BLAZE, EntityType.SKELETON});
+    private static World world(int index) {
+        return switch (index) {
+            case 0 -> new World("Crystal Grotto",
+                    s(Blocks.TUFF, Blocks.CALCITE, Blocks.SMOOTH_BASALT), s(Blocks.TUFF, Blocks.CALCITE),
+                    b(Blocks.TUFF), b(Blocks.DEEPSLATE),
+                    s(Blocks.TUFF_BRICKS, Blocks.CHISELED_TUFF_BRICKS, Blocks.POLISHED_TUFF),
+                    b(Blocks.AMETHYST_BLOCK), b(Blocks.AMETHYST_CLUSTER), null,
+                    s(Blocks.SMALL_AMETHYST_BUD, Blocks.MEDIUM_AMETHYST_BUD), Blocks.GLOW_LICHEN.defaultBlockState(), 2.2);
+            case 1 -> new World("Sunken Ruins",
+                    s(Blocks.PRISMARINE, Blocks.DARK_PRISMARINE, Blocks.PRISMARINE_BRICKS), s(Blocks.SAND, Blocks.GRAVEL, Blocks.CLAY),
+                    b(Blocks.DARK_PRISMARINE), b(Blocks.STONE),
+                    s(Blocks.PRISMARINE_BRICKS, Blocks.DARK_PRISMARINE, Blocks.PRISMARINE),
+                    b(Blocks.SEA_LANTERN), b(Blocks.SEA_LANTERN), null,
+                    s(Blocks.DEAD_BRAIN_CORAL, Blocks.DEAD_TUBE_CORAL, Blocks.DEAD_FIRE_CORAL), null, 1.0);
+            case 2 -> new World("Fungal Hollow",
+                    s(Blocks.MUD, Blocks.MOSS_BLOCK, Blocks.PACKED_MUD), s(Blocks.MOSS_BLOCK, Blocks.MYCELIUM, Blocks.ROOTED_DIRT),
+                    b(Blocks.MOSS_BLOCK), b(Blocks.DIRT),
+                    s(Blocks.MUD_BRICKS, Blocks.MOSSY_STONE_BRICKS, Blocks.PACKED_MUD),
+                    b(Blocks.SHROOMLIGHT), b(Blocks.SHROOMLIGHT), b(Blocks.HANGING_ROOTS),
+                    s(Blocks.BROWN_MUSHROOM, Blocks.RED_MUSHROOM, Blocks.MOSS_CARPET, Blocks.SHORT_GRASS), Blocks.GLOW_LICHEN.defaultBlockState(), 0.8);
+            case 3 -> new World("Frozen Tomb",
+                    s(Blocks.PACKED_ICE, Blocks.BLUE_ICE, Blocks.SNOW_BLOCK), s(Blocks.SNOW_BLOCK, Blocks.PACKED_ICE),
+                    b(Blocks.PACKED_ICE), b(Blocks.STONE),
+                    s(Blocks.STONE_BRICKS, Blocks.CRACKED_STONE_BRICKS, Blocks.POLISHED_DIORITE),
+                    b(Blocks.SEA_LANTERN), b(Blocks.SOUL_LANTERN), null,
+                    s(Blocks.SNOW), null, 1.2);
+            case 4 -> new World("Ember Depths",
+                    s(Blocks.BLACKSTONE, Blocks.BASALT, Blocks.SMOOTH_BASALT), s(Blocks.BLACKSTONE, Blocks.POLISHED_BLACKSTONE, Blocks.MAGMA_BLOCK),
+                    b(Blocks.BLACKSTONE), b(Blocks.BASALT),
+                    s(Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS, Blocks.GILDED_BLACKSTONE),
+                    b(Blocks.SHROOMLIGHT), b(Blocks.LANTERN), null,
+                    s(Blocks.CRIMSON_ROOTS), null, 1.0);
+            case 5 -> new World("Bone Ossuary",
+                    s(Blocks.SOUL_SOIL, Blocks.BONE_BLOCK, Blocks.DEEPSLATE), s(Blocks.SOUL_SOIL, Blocks.SOUL_SAND),
+                    b(Blocks.DEEPSLATE), b(Blocks.DEEPSLATE),
+                    s(Blocks.DEEPSLATE_BRICKS, Blocks.BONE_BLOCK, Blocks.CRACKED_DEEPSLATE_BRICKS),
+                    b(Blocks.OCHRE_FROGLIGHT), b(Blocks.SOUL_LANTERN), null,
+                    s(Blocks.COBWEB, Blocks.SKELETON_SKULL), null, 1.0);
+            case 6 -> new World("Sculk Abyss",
+                    s(Blocks.DEEPSLATE, Blocks.SCULK, Blocks.COBBLED_DEEPSLATE), s(Blocks.SCULK, Blocks.DEEPSLATE),
+                    b(Blocks.DEEPSLATE), b(Blocks.DEEPSLATE),
+                    s(Blocks.REINFORCED_DEEPSLATE, Blocks.DEEPSLATE_TILES, Blocks.CHISELED_DEEPSLATE),
+                    b(Blocks.VERDANT_FROGLIGHT), b(Blocks.SOUL_LANTERN), null,
+                    s(Blocks.SCULK_SENSOR), Blocks.SCULK_VEIN.defaultBlockState(), 1.4);
+            default -> new World("Mossy Crypt",
+                    s(Blocks.STONE, Blocks.MOSSY_COBBLESTONE, Blocks.ANDESITE), s(Blocks.COBBLESTONE, Blocks.MOSSY_COBBLESTONE, Blocks.GRAVEL),
+                    b(Blocks.STONE), b(Blocks.STONE),
+                    s(Blocks.STONE_BRICKS, Blocks.MOSSY_STONE_BRICKS, Blocks.CRACKED_STONE_BRICKS),
+                    b(Blocks.SHROOMLIGHT), b(Blocks.LANTERN), b(Blocks.CAVE_VINES_PLANT),
+                    s(Blocks.MOSS_CARPET, Blocks.COBWEB), Blocks.GLOW_LICHEN.defaultBlockState(), 1.0);
         };
     }
 
-    private static BlockState[] states(Block... blocks) {
+    /** Worlds each rank can roll: index into {@link #world(int)}. */
+    private static int[] worldsFor(GateRank rank) {
+        return switch (rank) {
+            case E -> new int[]{7, 2, 0};
+            case D -> new int[]{2, 7, 1, 0};
+            case C -> new int[]{0, 1, 3, 5};
+            case B -> new int[]{4, 3, 5};
+            case A -> new int[]{1, 4, 6};
+            case S -> new int[]{6, 4, 5};
+        };
+    }
+
+    private static EntityType<?>[] mobsFor(GateRank rank) {
+        return switch (rank) {
+            case E -> new EntityType<?>[]{EntityType.ZOMBIE, EntityType.SPIDER, EntityType.SKELETON};
+            case D -> new EntityType<?>[]{EntityType.ZOMBIE, EntityType.SKELETON, EntityType.SPIDER, EntityType.CAVE_SPIDER};
+            case C -> new EntityType<?>[]{EntityType.SKELETON, EntityType.ZOMBIE, EntityType.VINDICATOR, EntityType.SPIDER};
+            case B -> new EntityType<?>[]{EntityType.VINDICATOR, EntityType.SKELETON, EntityType.STRAY, EntityType.HUSK};
+            case A -> new EntityType<?>[]{EntityType.DROWNED, EntityType.STRAY, EntityType.VINDICATOR, EntityType.EVOKER};
+            case S -> new EntityType<?>[]{EntityType.WITHER_SKELETON, EntityType.VINDICATOR, EntityType.BLAZE, EntityType.SKELETON};
+        };
+    }
+
+    private static BlockState b(Block block) { return block.defaultBlockState(); }
+
+    private static BlockState[] s(Block... blocks) {
         BlockState[] out = new BlockState[blocks.length];
         for (int i = 0; i < blocks.length; i++) out[i] = blocks[i].defaultBlockState();
         return out;
     }
 
+    // ---------------------------------------------------------------- carving
+
+    /** Boolean air grid over the dungeon's bounding box (plus the shell margin). */
+    private static final class Grid {
+        final int x0, y0, z0, sx, sy, sz;
+        final byte[] cells;   // 0 solid/void, 1 air, 2..(1+SHELL) shell depth
+        Grid(int x0, int y0, int z0, int x1, int y1, int z1) {
+            this.x0 = x0; this.y0 = y0; this.z0 = z0;
+            sx = x1 - x0 + 1; sy = y1 - y0 + 1; sz = z1 - z0 + 1;
+            cells = new byte[sx * sy * sz];
+        }
+        boolean in(int x, int y, int z) {
+            return x >= x0 && y >= y0 && z >= z0 && x < x0 + sx && y < y0 + sy && z < z0 + sz;
+        }
+        int idx(int x, int y, int z) { return ((x - x0) * sz + (z - z0)) * sy + (y - y0); }
+        byte get(int x, int y, int z) { return in(x, y, z) ? cells[idx(x, y, z)] : 0; }
+        void set(int x, int y, int z, byte v) { if (in(x, y, z)) cells[idx(x, y, z)] = v; }
+        boolean air(int x, int y, int z) { return get(x, y, z) == 1; }
+        boolean solid(int x, int y, int z) { byte v = get(x, y, z); return v >= 2; }
+    }
+
+    private static Grid carve(Layout layout, SimplexNoise noise) {
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        for (Cave c : layout.caves) {
+            int r = (int) Math.ceil(c.reach() * 1.25);
+            minX = Math.min(minX, c.x - r); maxX = Math.max(maxX, c.x + r);
+            minZ = Math.min(minZ, c.z - r); maxZ = Math.max(maxZ, c.z + r);
+            minY = Math.min(minY, c.floor - 2); maxY = Math.max(maxY, c.floor + c.h + 3);
+        }
+        int m = SHELL + 2;
+        Grid g = new Grid(minX - m, minY - m, minZ - m, maxX + m, maxY + m, maxZ + m);
+
+        for (Cave c : layout.caves) carveCave(g, c, noise);
+        for (Tunnel t : layout.tunnels) {
+            carveTunnel(g, t.a, t.bendX, t.bendZ, t, noise, true);
+            carveTunnel(g, t.b, t.bendX, t.bendZ, t, noise, false);
+        }
+
+        // Shell: SHELL layers of solid around every air cell.
+        for (int layer = 0; layer < SHELL; layer++) {
+            byte from = (byte) (layer + 1), to = (byte) (layer + 2);
+            for (int x = g.x0; x < g.x0 + g.sx; x++)
+                for (int z = g.z0; z < g.z0 + g.sz; z++)
+                    for (int y = g.y0; y < g.y0 + g.sy; y++) {
+                        if (g.get(x, y, z) != 0) continue;
+                        if (g.get(x + 1, y, z) == from || g.get(x - 1, y, z) == from || g.get(x, y + 1, z) == from
+                                || g.get(x, y - 1, z) == from || g.get(x, y, z + 1) == from || g.get(x, y, z - 1) == from) {
+                            g.set(x, y, z, to);
+                        }
+                    }
+        }
+        return g;
+    }
+
+    private static void carveCave(Grid g, Cave c, SimplexNoise noise) {
+        int r = (int) Math.ceil(c.reach() * 1.25);
+        boolean flat = c.kind == Kind.BOSS || c.kind == Kind.ENTRANCE;
+        for (int x = c.x - r; x <= c.x + r; x++) {
+            for (int z = c.z - r; z <= c.z + r; z++) {
+                double nx = (x - c.x) / (double) c.rx, nz = (z - c.z) / (double) c.rz;
+                double wobble = 0.18 * noise.getValue(x * 0.07, c.floor * 0.07, z * 0.07);
+                double d = Math.sqrt(nx * nx + nz * nz) / (1 + wobble);
+                if (d >= 1) continue;
+                int floorBump = flat ? 0 : (int) Math.round(1.2 * noise.getValue(x * 0.11, 7.3, z * 0.11));
+                int top = (int) Math.round(c.h * Math.sqrt(1 - d * d) * (0.9 + 0.2 * noise.getValue(x * 0.09, 3.1, z * 0.09)));
+                top = Math.max(top, 4);
+                for (int y = c.floor + 1 + Math.max(0, floorBump); y <= c.floor + top; y++) g.set(x, y, z, (byte) 1);
+            }
+        }
+    }
+
+    /** One leg of a tunnel: from cave {@code c}'s centre to the bend point. */
+    private static void carveTunnel(Grid g, Cave c, double bx, double bz, Tunnel t, SimplexNoise noise, boolean firstLeg) {
+        double ax = c.x, az = c.z;
+        double len = Math.hypot(bx - ax, bz - az);
+        int steps = (int) Math.ceil(len);
+        Cave other = firstLeg ? t.b : t.a;
+        for (int i = 0; i <= steps; i++) {
+            double f = steps == 0 ? 0 : i / (double) steps;
+            double px = ax + (bx - ax) * f, pz = az + (bz - az) * f;
+            // Floor ramps from this cave's floor to the midpoint between both floors.
+            double floor = c.floor + (((c.floor + other.floor) / 2.0) - c.floor) * f;
+            double w = t.w * (1 + 0.25 * noise.getValue(px * 0.1, 11.0, pz * 0.1));
+            int ri = (int) Math.ceil(w);
+            for (int x = (int) Math.floor(px) - ri; x <= (int) Math.ceil(px) + ri; x++) {
+                for (int z = (int) Math.floor(pz) - ri; z <= (int) Math.ceil(pz) + ri; z++) {
+                    double d = Math.hypot(x - px, z - pz) / w;
+                    if (d >= 1) continue;
+                    int fy = (int) Math.round(floor);
+                    int top = Math.max(3, (int) Math.round(t.hgt * Math.sqrt(1 - d * d)));
+                    for (int y = fy + 1; y <= fy + top; y++) g.set(x, y, z, (byte) 1);
+                }
+            }
+        }
+    }
+
     // ---------------------------------------------------------------- build
 
     public static void buildAndPopulate(ServerLevel level, int slot, GateRank rank, GateSize size) {
+        long started = System.nanoTime();
         Layout layout = layout(slot, size);
-        Theme theme = theme(rank);
         RandomSource random = RandomSource.create(slot * 104729L + rank.ordinal());
+        int[] pool = worldsFor(rank);
+        World world = world(pool[Math.floorMod(slot * 31 + 7, pool.length)]);
+        SimplexNoise noise = new SimplexNoise(RandomSource.create(slot * 13L + 5L));
 
-        for (Corridor c : layout.corridors) corridorShell(level, c, theme, random);
-        for (Room r : layout.rooms) roomShell(level, r, theme, random);
-        for (Corridor c : layout.corridors) corridorCarve(level, c, theme, random);
+        Grid g = carve(layout, noise);
+        int placed = placeShell(level, g, world, noise, random);
+        decorate(level, g, layout, world, rank, size, random);
+        populate(level, slot, layout, g, rank, size, random);
 
-        for (Room r : layout.rooms) {
-            switch (r.kind) {
-                case ENTRANCE -> decorateEntrance(level, r, theme, rank, random);
-                case COMBAT -> decorateCombat(level, r, theme, random);
-                case TREASURE -> decorateTreasure(level, r, theme, rank, random);
-                case BOSS -> decorateBoss(level, r, theme, rank, random);
-            }
-        }
-
-        populate(level, slot, layout, theme, rank, size, random);
+        ProjectZero.LOGGER.info("[Gates] Built {} dungeon slot {} ({} {}): {} blocks in {} ms", world.name, slot,
+                rank, size, placed, (System.nanoTime() - started) / 1_000_000);
     }
 
-    private static void roomShell(ServerLevel level, Room r, Theme t, RandomSource random) {
-        BlockState air = Blocks.AIR.defaultBlockState();
-        for (int x = r.x0; x <= r.x1; x++) {
-            for (int z = r.z0; z <= r.z1; z++) {
-                for (int dy = 0; dy <= r.height; dy++) {
-                    boolean wall = x == r.x0 || x == r.x1 || z == r.z0 || z == r.z1;
+    private static BlockState pick(BlockState[] palette, SimplexNoise noise, int x, int y, int z, double scale) {
+        double v = noise.getValue(x * scale, y * scale * 1.6, z * scale);
+        if (palette.length == 1 || v < 0.15) return palette[0];
+        if (palette.length == 2 || v < 0.5) return palette[1];
+        return palette[2];
+    }
+
+    private static int placeShell(ServerLevel level, Grid g, World w, SimplexNoise noise, RandomSource random) {
+        int count = 0;
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        for (int x = g.x0; x < g.x0 + g.sx; x++) {
+            for (int z = g.z0; z < g.z0 + g.sz; z++) {
+                for (int y = g.y0; y < g.y0 + g.sy; y++) {
+                    byte v = g.get(x, y, z);
+                    if (v < 2) continue;
                     BlockState s;
-                    if (dy == 0) s = t.floor(random);
-                    else if (dy == r.height) s = t.ceiling;
-                    else if (wall) s = (dy == 1 || dy == r.height - 1) && random.nextInt(3) > 0 ? t.accent : t.wall(random);
-                    else s = air;
-                    level.setBlock(new BlockPos(x, r.y0 + dy, z), s, FLAGS);
+                    if (v == 2) {
+                        if (g.air(x, y + 1, z)) s = pick(w.floors, noise, x, y, z, 0.12);
+                        else if (g.air(x, y - 1, z)) s = w.ceiling;
+                        else s = pick(w.walls, noise, x, y, z, 0.08);
+                    } else {
+                        s = v == 2 + SHELL - 1 ? w.deep : pick(w.walls, noise, x, y, z, 0.08);
+                    }
+                    level.setBlock(p.set(x, y, z), s, FLAGS);
+                    count++;
                 }
             }
         }
-        // Ceiling lights on a grid.
-        for (int x = r.x0 + 3; x <= r.x1 - 3; x += 4) {
-            for (int z = r.z0 + 3; z <= r.z1 - 3; z += 4) {
-                if (t.hanging) {
-                    level.setBlock(new BlockPos(x, r.y0 + r.height - 1, z), Blocks.CHAIN.defaultBlockState(), FLAGS);
-                    level.setBlock(new BlockPos(x, r.y0 + r.height - 2, z),
-                            t.light.setValue(LanternBlock.HANGING, true), FLAGS);
-                } else {
-                    level.setBlock(new BlockPos(x, r.y0 + r.height, z), t.light, FLAGS);
+        return count;
+    }
+
+    // ---------------------------------------------------------------- decoration
+
+    private static void decorate(ServerLevel level, Grid g, Layout layout, World w, GateRank rank, GateSize size,
+                                 RandomSource random) {
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        Direction[] dirs = Direction.values();
+
+        // Surface pass: lights, growth, flora, crystal seeds.
+        List<BlockPos> crystalSeeds = new ArrayList<>();
+        for (int x = g.x0; x < g.x0 + g.sx; x++) {
+            for (int z = g.z0; z < g.z0 + g.sz; z++) {
+                for (int y = g.y0; y < g.y0 + g.sy; y++) {
+                    if (!g.air(x, y, z)) continue;
+                    boolean floorBelow = g.solid(x, y - 1, z);
+                    boolean ceilingAbove = g.solid(x, y + 1, z);
+                    int roll = random.nextInt(1000);
+                    if (ceilingAbove && !floorBelow) {
+                        if (roll < 7) {
+                            level.setBlock(p.set(x, y + 1, z), w.ceilingLight, FLAGS);
+                        } else if (roll < 14 && w.hanging != null && g.air(x, y - 1, z)) {
+                            level.setBlock(p.set(x, y, z), w.hanging, FLAGS);
+                        } else if (roll < 22 && g.air(x, y - 1, z) && g.air(x, y - 2, z)) {
+                            level.setBlock(p.set(x, y, z), Blocks.CHAIN.defaultBlockState(), FLAGS);
+                            level.setBlock(p.set(x, y - 1, z), hangingLantern(w), FLAGS);
+                        }
+                    } else if (floorBelow && !ceilingAbove) {
+                        if (roll < 4) {
+                            level.setBlock(p.set(x, y, z), w.floorLight, FLAGS);
+                        } else if (roll < 40 && w.flora.length > 0) {
+                            BlockState f = w.flora[random.nextInt(w.flora.length)];
+                            level.setBlock(p.set(x, y, z), f, FLAGS);
+                        }
+                    }
+                    // Walls: growth (lichen / sculk veins) and crystal seeds.
+                    for (Direction d : dirs) {
+                        if (d.getAxis() == Direction.Axis.Y) continue;
+                        if (!g.solid(x + d.getStepX(), y, z + d.getStepZ())) continue;
+                        if (w.wallGrowth != null && random.nextInt(1000) < 25) {
+                            level.setBlock(p.set(x, y, z),
+                                    w.wallGrowth.setValue(MultifaceBlock.getFaceProperty(d), true), FLAGS);
+                        }
+                        if (random.nextInt(10000) < 22 * w.crystals) crystalSeeds.add(new BlockPos(x, y, z));
+                        break;
+                    }
                 }
             }
         }
-        // Cobwebs in some upper corners.
-        int[][] corners = {{r.x0 + 1, r.z0 + 1}, {r.x1 - 1, r.z0 + 1}, {r.x0 + 1, r.z1 - 1}, {r.x1 - 1, r.z1 - 1}};
-        for (int[] c : corners) {
-            if (random.nextInt(3) == 0) level.setBlock(new BlockPos(c[0], r.y0 + r.height - 1, c[1]),
-                    Blocks.COBWEB.defaultBlockState(), FLAGS);
+
+        // Mana crystal clusters around each seed: 4-9 crystals on nearby surfaces.
+        BlockState crystal = ModBlocks.MANA_CRYSTAL.get().defaultBlockState();
+        for (BlockPos seed : crystalSeeds) {
+            int n = 4 + random.nextInt(6);
+            for (int i = 0; i < n * 3 && n > 0; i++) {
+                int x = seed.getX() + random.nextInt(5) - 2, y = seed.getY() + random.nextInt(5) - 2,
+                        z = seed.getZ() + random.nextInt(5) - 2;
+                if (!g.air(x, y, z)) continue;
+                for (Direction d : dirs) {
+                    if (!g.solid(x - d.getStepX(), y - d.getStepY(), z - d.getStepZ())) continue;
+                    level.setBlock(p.set(x, y, z), crystal.setValue(AmethystClusterBlock.FACING, d), FLAGS);
+                    g.set(x, y, z, (byte) 0);   // occupied
+                    // The rock it grows from turns to calcite, like a geode lining.
+                    level.setBlock(p.set(x - d.getStepX(), y - d.getStepY(), z - d.getStepZ()),
+                            Blocks.CALCITE.defaultBlockState(), FLAGS);
+                    n--;
+                    break;
+                }
+            }
+        }
+
+        // Ruins and chests per cave.
+        for (Cave c : layout.caves) {
+            switch (c.kind) {
+                case ENTRANCE -> decorateEntrance(level, g, c, w, rank, random);
+                case CHAMBER, SIDE -> {
+                    int ruins = 1 + random.nextInt(c.kind == Kind.CHAMBER ? 3 : 2);
+                    for (int i = 0; i < ruins; i++) ruin(level, g, c, w, random);
+                    if (random.nextFloat() < (c.kind == Kind.SIDE ? 0.6F : 0.3F)) chestNearWall(level, g, c, rank, random);
+                }
+                case TREASURE -> {
+                    for (int i = 0; i < 2 + random.nextInt(2); i++) chestNearWall(level, g, c, rank, random);
+                    // A treasure cave glitters: extra crystals ring its walls.
+                    for (int i = 0; i < 40; i++) {
+                        double a = random.nextDouble() * Math.PI * 2;
+                        int x = c.x + (int) Math.round(Math.sin(a) * (c.rx - 1)), z = c.z + (int) Math.round(Math.cos(a) * (c.rz - 1));
+                        int y = c.floor + 1 + random.nextInt(4);
+                        if (g.air(x, y, z)) {
+                            for (Direction d : dirs) {
+                                if (g.solid(x - d.getStepX(), y - d.getStepY(), z - d.getStepZ())) {
+                                    level.setBlock(p.set(x, y, z), crystal.setValue(AmethystClusterBlock.FACING, d), FLAGS);
+                                    g.set(x, y, z, (byte) 0);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                case BOSS -> decorateBoss(level, g, c, w, rank, random);
+            }
         }
     }
 
-    /** Corridors run between the two room centres along one axis: 3 wide, 4 tall inside. */
-    private static void corridorShell(ServerLevel level, Corridor c, Theme t, RandomSource random) {
-        forCorridor(c, (x, z, cross) -> {
-            for (int dy = 0; dy <= 5; dy++) {
-                BlockState s = dy == 0 ? t.floor(random) : dy == 5 ? t.ceiling : t.wall(random);
-                level.setBlock(new BlockPos(x, c.a.y0 + dy, z), s, FLAGS);
-            }
-        }, 2);
+    private static BlockState hangingLantern(World w) {
+        BlockState l = w.floorLight;
+        return l.getBlock() instanceof LanternBlock ? l.setValue(LanternBlock.HANGING, true)
+                : Blocks.LANTERN.defaultBlockState().setValue(LanternBlock.HANGING, true);
     }
 
-    private static void corridorCarve(ServerLevel level, Corridor c, Theme t, RandomSource random) {
-        BlockState air = Blocks.AIR.defaultBlockState();
-        int[] step = {0};
-        forCorridor(c, (x, z, cross) -> {
-            for (int dy = 1; dy <= 4; dy++) level.setBlock(new BlockPos(x, c.a.y0 + dy, z), air, FLAGS);
-            level.setBlock(new BlockPos(x, c.a.y0, z), t.floor(random), FLAGS);
-        }, 1);
-        // A light every few blocks along the corridor ceiling.
-        forCorridor(c, (x, z, cross) -> {
-            if (cross == 0 && (step[0]++ % 5) == 2) {
-                BlockPos p = new BlockPos(x, c.a.y0 + 4, z);
-                level.setBlock(p, t.hanging ? t.light.setValue(LanternBlock.HANGING, true) : air, FLAGS);
-                if (!t.hanging) level.setBlock(p.above(), t.light, FLAGS);
-            }
-        }, 0);
+    /** First air cell above the floor at (x, z), searching up from around {@code fromY}. */
+    private static int floorAt(Grid g, int x, int z, int fromY) {
+        for (int y = fromY - 3; y <= fromY + 8; y++) {
+            if (g.air(x, y, z) && g.solid(x, y - 1, z)) return y;
+        }
+        return Integer.MIN_VALUE;
     }
 
-    private interface CorridorCell { void at(int x, int z, int cross); }
-
-    private static void forCorridor(Corridor c, CorridorCell cell, int halfWidth) {
-        int ax = c.a.midX(), az = c.a.midZ(), bx = c.b.midX(), bz = c.b.midZ();
-        if (ax == bx) {
-            for (int z = Math.min(az, bz); z <= Math.max(az, bz); z++)
-                for (int w = -halfWidth; w <= halfWidth; w++) cell.at(ax + w, z, w);
+    /** Broken remnants of whoever lived in this world: a pillar, an arch stub or a wall piece. */
+    private static void ruin(ServerLevel level, Grid g, Cave c, World w, RandomSource random) {
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        double a = random.nextDouble() * Math.PI * 2;
+        double rr = 0.35 + random.nextDouble() * 0.4;
+        int x = c.x + (int) Math.round(Math.sin(a) * c.rx * rr), z = c.z + (int) Math.round(Math.cos(a) * c.rz * rr);
+        int y = floorAt(g, x, z, c.floor + 1);
+        if (y == Integer.MIN_VALUE) return;
+        int type = random.nextInt(3);
+        if (type == 0) {
+            // Pillar, snapped off; rubble at its foot.
+            int h = 3 + random.nextInt(Math.max(1, c.h - 4));
+            for (int dy = 0; dy < h && g.air(x, y + dy, z); dy++) {
+                level.setBlock(p.set(x, y + dy, z), w.ruin[dy == 0 ? 0 : random.nextInt(w.ruin.length)], FLAGS);
+            }
+            for (int i = 0; i < 3; i++) {
+                int rx = x + random.nextInt(5) - 2, rz = z + random.nextInt(5) - 2;
+                int ry = floorAt(g, rx, rz, y);
+                if (ry != Integer.MIN_VALUE && (rx != x || rz != z)) level.setBlock(p.set(rx, ry, rz), w.ruin[random.nextInt(w.ruin.length)], FLAGS);
+            }
+        } else if (type == 1) {
+            // Half an arch: two legs, a lintel that breaks off.
+            boolean alongX = random.nextBoolean();
+            int span = 4 + random.nextInt(3), h = 4 + random.nextInt(2);
+            for (int s = 0; s <= span; s++) {
+                int ax = alongX ? x + s : x, az = alongX ? z : z + s;
+                boolean leg = s == 0 || s == span;
+                for (int dy = 0; dy <= h; dy++) {
+                    if (!leg && dy < h) continue;
+                    if (s == span && dy > h - 2 - random.nextInt(2)) continue;   // broken end
+                    if (g.air(ax, y + dy, az)) level.setBlock(p.set(ax, y + dy, az), w.ruin[random.nextInt(w.ruin.length)], FLAGS);
+                }
+            }
         } else {
-            for (int x = Math.min(ax, bx); x <= Math.max(ax, bx); x++)
-                for (int w = -halfWidth; w <= halfWidth; w++) cell.at(x, az + w, w);
-        }
-    }
-
-    private static void pillars(ServerLevel level, Room r, Theme t, int inset) {
-        int[][] spots = {{r.x0 + inset, r.z0 + inset}, {r.x1 - inset, r.z0 + inset},
-                {r.x0 + inset, r.z1 - inset}, {r.x1 - inset, r.z1 - inset}};
-        for (int[] s : spots) {
-            for (int dy = 1; dy < r.height; dy++) {
-                level.setBlock(new BlockPos(s[0], r.y0 + dy, s[1]), t.pillar, FLAGS);
+            // A wall fragment with a gap.
+            boolean alongX = random.nextBoolean();
+            int len = 4 + random.nextInt(4), h = 2 + random.nextInt(3);
+            int gap = 1 + random.nextInt(Math.max(1, len - 2));
+            for (int s = 0; s < len; s++) {
+                if (s == gap) continue;
+                int ax = alongX ? x + s : x, az = alongX ? z : z + s;
+                int top = h - (s > gap ? random.nextInt(2) : 0);
+                for (int dy = 0; dy < top; dy++) {
+                    if (g.air(ax, y + dy, az)) level.setBlock(p.set(ax, y + dy, az), w.ruin[random.nextInt(w.ruin.length)], FLAGS);
+                }
             }
         }
     }
 
-    private static void decorateEntrance(ServerLevel level, Room r, Theme t, GateRank rank, RandomSource random) {
-        // Rug down the middle toward the way in.
-        for (int z = r.midZ() - 2; z <= r.z1 - 1; z++) level.setBlock(new BlockPos(r.midX(), r.y0 + 1, z), t.rug, FLAGS);
-        // The way back out, against the near wall: open for E-A, sealed for S (no retreat).
-        BlockPos base = new BlockPos(r.midX(), r.y0 + 1, r.z0 + 1);
-        boolean sealed = rank == GateRank.S;
+    private static void chestNearWall(ServerLevel level, Grid g, Cave c, GateRank rank, RandomSource random) {
+        for (int attempt = 0; attempt < 20; attempt++) {
+            double a = random.nextDouble() * Math.PI * 2;
+            double rr = 0.55 + random.nextDouble() * 0.35;
+            int x = c.x + (int) Math.round(Math.sin(a) * c.rx * rr), z = c.z + (int) Math.round(Math.cos(a) * c.rz * rr);
+            int y = floorAt(g, x, z, c.floor + 1);
+            if (y == Integer.MIN_VALUE || !g.air(x, y + 1, z)) continue;
+            Direction facing = Direction.fromYRot(Math.toDegrees(Math.atan2(x - c.x, c.z - z)));   // toward the centre
+            placeChest(level, new BlockPos(x, y, z), facing, rank, random);
+            g.set(x, y, z, (byte) 0);
+            return;
+        }
+    }
+
+    private static void placeChest(ServerLevel level, BlockPos pos, Direction facing, GateRank rank, RandomSource random) {
+        level.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing), Block.UPDATE_ALL);
+        if (level.getBlockEntity(pos) instanceof ChestBlockEntity chest) {
+            ResourceKey<LootTable> table = ResourceKey.create(Registries.LOOT_TABLE,
+                    ResourceLocation.withDefaultNamespace(rank.ordinal() >= GateRank.B.ordinal()
+                            ? "chests/stronghold_corridor" : "chests/simple_dungeon"));
+            chest.setLootTable(table, random.nextLong());
+            Container box = chest;
+            if (random.nextFloat() < 0.40F) {
+                box.setItem(4, EquipmentRules.rollItem(random, EquipmentRules.randomDroppableSlot(random),
+                        EquipmentRules.rollStandardRarity(random, false), rank));
+            }
+            if (random.nextFloat() < 0.08F + rank.ordinal() * 0.03F) {
+                box.setItem(13, new ItemStack(ModItems.AWAKENING_SHARD.get()));
+            }
+            box.setItem(22, new ItemStack(ModItems.MANA_CRYSTAL_SHARD.get(), 1 + random.nextInt(3 + rank.ordinal())));
+        }
+    }
+
+    private static void decorateEntrance(ServerLevel level, Grid g, Cave c, World w, GateRank rank, RandomSource random) {
+        if (rank == GateRank.S) return;   // red gates: no way back until the boss falls
+        // Return rift at the back of the entrance cavern, facing into it.
+        BlockPos base = new BlockPos(c.x, c.floor + 2, c.z - c.rz + 4);
         BlockState portal = ModBlocks.GATE_PORTAL.get().defaultBlockState()
                 .setValue(GateBlock.RANK, rank).setValue(GateBlock.EXIT, true);
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = 0; dy <= 3; dy++) {
-                boolean frame = dx != 0 || dy == 3;
+        for (int dx = 0; dx <= 1; dx++) {
+            for (int dy = 0; dy <= 2; dy++) {
                 BlockPos p = base.offset(dx, dy, 0);
-                level.setBlock(p, frame ? Blocks.CRYING_OBSIDIAN.defaultBlockState()
-                        : sealed ? Blocks.IRON_BARS.defaultBlockState() : portal, Block.UPDATE_ALL);
-                if (!frame && !sealed && level.getBlockEntity(p) instanceof GateBlockEntity be) {
+                level.setBlock(p, portal, Block.UPDATE_ALL);
+                g.set(p.getX(), p.getY(), p.getZ(), (byte) 0);
+                if (level.getBlockEntity(p) instanceof GateBlockEntity be) {
                     be.configure(rank, GateSize.SMALL, level.getGameTime(), -1, base);
                 }
             }
         }
     }
 
-    private static void decorateCombat(ServerLevel level, Room r, Theme t, RandomSource random) {
-        if (r.x1 - r.x0 >= 12 && r.z1 - r.z0 >= 12) pillars(level, r, t, 3);
-        // Rubble and broken floor.
-        for (int i = 0; i < 4; i++) {
-            int x = r.x0 + 2 + random.nextInt(Math.max(1, r.x1 - r.x0 - 3));
-            int z = r.z0 + 2 + random.nextInt(Math.max(1, r.z1 - r.z0 - 3));
-            if (Math.abs(x - r.midX()) <= 1 || Math.abs(z - r.midZ()) <= 1) continue;   // keep paths clear
-            level.setBlock(new BlockPos(x, r.y0 + 1, z), random.nextBoolean() ? t.wall(random) : t.accent, FLAGS);
-        }
-    }
-
-    private static void decorateTreasure(ServerLevel level, Room r, Theme t, GateRank rank, RandomSource random) {
-        for (int x = r.midX() - 1; x <= r.midX() + 1; x++)
-            for (int z = r.midZ() - 1; z <= r.midZ() + 1; z++)
-                level.setBlock(new BlockPos(x, r.y0 + 1, z), t.rug, FLAGS);
-        // Chest on a plinth, facing the corridor side (toward the room's middle row).
-        BlockPos plinth = new BlockPos(r.midX(), r.y0, r.midZ());
-        level.setBlock(plinth, t.accent, FLAGS);
-        BlockPos chestPos = plinth.above();
-        level.setBlock(chestPos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.NORTH), Block.UPDATE_ALL);
-        if (level.getBlockEntity(chestPos) instanceof ChestBlockEntity chest) {
-            ResourceKey<LootTable> table = ResourceKey.create(Registries.LOOT_TABLE,
-                    ResourceLocation.withDefaultNamespace(rank.ordinal() >= GateRank.B.ordinal()
-                            ? "chests/stronghold_corridor" : "chests/simple_dungeon"));
-            chest.setLootTable(table, random.nextLong());
-            Container box = chest;
-            if (random.nextFloat() < 0.45F) {
-                box.setItem(4, EquipmentRules.rollItem(random, EquipmentRules.randomDroppableSlot(random),
-                        EquipmentRules.rollStandardRarity(random, false), rank));
-            }
-            if (random.nextFloat() < 0.10F + rank.ordinal() * 0.04F) {
-                box.setItem(13, new ItemStack(ModItems.AWAKENING_SHARD.get()));
-            }
-        }
-        level.setBlock(new BlockPos(r.x0 + 1, r.y0 + 1, r.z0 + 1), Blocks.BARREL.defaultBlockState(), FLAGS);
-        level.setBlock(new BlockPos(r.x1 - 1, r.y0 + 1, r.z1 - 1), Blocks.BARREL.defaultBlockState(), FLAGS);
-    }
-
-    private static void decorateBoss(ServerLevel level, Room r, Theme t, GateRank rank, RandomSource random) {
-        // Ring of pillars.
-        int cx = r.midX(), cz = r.midZ();
-        for (int k = 0; k < 8; k++) {
-            double a = k * Math.PI / 4;
-            int px = cx + (int) Math.round(Math.cos(a) * 7);
-            int pz = cz + (int) Math.round(Math.sin(a) * 7);
-            for (int dy = 1; dy < r.height; dy++) level.setBlock(new BlockPos(px, r.y0 + dy, pz), t.pillar, FLAGS);
-            level.setBlock(new BlockPos(px, r.y0 + r.height - 1, pz), t.accent, FLAGS);
-        }
-        // Ring of the rank's glow set into the floor.
+    private static void decorateBoss(ServerLevel level, Grid g, Cave c, World w, GateRank rank, RandomSource random) {
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        // Rank-colored ring in the floor around the centre.
         BlockState glow = rankGlass(rank);
-        for (int k = 0; k < 48; k++) {
-            double a = k * Math.PI * 2 / 48;
-            level.setBlock(new BlockPos(cx + (int) Math.round(Math.cos(a) * 5), r.y0,
-                    cz + (int) Math.round(Math.sin(a) * 5)), glow, FLAGS);
-        }
-        // Raised dais at the far end with the sealed exit frame.
-        for (int x = cx - 4; x <= cx + 4; x++)
-            for (int z = r.z1 - 4; z <= r.z1 - 1; z++)
-                level.setBlock(new BlockPos(x, r.y0 + 1, z), t.accent, FLAGS);
-        BlockPos exit = new BlockPos(cx, r.y0 + 1, r.z1 - 2);
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = 0; dy <= 3; dy++) {
-                boolean frame = dx != 0 || dy == 3;
-                level.setBlock(exit.offset(dx, dy, 0),
-                        frame ? Blocks.CRYING_OBSIDIAN.defaultBlockState() : Blocks.IRON_BARS.defaultBlockState(), FLAGS);
+        for (int k = 0; k < 72; k++) {
+            double a = k * Math.PI * 2 / 72;
+            for (int r : new int[]{7, 8}) {
+                level.setBlock(p.set(c.x + (int) Math.round(Math.cos(a) * r), c.floor, c.z + (int) Math.round(Math.sin(a) * r)), glow, FLAGS);
             }
         }
-        // Rug from the door to the dais.
-        for (int z = r.z0 + 1; z < r.z1 - 4; z++) level.setBlock(new BlockPos(cx, r.y0 + 1, z), t.rug, FLAGS);
+        // Ring of tall broken pillars.
+        for (int k = 0; k < 10; k++) {
+            double a = k * Math.PI * 2 / 10;
+            int x = c.x + (int) Math.round(Math.cos(a) * (c.rx - 6)), z = c.z + (int) Math.round(Math.sin(a) * (c.rz - 6));
+            int top = 6 + random.nextInt(c.h - 8);
+            for (int dy = 1; dy <= top; dy++) {
+                if (g.air(x, c.floor + dy, z)) level.setBlock(p.set(x, c.floor + dy, z), w.ruin[dy == 1 ? 0 : random.nextInt(w.ruin.length)], FLAGS);
+            }
+        }
+        // Dais where the exit rift will open.
+        BlockPos exit = new BlockPos(c.x, c.floor + 2, c.z + c.rz - 7);
+        for (int x = exit.getX() - 3; x <= exit.getX() + 4; x++)
+            for (int z = exit.getZ() - 3; z <= exit.getZ() + 3; z++)
+                if (g.air(x, c.floor + 1, z)) level.setBlock(p.set(x, c.floor + 1, z), w.ruin[0], FLAGS);
+        // Reward chest behind the dais.
+        placeChest(level, new BlockPos(exit.getX(), c.floor + 2, exit.getZ() + 3), Direction.NORTH, rank, random);
     }
 
     private static BlockState rankGlass(GateRank rank) {
@@ -436,18 +684,19 @@ public final class GateDungeonArena {
 
     // ---------------------------------------------------------------- mobs
 
-    private static void populate(ServerLevel level, int slot, Layout layout, Theme theme, GateRank rank,
+    private static void populate(ServerLevel level, int slot, Layout layout, Grid g, GateRank rank,
                                  GateSize size, RandomSource random) {
-        List<Room> combat = new ArrayList<>();
-        for (Room r : layout.rooms) if (r.kind == Kind.COMBAT) combat.add(r);
-        int total = size.mobCount() + combat.size() * 2;
-        for (int i = 0; i < total && !combat.isEmpty(); i++) {
-            Room r = combat.get(i % combat.size());
-            EntityType<?> type = theme.mobs[random.nextInt(theme.mobs.length)];
+        EntityType<?>[] mobs = mobsFor(rank);
+        List<Cave> fights = new ArrayList<>();
+        for (Cave c : layout.caves) if (c.kind == Kind.CHAMBER || c.kind == Kind.SIDE) fights.add(c);
+        int total = size.mobCount() + fights.size() * 3;
+        for (int i = 0; i < total && !fights.isEmpty(); i++) {
+            Cave c = fights.get(i % fights.size());
+            EntityType<?> type = mobs[random.nextInt(mobs.length)];
             if (!(type.create(level) instanceof Mob mob)) continue;
-            double mx = r.x0 + 2 + random.nextDouble() * Math.max(1, r.x1 - r.x0 - 4);
-            double mz = r.z0 + 2 + random.nextDouble() * Math.max(1, r.z1 - r.z0 - 4);
-            mob.moveTo(mx, r.y0 + 1.0, mz, random.nextFloat() * 360.0F, 0.0F);
+            BlockPos spot = spawnSpot(g, c, random);
+            if (spot == null) continue;
+            mob.moveTo(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5, random.nextFloat() * 360.0F, 0.0F);
             mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), MobSpawnType.EVENT, null);
             mob.setPersistenceRequired();
             mob.getPersistentData().putBoolean(MobScaling.GATE_MONSTER_KEY, true);
@@ -456,7 +705,7 @@ public final class GateDungeonArena {
             level.addFreshEntity(mob);
         }
 
-        Room bossRoom = layout.boss();
+        Cave bossCave = layout.boss();
         EntityType<? extends Mob> bossType = switch (rank) {
             case E, D -> EntityType.HUSK;
             case C, B -> EntityType.VINDICATOR;
@@ -464,7 +713,7 @@ public final class GateDungeonArena {
         };
         Mob boss = bossType.create(level);
         if (boss != null) {
-            boss.moveTo(bossRoom.midX() + 0.5, bossRoom.y0 + 1.0, bossRoom.midZ() + 0.5, 180.0F, 0.0F);
+            boss.moveTo(bossCave.x + 0.5, bossCave.floor + 1.0, bossCave.z + 0.5, 180.0F, 0.0F);
             boss.finalizeSpawn(level, level.getCurrentDifficultyAt(boss.blockPosition()), MobSpawnType.EVENT, null);
             boss.setPersistenceRequired();
             boss.getPersistentData().putBoolean(MobScaling.GATE_MONSTER_KEY, true);
@@ -488,16 +737,28 @@ public final class GateDungeonArena {
         }
     }
 
+    private static BlockPos spawnSpot(Grid g, Cave c, RandomSource random) {
+        for (int attempt = 0; attempt < 16; attempt++) {
+            double a = random.nextDouble() * Math.PI * 2, rr = random.nextDouble() * 0.7;
+            int x = c.x + (int) Math.round(Math.sin(a) * c.rx * rr), z = c.z + (int) Math.round(Math.cos(a) * c.rz * rr);
+            int y = floorAt(g, x, z, c.floor + 1);
+            if (y != Integer.MIN_VALUE && g.air(x, y + 1, z)) return new BlockPos(x, y, z);
+        }
+        return null;
+    }
+
     public static void openExitPortal(ServerLevel level, int slot, GateSize size, GateRank rank) {
         BlockPos exitBase = exitPortalCenter(slot, size);
         BlockState portal = ModBlocks.GATE_PORTAL.get().defaultBlockState()
                 .setValue(GateBlock.RANK, rank)
                 .setValue(GateBlock.EXIT, true);
-        for (int dy = 0; dy <= 2; dy++) {
-            BlockPos p = exitBase.offset(0, dy, 0);
-            level.setBlock(p, portal, Block.UPDATE_ALL);
-            if (level.getBlockEntity(p) instanceof GateBlockEntity be) {
-                be.configure(rank, size, level.getGameTime(), slot, exitBase);
+        for (int dx = 0; dx <= 1; dx++) {
+            for (int dy = 0; dy <= 2; dy++) {
+                BlockPos p = exitBase.offset(dx, dy, 0);
+                level.setBlock(p, portal, Block.UPDATE_ALL);
+                if (level.getBlockEntity(p) instanceof GateBlockEntity be) {
+                    be.configure(rank, size, level.getGameTime(), slot, exitBase);
+                }
             }
         }
     }

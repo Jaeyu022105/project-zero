@@ -80,6 +80,18 @@ public final class ModBlocks {
                     .emissiveRendering((state, level, pos) -> true)
                     .pushReaction(PushReaction.BLOCK)));
 
+    /** Mineable mana crystal clusters on dungeon walls. Glow softly; drop Mana Crystals and XP. */
+    public static final RegistryObject<Block> MANA_CRYSTAL = BLOCKS.register("mana_crystal",
+            () -> new com.projectzero.gates.ManaCrystalBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_LIGHT_BLUE)
+                    .strength(1.5F)
+                    .sound(SoundType.AMETHYST_CLUSTER)
+                    .lightLevel(state -> 8)
+                    .emissiveRendering((state, level, pos) -> true)
+                    .noOcclusion()
+                    .forceSolidOn()
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
+
     /** Rank-colored Gate portal block (TODO(claude-art): swirling rift visuals). */
     public static final RegistryObject<Block> GATE_PORTAL = BLOCKS.register("gate_portal",
             () -> new GateBlock(BlockBehaviour.Properties.of()

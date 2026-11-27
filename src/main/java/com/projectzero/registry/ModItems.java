@@ -49,6 +49,12 @@ public final class ModItems {
     public static final RegistryObject<Item> GATE_PORTAL = ITEMS.register("gate_portal",
             () -> new BlockItem(ModBlocks.GATE_PORTAL.get(), new Item.Properties().rarity(Rarity.EPIC)));
 
+    public static final RegistryObject<Item> MANA_CRYSTAL_BLOCK = ITEMS.register("mana_crystal",
+            () -> new BlockItem(ModBlocks.MANA_CRYSTAL.get(), new Item.Properties().rarity(Rarity.UNCOMMON)));
+    /** Mined from dungeon walls. TODO(gemini): uses (vessel fuel, crafting, trade). */
+    public static final RegistryObject<Item> MANA_CRYSTAL_SHARD = ITEMS.register("mana_crystal_shard",
+            () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+
     // ---- Starter Accessories (icons + worn gauntlet layer done; see client/GauntletLayer) ----
     public static final RegistryObject<Item> IRON_GAUNTLETS = ITEMS.register("iron_gauntlets",
             () -> new AccessoryItem(AccessorySlotType.GAUNTLETS, new Item.Properties().stacksTo(1)));
