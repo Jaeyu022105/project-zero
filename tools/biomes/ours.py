@@ -91,6 +91,13 @@ def features():
         configured(n, {"type": "projectzero:" + n, "config": {}})
     placed("travertine_terrace", "projectzero:travertine_terrace", rarity=3)
     placed("frozen_pond", "projectzero:frozen_pond", rarity=4)
+    # Polish round 3: mana craters (Mana Wastes), fairy rings (Capwood), elven ruins (Elderwood).
+    # Capwood and Elderwood biome JSONs are hand-written, so those two are appended to their JSONs directly.
+    for n in ["mana_crater", "fairy_ring", "elven_ruin"]:
+        configured(n, {"type": "projectzero:" + n, "config": {}})
+    placed("mana_crater", "projectzero:mana_crater", rarity=4)
+    placed("fairy_ring", "projectzero:fairy_ring", rarity=5)
+    placed("elven_ruin", "projectzero:elven_ruin", rarity=14)
     gen.plant_patch("bloodmoon_brush", [("minecraft:dead_bush", 3, {}), ("minecraft:short_grass", 2, {})], tries=24)
     placed("bloodmoon_brush", "projectzero:bloodmoon_brush", count=1, heightmap="MOTION_BLOCKING")
     gen.plant_patch("bamboo_shoots", [("minecraft:bamboo", 1, {"age": 0, "leaves": "small", "stage": 0})], tries=32, spread=5)
@@ -142,7 +149,7 @@ BIOMES = {
     # Round 5.
     "mana_wastes": ("windswept_savanna", ["minecraft:trees_windswept_savanna"],
         ["boulder_andesite_rare", "dry_grass"],
-        {VEG: ["projectzero:mana_waste"]},
+        {VEG: ["projectzero:mana_waste", "projectzero:mana_crater"]},
         {"effects": {"fog_color": 10255318, "sky_color": 11570416, "water_color": 8084694, "water_fog_color": 5126300,
          "grass_color": 9341598, "foliage_color": 8156816,
          "particle": {"options": {"type": "minecraft:reverse_portal"}, "probability": 0.004}}}),

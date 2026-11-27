@@ -85,6 +85,12 @@ public final class ModFeatures {
             FEATURES.register("travertine_terrace", com.projectzero.worldgen.TravertineTerraceFeature::new);
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> FROZEN_POND =
             FEATURES.register("frozen_pond", com.projectzero.worldgen.FrozenPondFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> MANA_CRATER =
+            FEATURES.register("mana_crater", com.projectzero.worldgen.ManaCraterFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> FAIRY_RING =
+            FEATURES.register("fairy_ring", com.projectzero.worldgen.FairyRingFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> ELVEN_RUIN =
+            FEATURES.register("elven_ruin", com.projectzero.worldgen.ElvenRuinFeature::new);
 
     public static final DeferredRegister<net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType<?>> TREE_DECORATORS =
             DeferredRegister.create(net.minecraft.core.registries.Registries.TREE_DECORATOR_TYPE, ProjectZero.MOD_ID);

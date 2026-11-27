@@ -92,7 +92,8 @@
       "minecraft:birch_tall",
       "projectzero:elderwood_flowers",
       "minecraft:patch_grass_forest",
-      "minecraft:brown_mushroom_normal"
+      "minecraft:brown_mushroom_normal",
+      "projectzero:elven_ruin"
     ],
     [
       "minecraft:freeze_top_layer"

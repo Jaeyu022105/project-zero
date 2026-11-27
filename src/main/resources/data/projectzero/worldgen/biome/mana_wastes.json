@@ -88,7 +88,8 @@
       "minecraft:patch_pumpkin",
       "projectzero:boulder_andesite_rare",
       "projectzero:dry_grass",
-      "projectzero:mana_waste"
+      "projectzero:mana_waste",
+      "projectzero:mana_crater"
     ],
     [
       "minecraft:freeze_top_layer"
