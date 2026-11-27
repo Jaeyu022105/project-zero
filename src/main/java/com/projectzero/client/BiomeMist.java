@@ -2,6 +2,10 @@ package com.projectzero.client;
 
 import com.projectzero.ProjectZero;
 import com.projectzero.worldgen.ModBiomes;
+import com.projectzero.worldgen.ShatteredPlateauFeature;
+import net.minecraft.client.ParticleStatus;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.core.BlockPos;
@@ -13,7 +17,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 /**
- * Biome mist. Cloud Forest: thick fog all the time. Karst Tower Bay: light sea haze. Sky Pillars: fog thickens near the valley floor so the pillars fade into haze
+ * Biome mist. Cloud Forest: thick fog all the time. Shattered Sky Plateau: light haze on the table,
+ * thick cloud down in the chasms (with drifting cloud puffs). Karst Tower Bay: light sea haze. Sky Pillars: fog thickens near the valley floor so the pillars fade into haze
  * row behind row, and thins out as you climb above the pillar tops. Fades in and out over a few
  * seconds when you cross the biome edge.
  */
@@ -41,7 +46,10 @@ public final class BiomeMist {
         } else if (biome.is(ModBiomes.MANA_WASTES)) {
             target = 0.55F;   // mana haze
         } else if (biome.is(ModBiomes.SHATTERED_PLATEAU)) {
-            target = 0.35F;
+            // Light haze on the table; the chasms are full of cloud, thickest at the bottom.
+            float below = ShatteredPlateauFeature.TABLE - at.getY();
+            target = 0.3F + Mth.clamp(below / 30F, 0F, 1F) * 1.05F;
+            chasmCloud(mc);
         } else if (biome.is(ModBiomes.BLOODMOON_STEPPE)) {
             target = 0.3F;
         } else if (biome.is(ModBiomes.GEYSER_BASIN)) {
@@ -50,6 +58,27 @@ public final class BiomeMist {
             target = 0.55F;   // sea haze between the towers
         }
         mist += (target - mist) * 0.02F;
+    }
+
+    /** Low cloud drifting in the chasms near you: probes random spots below the table top. */
+    private static void chasmCloud(Minecraft mc) {
+        if (mc.options.particles().get() == ParticleStatus.MINIMAL) return;
+        var level = mc.level;
+        RandomSource r = level.random;
+        BlockPos c = mc.player.blockPosition();
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+        int probes = mc.options.particles().get() == ParticleStatus.DECREASED ? 12 : 28;
+        for (int i = 0; i < probes; i++) {
+            int x = c.getX() + r.nextInt(65) - 32, z = c.getZ() + r.nextInt(65) - 32;
+            // Only inside a chasm: open air two blocks under the table here.
+            p.set(x, ShatteredPlateauFeature.TABLE - 2, z);
+            if (!level.isLoaded(p) || !level.getBlockState(p).isAir()) continue;
+            int y = ShatteredPlateauFeature.TABLE - 5 - r.nextInt(40);
+            p.setY(y);
+            if (!level.getBlockState(p).isAir()) continue;
+            level.addParticle(ParticleTypes.CLOUD, x + r.nextFloat(), y + r.nextFloat(), z + r.nextFloat(),
+                    (r.nextFloat() - 0.5F) * 0.02F, 0.004F, (r.nextFloat() - 0.5F) * 0.02F);
+        }
     }
 
     @SubscribeEvent

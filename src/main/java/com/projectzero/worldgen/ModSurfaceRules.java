@@ -77,8 +77,15 @@ public final class ModSurfaceRules {
                 SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.4D), COARSE_DIRT));
         SurfaceRules.RuleSource marsh = floor(ModBiomes.SUNKEN_MARSH,
                 SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.1D), state(Blocks.MUD)));
-        SurfaceRules.RuleSource shattered = floor(ModBiomes.SHATTERED_PLATEAU,
-                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.3D), state(Blocks.STONE)));
+        // Shattered Sky Plateau: a grassy table top with bare stone and coarse dirt showing through
+        // (the levelling pass lays the same cover on ground it builds or cuts; this covers the edges).
+        SurfaceRules.RuleSource shattered = SurfaceRules.ifTrue(SurfaceRules.isBiome(ModBiomes.SHATTERED_PLATEAU),
+                SurfaceRules.ifTrue(SurfaceRules.abovePreliminarySurface(), SurfaceRules.sequence(
+                        SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.ifTrue(SurfaceRules.waterBlockCheck(-1, 0), SurfaceRules.sequence(
+                                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.45D), state(Blocks.STONE)),
+                                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.3D), COARSE_DIRT),
+                                state(Blocks.GRASS_BLOCK)))),
+                        SurfaceRules.ifTrue(SurfaceRules.waterStartCheck(-6, -1), SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, state(Blocks.DIRT))))));
         return SurfaceRules.sequence(capwood, baobab, tsingy, saltFlats, geyser, ice, mana, blood, marsh, shattered);
     }
 }
