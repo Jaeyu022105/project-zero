@@ -6,6 +6,7 @@ import com.projectzero.ProjectZero;
 import com.projectzero.config.ClientConfig;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
@@ -16,7 +17,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.Util;
 import com.projectzero.gates.GateBlock;
 import com.projectzero.gates.GateBlockEntity;
 import com.projectzero.gates.GateRank;
@@ -50,6 +54,7 @@ public final class MinimapOverlay {
     private static int centerX;
     private static int centerZ;
     private static boolean hasCenter;
+    private static int centerLayerY;
     private static Level markerLevel;
     private static long lastMarkerScan = Long.MIN_VALUE;
     private static List<GateMarker> gateMarkers = List.of();
@@ -95,9 +100,14 @@ public final class MinimapOverlay {
         ensureTexture(mc, ClientConfig.MINIMAP_SIZE.get());
         int px = mc.player.blockPosition().getX();
         int pz = mc.player.blockPosition().getZ();
-        if (!hasCenter || Math.abs(px - centerX) >= 4 || Math.abs(pz - centerZ) >= 4) {
+        boolean caveLayer = mc.level.dimensionType().hasCeiling()
+                || mc.level.dimension().location().equals(ProjectZero.id("dungeon"));
+        int playerLayerY = mc.player.blockPosition().getY();
+        if (!hasCenter || Math.abs(px - centerX) >= 4 || Math.abs(pz - centerZ) >= 4
+                || (caveLayer && playerLayerY != centerLayerY)) {
             centerX = px;
             centerZ = pz;
+            centerLayerY = playerLayerY;
             hasCenter = true;
             nextRow = 0;
         }
@@ -108,7 +118,7 @@ public final class MinimapOverlay {
                 nextRow = 0;
                 y = nextRow++;
             }
-            renderMapRow(mc.level, y, ClientConfig.MINIMAP_ZOOM.get());
+            renderMapRow(mc.level, y, ClientConfig.MINIMAP_ZOOM.get(), caveLayer, centerLayerY);
         }
         texture.upload();
     }
@@ -153,7 +163,7 @@ public final class MinimapOverlay {
         texture.upload();
     }
 
-    private static void renderMapRow(Level level, int row, int zoom) {
+    private static void renderMapRow(Level level, int row, int zoom, boolean caveLayer, int layerY) {
         int radius = textureSize / 2;
         int dz = row - radius;
         for (int x = 0; x < textureSize; x++) {
@@ -170,14 +180,39 @@ public final class MinimapOverlay {
                 image.setPixelRGBA(x, row, packAbgr(NAVY));
                 continue;
             }
-            int surfaceY = level.getHeight(Heightmap.Types.WORLD_SURFACE, wx, wz);
-            if (surfaceY <= level.getMinBuildHeight()) {
-                image.setPixelRGBA(x, row, packAbgr(NAVY));
-                continue;
+            int surfaceY;
+            BlockPos surface;
+            if (caveLayer) {
+                surfaceY = layerY;
+                int floorY = surfaceY - 1;
+                while (floorY >= Math.max(level.getMinBuildHeight(), surfaceY - 12)
+                        && level.getBlockState(new BlockPos(wx, floorY, wz)).isAir()) floorY--;
+                if (floorY < Math.max(level.getMinBuildHeight(), surfaceY - 12)) {
+                    image.setPixelRGBA(x, row, packAbgr(NAVY));
+                    continue;
+                }
+                surfaceY = floorY + 1;
+                surface = new BlockPos(wx, floorY, wz);
+            } else {
+                surfaceY = level.getHeight(Heightmap.Types.WORLD_SURFACE, wx, wz);
+                if (surfaceY <= level.getMinBuildHeight()) {
+                    image.setPixelRGBA(x, row, packAbgr(NAVY));
+                    continue;
+                }
+                surface = new BlockPos(wx, surfaceY - 1, wz);
             }
-            BlockPos surface = new BlockPos(wx, surfaceY - 1, wz);
             BlockState state = level.getBlockState(surface);
             int color = state.getMapColor(level, surface).col | 0xFF000000;
+            if (state.getFluidState().isEmpty()) {
+                if (state.is(BlockTags.LEAVES)) {
+                    color = multiplyRgb(color, BiomeColors.getAverageFoliageColor(level, surface));
+                } else if (state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.SHORT_GRASS)
+                        || state.is(Blocks.TALL_GRASS) || state.is(Blocks.FERN) || state.is(Blocks.LARGE_FERN)) {
+                    color = multiplyRgb(color, BiomeColors.getAverageGrassColor(level, surface));
+                }
+            } else {
+                color = multiplyRgb(color, BiomeColors.getAverageWaterColor(level, surface));
+            }
             if (state.getFluidState().isSource()) {
                 int depth = 1;
                 for (int y = surfaceY - 2; y >= Math.max(level.getMinBuildHeight(), surfaceY - 12); y--) {
@@ -188,9 +223,33 @@ public final class MinimapOverlay {
                 int darken = Math.max(100, 255 - (depth - 1) * 13);
                 color = scaleRgb(color, darken / 255F);
             }
-            float slope = heightShade(level, wx, wz, surfaceY);
+            float slope = caveLayer ? heightShadeCave(level, wx, wz, layerY) : heightShade(level, wx, wz, surfaceY);
             image.setPixelRGBA(x, row, packAbgr(scaleRgb(color, slope)));
         }
+    }
+
+    private static float heightShadeCave(Level level, int x, int z, int layerY) {
+        int north = caveFloor(level, x, z - 1, layerY);
+        int west = caveFloor(level, x - 1, z, layerY);
+        int south = caveFloor(level, x, z + 1, layerY);
+        int east = caveFloor(level, x + 1, z, layerY);
+        int light = (north + west) - (south + east);
+        return Math.max(0.68F, Math.min(1.22F, 1F + light * 0.035F));
+    }
+
+    private static int caveFloor(Level level, int x, int z, int layerY) {
+        if (!level.hasChunkAt(new BlockPos(x, layerY, z))) return layerY;
+        for (int y = layerY - 1; y >= Math.max(level.getMinBuildHeight(), layerY - 12); y--) {
+            if (!level.getBlockState(new BlockPos(x, y, z)).isAir()) return y;
+        }
+        return layerY;
+    }
+
+    private static int multiplyRgb(int base, int tint) {
+        int r = ((base >> 16) & 255) * ((tint >> 16) & 255) / 255;
+        int g = ((base >> 8) & 255) * ((tint >> 8) & 255) / 255;
+        int b = (base & 255) * (tint & 255) / 255;
+        return 0xFF000000 | (r << 16) | (g << 8) | b;
     }
 
     private static float heightShade(Level level, int x, int z, int height) {
@@ -262,14 +321,24 @@ public final class MinimapOverlay {
         int cy = y + size / 2;
         g.pose().pushPose();
         g.pose().translate(cx, cy, 0);
-        g.pose().mulPose(Axis.ZP.rotationDegrees(mc.player.getYRot()));
+        g.pose().mulPose(Axis.ZP.rotationDegrees(180F - mc.player.getYRot()));
         g.fill(-1, -5, 2, 4, 0xFFFFFFFF);
         g.fill(-4, 1, -1, 4, LIGHT_CYAN);
         g.fill(2, 1, 5, 4, LIGHT_CYAN);
         g.pose().popPose();
         g.drawString(mc.font, "N", cx - mc.font.width("N") / 2, y + 2, LIGHT_CYAN, false);
+        if (ClientConfig.MINIMAP_COORDS.get()) {
+            var biomeKey = mc.level.getBiome(mc.player.blockPosition()).unwrapKey();
+            Component biomeName = biomeKey
+                    .<Component>map(key -> Component.translatable(Util.makeDescriptionId("biome", key.location())))
+                    .orElse(Component.empty());
+            String text = biomeName.getString() + "  " + mc.player.blockPosition().getX() + ", "
+                    + mc.player.blockPosition().getY() + ", " + mc.player.blockPosition().getZ();
+            int textX = Math.max(0, x + size - mc.font.width(text));
+            g.drawString(mc.font, text, textX, y + size + 4, LIGHT_CYAN, false);
+        }
         if (objectiveLine != null) {
-            g.drawString(mc.font, objectiveLine, x, y + size + 4, 0xFFFFFFFF, false);
+            g.drawString(mc.font, objectiveLine, x, y + size + 14, 0xFFFFFFFF, false);
         }
     }
 
