@@ -11,16 +11,26 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import com.projectzero.gates.GateBlock;
+import com.projectzero.gates.GateBlockEntity;
+import com.projectzero.gates.GateRank;
+import org.jetbrains.annotations.Nullable;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** Client-only north-up terrain map, attached above the vanilla HUD layers. */
 @Mod.EventBusSubscriber(modid = ProjectZero.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -40,6 +50,19 @@ public final class MinimapOverlay {
     private static int centerX;
     private static int centerZ;
     private static boolean hasCenter;
+    private static Level markerLevel;
+    private static long lastMarkerScan = Long.MIN_VALUE;
+    private static List<GateMarker> gateMarkers = List.of();
+    private static Component objectiveLine;
+    private static BlockPos objectiveTarget;
+
+    private record GateMarker(BlockPos pos, GateRank rank, boolean broken) {}
+
+    /** Sets the optional quest/objective line and map target for a future quest system. */
+    public static void setObjective(@Nullable Component line, @Nullable BlockPos target) {
+        objectiveLine = line;
+        objectiveTarget = target == null ? null : target.immutable();
+    }
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent.Post event) {
@@ -60,6 +83,15 @@ public final class MinimapOverlay {
         }
 
         if (mc.player == null || mc.level == null || mc.isPaused() || !ClientConfig.MINIMAP.get()) return;
+        if (markerLevel != mc.level) {
+            markerLevel = mc.level;
+            gateMarkers = List.of();
+            lastMarkerScan = Long.MIN_VALUE;
+        }
+        if (mc.level.getGameTime() - lastMarkerScan >= 20) {
+            scanGateMarkers(mc.level, mc.player.blockPosition());
+            lastMarkerScan = mc.level.getGameTime();
+        }
         ensureTexture(mc, ClientConfig.MINIMAP_SIZE.get());
         int px = mc.player.blockPosition().getX();
         int pz = mc.player.blockPosition().getZ();
@@ -79,6 +111,30 @@ public final class MinimapOverlay {
             renderMapRow(mc.level, y, ClientConfig.MINIMAP_ZOOM.get());
         }
         texture.upload();
+    }
+
+    private static void scanGateMarkers(Level level, BlockPos playerPos) {
+        Map<BlockPos, GateMarker> found = new HashMap<>();
+        int minChunkX = (playerPos.getX() - 160) >> 4;
+        int maxChunkX = (playerPos.getX() + 160) >> 4;
+        int minChunkZ = (playerPos.getZ() - 160) >> 4;
+        int maxChunkZ = (playerPos.getZ() + 160) >> 4;
+        for (int cx = minChunkX; cx <= maxChunkX; cx++) {
+            for (int cz = minChunkZ; cz <= maxChunkZ; cz++) {
+                LevelChunk chunk = level.getChunkSource().getChunk(cx, cz, false);
+                if (chunk == null) continue;
+                for (var entry : chunk.getBlockEntities().entrySet()) {
+                    if (!(entry.getValue() instanceof GateBlockEntity gate)) continue;
+                    BlockPos pos = gate.anchorPos();
+                    if (pos.distSqr(playerPos) > 160 * 160) continue;
+                    BlockState state = level.getBlockState(entry.getKey());
+                    if (!(state.getBlock() instanceof GateBlock) || state.getValue(GateBlock.EXIT)) continue;
+                    found.put(pos.immutable(), new GateMarker(pos.immutable(), state.getValue(GateBlock.RANK),
+                            state.getValue(GateBlock.BROKEN)));
+                }
+            }
+        }
+        gateMarkers = List.copyOf(found.values());
     }
 
     private static void ensureTexture(Minecraft mc, int size) {
@@ -179,6 +235,29 @@ public final class MinimapOverlay {
         g.fill(x, y, x + size, y + size, PANEL);
         g.blit(textureId, x, y, 0, 0, size, size, textureSize, textureSize);
 
+        int zoom = ClientConfig.MINIMAP_ZOOM.get();
+        int radius = size / 2 - 3;
+        for (GateMarker marker : gateMarkers) {
+            int dx = Math.round((marker.pos().getX() - mc.player.blockPosition().getX()) / (float) zoom);
+            int dz = Math.round((marker.pos().getZ() - mc.player.blockPosition().getZ()) / (float) zoom);
+            drawMarker(g, x + size / 2, y + size / 2, radius, dx, dz, marker.rank().argb(),
+                    marker.broken(), mc.level.getGameTime());
+        }
+        for (var other : mc.level.players()) {
+            if (other == mc.player || other.isSpectator()) continue;
+            int dx = (int) Math.round((other.getX() - mc.player.getX()) / zoom);
+            int dz = (int) Math.round((other.getZ() - mc.player.getZ()) / zoom);
+            if (dx * dx + dz * dz <= radius * radius) {
+                g.fill(x + size / 2 + dx - 1, y + size / 2 + dz - 1,
+                        x + size / 2 + dx + 2, y + size / 2 + dz + 2, 0xFFFFFFFF);
+            }
+        }
+        if (objectiveTarget != null) {
+            int dx = Math.round((objectiveTarget.getX() - mc.player.blockPosition().getX()) / (float) zoom);
+            int dz = Math.round((objectiveTarget.getZ() - mc.player.blockPosition().getZ()) / (float) zoom);
+            drawMarker(g, x + size / 2, y + size / 2, radius, dx, dz, 0xFFFFD34D, false, 0L);
+        }
+
         int cx = x + size / 2;
         int cy = y + size / 2;
         g.pose().pushPose();
@@ -189,5 +268,31 @@ public final class MinimapOverlay {
         g.fill(2, 1, 5, 4, LIGHT_CYAN);
         g.pose().popPose();
         g.drawString(mc.font, "N", cx - mc.font.width("N") / 2, y + 2, LIGHT_CYAN, false);
+        if (objectiveLine != null) {
+            g.drawString(mc.font, objectiveLine, x, y + size + 4, 0xFFFFFFFF, false);
+        }
+    }
+
+    private static void drawMarker(GuiGraphics g, int cx, int cy, int radius, int dx, int dz,
+                                   int color, boolean broken, long gameTime) {
+        int distanceSq = dx * dx + dz * dz;
+        if (distanceSq <= radius * radius) {
+            int pulse = broken && (gameTime / 5) % 2 == 0 ? 5 : 3;
+            int x = cx + dx;
+            int y = cy + dz;
+            g.fill(x - pulse / 2, y - pulse / 2, x + (pulse + 1) / 2, y + (pulse + 1) / 2, color);
+            return;
+        }
+
+        double angle = Math.atan2(dz, dx);
+        int px = cx + (int) Math.round(Math.cos(angle) * radius);
+        int py = cy + (int) Math.round(Math.sin(angle) * radius);
+        g.pose().pushPose();
+        g.pose().translate(px, py, 0);
+        g.pose().mulPose(Axis.ZP.rotation((float) angle));
+        g.fill(-2, -2, 3, 3, color);
+        g.fill(1, -4, 5, -1, color);
+        g.fill(1, 1, 5, 4, color);
+        g.pose().popPose();
     }
 }
