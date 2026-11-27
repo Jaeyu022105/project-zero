@@ -160,5 +160,10 @@
   "biome.projectzero.salt_flats": "Salt Mirror Flats",
   "biome.projectzero.geyser_basin": "Geyser Basin",
   "biome.projectzero.ice_cathedral": "Ice Cathedral",
-  "biome.projectzero.crystal_tundra": "Crystal Tundra"
+  "biome.projectzero.crystal_tundra": "Crystal Tundra",
+  "biome.projectzero.mana_wastes": "Mana Wastes",
+  "biome.projectzero.bloodmoon_steppe": "Bloodmoon Steppe",
+  "biome.projectzero.spirit_bamboo": "Spirit Bamboo Sea",
+  "biome.projectzero.sunken_marsh": "Sunken Ruins Marsh",
+  "biome.projectzero.shattered_plateau": "Shattered Sky Plateau"
 }

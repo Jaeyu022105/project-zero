@@ -40,6 +40,17 @@ public final class ModBiomes {
     /** Snow fields broken by glowing mana-crystal outcrops. */
     public static final ResourceKey<Biome> CRYSTAL_TUNDRA = key("crystal_tundra");
 
+    /** Land around a long-dead gate: crystallised ground, rocks hanging in the air, broken gate rings. */
+    public static final ResourceKey<Biome> MANA_WASTES = key("mana_wastes");
+    /** Dark red grass and dead trees under a blood-red sky. A high-rank danger zone. */
+    public static final ResourceKey<Biome> BLOODMOON_STEPPE = key("bloodmoon_steppe");
+    /** Giant bamboo with spirit lanterns among the last cherry trees. */
+    public static final ResourceKey<Biome> SPIRIT_BAMBOO = key("spirit_bamboo");
+    /** Half-drowned towers, columns and statues of an older civilisation among the mangroves. */
+    public static final ResourceKey<Biome> SUNKEN_MARSH = key("sunken_marsh");
+    /** A plateau split by deep chasms, with broken-off slabs hanging over them. */
+    public static final ResourceKey<Biome> SHATTERED_PLATEAU = key("shattered_plateau");
+
     private static ResourceKey<Biome> key(String name) {
         return ResourceKey.create(Registries.BIOME, ProjectZero.id(name));
     }

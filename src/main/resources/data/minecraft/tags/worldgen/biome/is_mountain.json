@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
+    "projectzero:shattered_plateau",
     "projectzero:sky_pillars"
   ]
 }

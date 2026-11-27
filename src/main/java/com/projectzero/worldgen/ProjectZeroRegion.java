@@ -53,6 +53,11 @@ public class ProjectZeroRegion extends Region {
             builder.replaceBiome(Biomes.OLD_GROWTH_PINE_TAIGA, ModBiomes.GEYSER_BASIN);
             builder.replaceBiome(Biomes.ICE_SPIKES, ModBiomes.ICE_CATHEDRAL);
             builder.replaceBiome(Biomes.SNOWY_PLAINS, ModBiomes.CRYSTAL_TUNDRA);
+            builder.replaceBiome(Biomes.WINDSWEPT_SAVANNA, ModBiomes.MANA_WASTES);
+            builder.replaceBiome(Biomes.WOODED_BADLANDS, ModBiomes.BLOODMOON_STEPPE);
+            builder.replaceBiome(Biomes.CHERRY_GROVE, ModBiomes.SPIRIT_BAMBOO);
+            builder.replaceBiome(Biomes.MANGROVE_SWAMP, ModBiomes.SUNKEN_MARSH);
+            builder.replaceBiome(Biomes.STONY_PEAKS, ModBiomes.SHATTERED_PLATEAU);
         });
     }
 }

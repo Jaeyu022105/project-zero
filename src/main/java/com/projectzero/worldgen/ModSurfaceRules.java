@@ -19,6 +19,12 @@ public final class ModSurfaceRules {
         return SurfaceRules.state(b.defaultBlockState());
     }
 
+    /** Top block only, above the preliminary surface. */
+    private static SurfaceRules.RuleSource floor(net.minecraft.resources.ResourceKey<net.minecraft.world.level.biome.Biome> biome, SurfaceRules.RuleSource rule) {
+        return SurfaceRules.ifTrue(SurfaceRules.isBiome(biome), SurfaceRules.ifTrue(SurfaceRules.abovePreliminarySurface(),
+                SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, rule)));
+    }
+
     public static SurfaceRules.RuleSource rules() {
         LIMESTONE = SurfaceRules.state(com.projectzero.registry.ModNature.LIMESTONE.get().defaultBlockState());
         // Capwood: mostly mycelium, with podzol and coarse dirt where the surface noise dips.
@@ -61,6 +67,18 @@ public final class ModSurfaceRules {
                 SurfaceRules.ifTrue(SurfaceRules.abovePreliminarySurface(), SurfaceRules.sequence(
                         SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, state(Blocks.SNOW_BLOCK)),
                         SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, state(Blocks.PACKED_ICE)))));
-        return SurfaceRules.sequence(capwood, baobab, tsingy, saltFlats, geyser, ice);
+        // Mana Wastes: crystallised ground in bands: amethyst, calcite, tuff, bare dirt.
+        SurfaceRules.RuleSource mana = floor(ModBiomes.MANA_WASTES, SurfaceRules.sequence(
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.55D), state(Blocks.AMETHYST_BLOCK)),
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.15D), state(Blocks.CALCITE)),
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.3D), state(Blocks.TUFF)),
+                COARSE_DIRT));
+        SurfaceRules.RuleSource blood = floor(ModBiomes.BLOODMOON_STEPPE,
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.4D), COARSE_DIRT));
+        SurfaceRules.RuleSource marsh = floor(ModBiomes.SUNKEN_MARSH,
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.1D), state(Blocks.MUD)));
+        SurfaceRules.RuleSource shattered = floor(ModBiomes.SHATTERED_PLATEAU,
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.3D), state(Blocks.STONE)));
+        return SurfaceRules.sequence(capwood, baobab, tsingy, saltFlats, geyser, ice, mana, blood, marsh, shattered);
     }
 }

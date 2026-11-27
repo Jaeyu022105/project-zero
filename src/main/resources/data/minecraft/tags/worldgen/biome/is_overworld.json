@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "projectzero:baobab_savanna",
+    "projectzero:bloodmoon_steppe",
     "projectzero:capwood",
     "projectzero:cloud_forest",
     "projectzero:crystal_tundra",
@@ -9,9 +10,13 @@
     "projectzero:geyser_basin",
     "projectzero:ice_cathedral",
     "projectzero:karst_bay",
+    "projectzero:mana_wastes",
     "projectzero:salt_flats",
+    "projectzero:shattered_plateau",
     "projectzero:sky_pillars",
     "projectzero:skyfall_isles",
+    "projectzero:spirit_bamboo",
+    "projectzero:sunken_marsh",
     "projectzero:tsingy"
   ]
 }

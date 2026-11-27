@@ -36,6 +36,14 @@ public final class BiomeMist {
             target = 1F - Mth.clamp((at.getY() - 90F) / 170F, 0F, 1F);
         } else if (biome.is(ModBiomes.CLOUD_FOREST)) {
             target = 1.25F;   // the forest lives inside the cloud
+        } else if (biome.is(ModBiomes.SUNKEN_MARSH)) {
+            target = 0.7F;
+        } else if (biome.is(ModBiomes.MANA_WASTES)) {
+            target = 0.55F;   // mana haze
+        } else if (biome.is(ModBiomes.SHATTERED_PLATEAU)) {
+            target = 0.35F;
+        } else if (biome.is(ModBiomes.BLOODMOON_STEPPE)) {
+            target = 0.3F;
         } else if (biome.is(ModBiomes.GEYSER_BASIN)) {
             target = 0.45F;   // steam hangs over the basin
         } else if (biome.is(ModBiomes.KARST_BAY)) {

@@ -70,6 +70,21 @@ def features():
     placed("ice_arch", "projectzero:ice_arch", rarity=2)
     placed("crystal_outcrop", "projectzero:crystal_outcrop", rarity=2)
 
+    # Round 5.
+    for n in ["mana_waste", "dead_tree", "giant_bamboo", "sunken_ruin", "shattered_plateau"]:
+        configured(n, {"type": "projectzero:" + n, "config": {}})
+    placed("mana_waste", "projectzero:mana_waste", count=2, water=False)
+    placed("dead_tree", "projectzero:dead_tree", count=2)
+    placed("giant_bamboo", "projectzero:giant_bamboo", count=1)
+    placed("sunken_ruin", "projectzero:sunken_ruin", rarity=2, water=False, heightmap="OCEAN_FLOOR_WG")
+    # Whole-chunk pass from the chunk corner; it checks the biome per column itself.
+    gen.write(os.path.join(MOD, 'placed_feature', 'shattered_plateau.json'), {"feature": "projectzero:shattered_plateau",
+        "placement": [{"type": "minecraft:heightmap", "heightmap": "WORLD_SURFACE_WG"}]})
+    gen.plant_patch("bloodmoon_brush", [("minecraft:dead_bush", 3, {}), ("minecraft:short_grass", 2, {})], tries=24)
+    placed("bloodmoon_brush", "projectzero:bloodmoon_brush", count=1, heightmap="MOTION_BLOCKING")
+    gen.plant_patch("bamboo_shoots", [("minecraft:bamboo", 1, {"age": 0, "leaves": "small", "stage": 0})], tries=32, spread=5)
+    placed("bamboo_shoots", "projectzero:bamboo_shoots", count=2, heightmap="MOTION_BLOCKING")
+
 def placed_plain(name):
     gen.write(os.path.join(MOD, 'placed_feature', name + '.json'), {"feature": "projectzero:" + name, "placement": []})
 
@@ -113,6 +128,35 @@ BIOMES = {
         ["boulder_stone_rare", "snow_scrub"],
         {VEG: ["projectzero:crystal_outcrop"]},
         {"effects": {"fog_color": 13690111, "sky_color": 10273023, "water_color": 4159204, "water_fog_color": 329011}}),
+    # Round 5.
+    "mana_wastes": ("windswept_savanna", ["minecraft:trees_windswept_savanna"],
+        ["boulder_andesite_rare", "dry_grass"],
+        {VEG: ["projectzero:mana_waste"]},
+        {"effects": {"fog_color": 10255318, "sky_color": 11570416, "water_color": 8084694, "water_fog_color": 5126300,
+         "grass_color": 9341598, "foliage_color": 8156816,
+         "particle": {"options": {"type": "minecraft:reverse_portal"}, "probability": 0.004}}}),
+    "bloodmoon_steppe": ("wooded_badlands", ["minecraft:trees_badlands", "minecraft:patch_cactus_decorated"],
+        ["coarse_dirt_patch", "boulder_granite_rare", "dry_grass", "undergrowth"],
+        {VEG: ["projectzero:dead_tree", "projectzero:bloodmoon_brush"]},
+        {"effects": {"fog_color": 11553850, "sky_color": 13129290, "water_color": 7023146, "water_fog_color": 4200990,
+         "grass_color": 8004644, "foliage_color": 6168094,
+         "particle": {"options": {"type": "minecraft:crimson_spore"}, "probability": 0.006}}}),
+    "spirit_bamboo": ("cherry_grove", [],
+        ["fern_carpet", "undergrowth"],
+        {VEG: ["projectzero:giant_bamboo", "projectzero:bamboo_shoots"]},
+        {"effects": {"fog_color": 13494488, "sky_color": 8103167, "water_color": 6141935, "water_fog_color": 6141935,
+         "grass_color": 7979098, "foliage_color": 6268996,
+         "particle": {"options": {"type": "minecraft:end_rod"}, "probability": 0.0015}}}),
+    "sunken_marsh": ("mangrove_swamp", [],
+        ["mud_patch", "fern_carpet", "moss_floor"],
+        {VEG: ["projectzero:sunken_ruin"]},
+        {"effects": {"fog_color": 9412746, "sky_color": 7907327, "water_color": 3824192, "water_fog_color": 2367520,
+         "foliage_color": 9285927, "grass_color_modifier": "swamp",
+         "particle": {"options": {"type": "minecraft:spore_blossom_air"}, "probability": 0.003}}}),
+    "shattered_plateau": ("stony_peaks", [],
+        ["boulder_stone", "boulder_andesite_rare", "shrub_spruce_sparse", "undergrowth"],
+        {VEG: ["projectzero:shattered_plateau"]},
+        {"effects": {"fog_color": 14213354, "sky_color": 9418992, "water_color": 4159204, "water_fog_color": 329011}}),
 }
 
 def build(vanilla_dir):

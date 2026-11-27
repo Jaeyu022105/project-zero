@@ -60,6 +60,18 @@ public final class ModFeatures {
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> CRYSTAL_OUTCROP =
             FEATURES.register("crystal_outcrop", com.projectzero.worldgen.CrystalOutcropFeature::new);
 
+    // Round 5 biomes.
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> MANA_WASTE =
+            FEATURES.register("mana_waste", com.projectzero.worldgen.ManaWasteFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> DEAD_TREE =
+            FEATURES.register("dead_tree", com.projectzero.worldgen.DeadTreeFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> GIANT_BAMBOO =
+            FEATURES.register("giant_bamboo", com.projectzero.worldgen.GiantBambooFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> SUNKEN_RUIN =
+            FEATURES.register("sunken_ruin", com.projectzero.worldgen.SunkenRuinFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> SHATTERED_PLATEAU =
+            FEATURES.register("shattered_plateau", com.projectzero.worldgen.ShatteredPlateauFeature::new);
+
     public static final DeferredRegister<net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType<?>> TREE_DECORATORS =
             DeferredRegister.create(net.minecraft.core.registries.Registries.TREE_DECORATOR_TYPE, ProjectZero.MOD_ID);
     /** Buttress roots at the base of a tree (see worldgen/RootsDecorator). */
