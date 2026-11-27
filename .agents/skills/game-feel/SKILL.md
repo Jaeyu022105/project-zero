@@ -19,7 +19,7 @@ writeups (see the end).
 | Phase | What happens | Hitbox | Rule of thumb (20 TPS) |
 |---|---|---|---|
 | Opening pose | Wind-up from idle. A readable silhouette and charge FX. | off | Bosses: 8 to 20 ticks |
-| Signal | The last beat before the strike (flash, sound, glint). | off | Signal + strike must be at least 7 ticks (~340 ms) for a fair reaction |
+| Signal | The last beat before the strike: the body pose plus a sound. No glows or warning symbols. | off | Signal + strike must be at least 7 ticks (~340 ms) for a fair reaction |
 | Strike | Fast and snappy. It bends physics. | **on for 1 to 3 ticks** | Short and decisive |
 | End pose | Hold the finish so the player can confirm it ended. | off | At least 4 ticks; 5+ if it may chain |
 | Return | Back to idle. **This is the punish window.** | off | The longest phase. Scale with attack strength |
@@ -31,9 +31,9 @@ writeups (see the end).
 
 ## 2. Readability rules (bosses and mobs)
 
-- **One meaning per cue, everywhere.** For example, a red glow means "unblockable, dodge it", a white glint means "parry window" and a blue rune circle means "area attack lands here". Write new cues into DESIGN-DOCUMENT §10 so they stay consistent.
+- **No warning overlays.** Like vanilla mobs (the creeper hiss, the ravager roar, the warden's charge), the warning comes from the **body and sound only**: the wind-up pose, the weapon pulling back, a growl or swish. There are no red glows, glints, danger symbols or ground markers. The owner decided this to keep the Minecraft feel (2026-11-27).
 - Pair **sound** with each signal. Players learn boss rhythms by ear.
-- Show area attacks with ground markers (Fx.rune rings) that fill before they detonate.
+- Show area attacks through the body: the boss rears up, lifts its weapon high or gathers particles into itself. You read the size of the attack from the size of the wind-up.
 - Introduce patterns one at a time. Later phases remix known moves (faster, chained, mirrored) before they add new ones.
 - Damage should match how scary the attack looks. A huge slam that tickles kills the menace.
 - Downtime between patterns should match the punish window you give.
@@ -92,14 +92,14 @@ Keep it Minecraft:
 - **Shake / punch-in:** `ViewportEvent.ComputeCameraAngles` (shake) and `ViewportEvent.ComputeFov` (punch-in), driven by a client timer.
 - **Slash arcs:** draw in `SkillVisualRenderer` (RenderLevelStageEvent AFTER_PARTICLES). Build a triangle strip of quads along the arc, with alpha from 0 to 1 along it and fading over the lifetime. Use an additive or eyes render type.
 - **Directional sparks:** spawn velocity = hit direction × 0.3 + a random cone. Use Fx.spark or Fx.shard with the skill's rgb.
-- **Telegraph rings:** Fx.rune on the ground, plus a growing disc rendered in SkillVisualRenderer, coloured by the cue language in §2.
+- **Telegraphs:** keyframed wind-up poses plus a charge sound. An Fx.inflow pull toward the attacker is allowed, because it is part of the attack itself, not a separate warning.
 - **Sound:** register our own SoundEvents in sounds.json, with separate swing, impact and charge sounds. Play impact sounds from the server on the hit tick, at the victim's position.
 
 ## 7. Checklist before calling an attack done
 
 - [ ] All five phases exist. Signal + strike is at least 7 ticks for enemy attacks.
 - [ ] The return window matches the attack's strength.
-- [ ] The cue colour and sound follow the shared language in §2.
+- [ ] The warning is only the wind-up pose and sound, with no warning overlays.
 - [ ] There is a charge or anticipation before anything is released.
 - [ ] Contact has a flash, directional sparks, victim flash and flinch, and a sound on the impact tick.
 - [ ] The hitstop tier matches the hit weight (light, heavy or finisher).

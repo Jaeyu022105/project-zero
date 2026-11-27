@@ -171,11 +171,7 @@ Our own mechanic, not in Solo Leveling.
 - Boss arenas lock the exit until the fight ends.
 - Use GeckoLib (or similar) for animated models when we get there; this adds a dependency, so confirm with the owner first.
 - **Attack timing and feel follow `.agents/skills/game-feel/SKILL.md`.** Every attack has five phases: opening pose, signal, strike, end pose, return. For enemy attacks, signal + strike lasts at least 7 ticks. The return is the punish window. Make fights harder through timing, not damage.
-- **Cue language (one meaning everywhere):**
-  - Red glow: unblockable, dodge it.
-  - White glint: parry or block window.
-  - Blue rune ring on the ground: area attack lands here.
-  - Each cue has its own sound.
+- **No warning overlays** (owner decision, 2026-11-27). Like vanilla mobs, attacks are read from the wind-up pose and sound only. There are no glows, glints, danger symbols or ground markers.
 - **Hit juice:**
   - Every hit gets a flash, directional sparks, a white flash and flinch on the victim, and a sound on the impact tick.
   - Every hit gets hitstop in tiers: light 1-2 ticks, heavy 3-4, finisher 5-6. The hitstop is client visual only.
