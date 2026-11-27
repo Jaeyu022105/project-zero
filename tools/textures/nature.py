@@ -146,17 +146,22 @@ def baobab_planks():
     im.save(OUT + "baobab_planks.png")
 
 def salt_crust():
-    """White salt with raised hexagon ridges."""
-    r = random.Random(41)
+    """Smooth white salt crust: soft crystalline grain, faint irregular cracks that wrap across
+    block edges (Voronoi on a torus), so the ground reads as one continuous crust, not tiles."""
+    r = random.Random(43)
+    seeds = [(r.uniform(0, 16), r.uniform(0, 16)) for _ in range(5)]
+    def dist(x, y, s):
+        dx = min(abs(x - s[0]), 16 - abs(x - s[0])); dy = min(abs(y - s[1]), 16 - abs(y - s[1]))
+        return (dx * dx + dy * dy) ** 0.5
     im = Image.new("RGBA", (16, 16))
     for x in range(16):
         for y in range(16):
-            n = r.randint(-6, 6)
-            # Hex-ish cell edges: rows offset every other band.
-            row = y // 8
-            cx = (x + (4 if row % 2 else 0)) % 8
-            edge = cx == 0 or y % 8 == 0 or (y % 8 in (1, 7) and cx in (1, 7))
-            c = (206, 204, 198) if edge else (238, 238, 234)
+            d = sorted(dist(x + 0.5, y + 0.5, s) for s in seeds)
+            crack = d[1] - d[0] < 0.7
+            n = r.randint(-5, 5)
+            c = (232, 232, 228)
+            if crack: c = (214, 213, 207)
+            if r.random() < 0.08: c = (246, 247, 245)   # glints
             im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
     im.save(OUT + "salt_crust.png")
 

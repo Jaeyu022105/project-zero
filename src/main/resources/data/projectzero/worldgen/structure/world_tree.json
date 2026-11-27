@@ -1,0 +1,7 @@
+{
+  "type": "projectzero:world_tree",
+  "biomes": "#projectzero:has_structure/world_tree",
+  "step": "vegetal_decoration",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none"
+}

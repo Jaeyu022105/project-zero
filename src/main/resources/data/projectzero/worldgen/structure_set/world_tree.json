@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "projectzero:world_tree",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 48,
+    "separation": 24,
+    "salt": 731905114
+  }
+}
