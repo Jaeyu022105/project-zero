@@ -32,6 +32,7 @@ public final class MaterialRules {
     public static final int CRYSTAL_DROP_BASE_PERCENT = 20;
     public static final int CRYSTAL_DROP_PERCENT_PER_RANK = 8;
     public static final int MAX_CRYSTAL_DROP_PERCENT = 60;
+    public static final int BOSS_CRYSTAL_DROP_COUNT = 1;
     public static final int RAW_MEAT_NUTRITION = 3;
     public static final float RAW_MEAT_SATURATION = 0.3F;
     public static final int COOKED_MEAT_NUTRITION = 9;

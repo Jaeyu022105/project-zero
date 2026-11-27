@@ -71,7 +71,7 @@ public class MaterialLootModifier extends LootModifier {
                 || victim.getPersistentData().getBoolean(MobScaling.GATE_MONSTER_KEY);
         GateRank crystalRank = rank == null ? GateRank.E : rank;
         if (isBoss || (isGateMonster && random.nextInt(100) < MaterialRules.crystalChancePercent(crystalRank))) {
-            generatedLoot.add(new ItemStack(crystalFor(crystalRank)));
+            generatedLoot.add(new ItemStack(crystalFor(crystalRank), MaterialRules.BOSS_CRYSTAL_DROP_COUNT));
         }
         return generatedLoot;
     }
