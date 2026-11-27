@@ -58,6 +58,8 @@ def features():
     # Sky Pillars arch and its valley-floor boulder detail.
     configured("sky_arch", {"type": "projectzero:sky_arch", "config": {}})
     placed("sky_arch", "projectzero:sky_arch", rarity=6)
+    configured("sky_fragment", {"type": "projectzero:sky_fragment", "config": {}})
+    placed("sky_fragment", "projectzero:sky_fragment", rarity=2)
     # Tsingy.
     configured("tsingy", {"type": "projectzero:tsingy", "config": {}})
     placed("tsingy", "projectzero:tsingy", rarity=2)

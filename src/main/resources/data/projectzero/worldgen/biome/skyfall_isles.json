@@ -89,7 +89,8 @@
       "projectzero:isles_trees",
       "projectzero:shrub_azalea",
       "projectzero:undergrowth_dense",
-      "projectzero:wildflowers_dense"
+      "projectzero:wildflowers_dense",
+      "projectzero:sky_fragment"
     ],
     [
       "minecraft:freeze_top_layer"
