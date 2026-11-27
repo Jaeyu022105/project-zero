@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Reset backlog Task 5: fireflies — `firefly_bush` block, `FIREFLY` particle, night/dusk client emitter, biome-modifier worldgen).
+Last caught up: **2026-11-28** (Codex 4: merged the biome, minimap and monster-parts branches; waypoint stones now support crafting, attunement, travel, renaming and minimap markers).
 
 ---
 
@@ -80,6 +80,7 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Monster materials (`materials/`): `MaterialRules` owns the entity-to-part table, part chances, rank scaling, crystal chances, food values and sell values. `MaterialLootModifier` adds server-side drops on player kills; `ModMaterials` registers nine parts and six rank crystals. A/S crystals glint, beast meat cooks in a furnace, smoker or campfire, and `MaterialItem` shows a translated source and value tooltip.
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
 - Top-right minimap (`client/MinimapOverlay`): client-only dynamic terrain texture updated 12 rows per tick, loaded-chunk-only gate scan every 20 ticks, nearby player dots, objective-marker hook, biome tint and name, coordinates, and cave-floor sampling in ceiling/dungeon dimensions. Options are under `ui.minimap`, `ui.minimapSize`, `ui.minimapZoom`, and `ui.minimapCoords`.
+- Waypoint stones (`waypoints/`): craftable waist-high rune markers (light 7), placed-world records stored per dimension and player-known locations in persistent player NBT. First use attunes a stone; known use opens a System list; owners can sneak-use to rename; server-validated travel finds a safe arrival point, plays effects and enforces a 30-second cooldown. Placement and cross-dimension travel exclude the dungeon and Library; travel is limited to natural, skylit, non-ceiling dimensions. The minimap draws known stones as cyan diamonds with rim arrows.
 - Data saved with the player and kept on death (accessories follow `keepInventory`).
 - Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`, `/pz gate spawn <rank> <size> [sea|ancient]`, `/pz gate leave`, `/pz gate age <days>`, `/pz gate break`.
 
@@ -119,8 +120,8 @@ Package layout (`src/main/java/com/projectzero/`):
   - `JobCommands.java`: `/pz job set|reroll|clear` (merged into the `/pz` node).
 - `registry/`
   - `ModDataComponents.java`: MC 1.21+ data components (`SHARD_CHARGE`, `SHARD_CHARGE_TIER`, `SKILL_ID`, `ACCESSORY_DATA`).
-  - `ModBlocks.java` & `ModBlockEntities.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL`, `AWAKENING_CORE`, `AWAKENING_CRYSTAL_DEEP`, `AWAKENING_CLUSTER`, `VOID_SEA`, `VOID_MOTE`, `GATE_PORTAL` (`GateBlockEntity`), `MANA_CRYSTAL`, `ANCIENT_GATE_STONE`.
-  - `ModItems.java`: block items, `AWAKENING_SHARD`, `SHARD_VESSEL`, `SKILLBOOK`, `MANA_CRYSTAL_SHARD`, and 9 starter `AccessoryItem`s.
+  - `ModBlocks.java` & `ModBlockEntities.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL`, `AWAKENING_CORE`, `AWAKENING_CRYSTAL_DEEP`, `AWAKENING_CLUSTER`, `VOID_SEA`, `VOID_MOTE`, `GATE_PORTAL` (`GateBlockEntity`), `MANA_CRYSTAL`, `ANCIENT_GATE_STONE`, `WAYPOINT_STONE`.
+  - `ModItems.java`: block items including `WAYPOINT_STONE`, `AWAKENING_SHARD`, `SHARD_VESSEL`, `SKILLBOOK`, `MANA_CRYSTAL_SHARD`, and 9 starter `AccessoryItem`s.
   - `ModEntities.java`: `JOB_CARD` (`JobCardEntity`).
   - `ModFeatures.java`: `ANCIENT_GATE` (`AncientGateFeature` worldgen).
   - `ModMenus.java` & `ModLootModifiers.java`: `ACCESSORIES` (`AccessoryMenu`), `ACCESSORY_DROPS` (`AccessoryLootModifier`) and `MATERIAL_DROPS` (`MaterialLootModifier`).
@@ -140,11 +141,13 @@ Package layout (`src/main/java/com/projectzero/`):
   - `CrystalCommands.java`: `/pz crystal small|large|colossal`.
   - `AwakeningEvents.java`: registers `AwakeningCommands` and `CrystalCommands`.
 - `ui/`: `NoticeRules`, `NoticeType` (`LEVEL_UP`, `SKILL`, `QUEST`, `GATE`, `ITEM`, `COOLDOWN`, `TITLE`, `WARNING`), `SystemNotices` (shared server notice + optional `[System]` chat helper), `NoticeCommands` (`/pz notice <type> <text>`), `NoticeEvents`.
+- `waypoints/`: `WaypointRules` (travel cooldown, range, safety search and forbidden dimension tag), `WaypointSavedData` (per-dimension marker records), `PlayerWaypoints` (attuned dimensions and positions, copied on clone), `WaypointService` (placement, attunement, list sync, safe travel and rename), `WaypointEvents`, `WaypointStoneBlock`, `WaypointStoneItem`.
 - `network/`
-  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version `9`. Bump the version when a packet's format changes.
-  - `SyncStatsPacket`, `AllocateStatPacket`, `SyncJobPacket`, `VisionOverlayPacket`, `SyncSkillsPacket`, `CastSkillPacket`, `SyncTitlesPacket`, `CycleTitlePacket`, `SyncStatBonusesPacket`, `OpenAccessoriesPacket`, `SyncWornGearPacket`, `SwitchPresetPacket`, `AssignSkillSlotPacket`, `SkillVisualPacket`, `SystemNoticePacket`.
+  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version `11`. Bump the version when a packet's format changes.
+  - `SyncStatsPacket`, `AllocateStatPacket`, `SyncJobPacket`, `VisionOverlayPacket`, `SyncSkillsPacket`, `CastSkillPacket`, `SyncTitlesPacket`, `CycleTitlePacket`, `SyncStatBonusesPacket`, `OpenAccessoriesPacket`, `SyncWornGearPacket`, `SwitchPresetPacket`, `AssignSkillSlotPacket`, `SkillVisualPacket`, `SystemNoticePacket`, `SyncWaypointsPacket`, `WaypointTravelPacket`, `RenameWaypointPacket`.
 - `client/`
-  - `ClientStatsCache`, `ClientJobCache`, `ClientSkillsCache`, `ClientTitlesCache`, `ClientBonusCache`, `ClientNoticeCache`: synced local caches with zero client-only imports so packet handlers are server-safe.
+  - `ClientStatsCache`, `ClientJobCache`, `ClientSkillsCache`, `ClientTitlesCache`, `ClientBonusCache`, `ClientNoticeCache`, `ClientWaypointCache`: synced local caches with zero client-only imports so packet handlers are server-safe.
+  - `WaypointScreen` and `WaypointRenameScreen`: System-style travel list and owner rename form.
   - `ClientEvents.java` & `ClientModEvents.java`: logout cache reset, `JobCardRenderer`, and `MenuScreens.register` for `AccessoryScreen`.
   - `ModKeyBindings.java`: `K` opens `StatusScreen`; `J` opens `SkillLoadoutScreen`; `R` cycles presets; `Z`, `X`, `C`, `V` cast active skill slots 1–4.
   - `StatusScreen.java`, `AccessoryScreen.java`, `SkillLoadoutScreen.java`, `SkillHudOverlay.java`, `SystemNoticeOverlay.java`, `VisionOverlayRenderer.java`.
@@ -185,6 +188,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 - `projectzero:milestones`: kill map by entity type, total kills, boss kills, deaths, highest level, rerolls, gates cleared.
 - `projectzero:titles`: unlocked title ids and single equipped title id.
 - `projectzero:accessories`: 8 active equipped accessory `ItemStack`s (+1 spare locked Relic slot); cleared & dropped on `LivingDropsEvent` when `keepInventory` is `false`.
+- `projectzero:waypoints`: a string list of `<dimension-id>|<packed-block-position>` keys the player has attuned. Per-dimension `projectzero_waypoints` SavedData stores each placed stone's position, display name and owner UUID.
 
 ---
 
@@ -214,7 +218,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 - Move `LevelingRules` numbers into a Forge config file so they can be tuned without rebuilding.
 - HUD: small level / XP / mana display.
-- Minimap follow-ups: connect Association quests and discovered waypoint stones/civilizations; implement the full-screen map (§11).
+- Minimap follow-ups: connect Association quests and civilization discovery; implement the full-screen map (§11).
 - Data storage: move from persistent NBT to a capability if player data gets large.
 
 ### Low Priority / Nice To Have
@@ -226,7 +230,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ## Current Git Caveats
 
-- Work is split across task branches (this task uses `codex/3-monster-parts`); merge completed work into `main` through the owner's normal review flow.
+- Work is split across task branches (this task uses `codex/4-waypoints`); merge completed work into `main` through the owner's normal review flow.
 - The owner keeps a working clone at `C:\Users\Jaime\Downloads\project-zero` for uncommitted work. Do not assume the GitHub copy has everything; ask before overwriting local changes there.
 - Commits are authored by the owner. **No `Co-Authored-By` or AI attribution lines.**
 - `run/` and `build/` are ignored. Do not commit worlds, logs or jars.
@@ -1115,5 +1119,29 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 
 1. Add original Project Zero mobs to the `MaterialRules` part table as they are implemented.
 2. Decide crafting uses for parts and crystals alongside those mobs and the Synthesizer; currency remains unnamed and no shop or coin item was added.
+
+---
+
+### Session Log — 2026-11-28 (Codex 4: merge + waypoint stones)
+
+**Context & Direction Check**
+- Followed `.agents/prompts/codex-4.md` stage by stage in the prepared `codex/merged` worktree. Merged `origin/codex/1-biome-polish`, `origin/codex/2-minimap`, and `origin/codex/3-monster-parts` in order; all merges were clean. Checkpoint A was built and pushed before creating `codex/4-waypoints`.
+- Commits use `Jaeyu022105` and contain no AI attribution lines. Only `codex/merged` and `codex/4-waypoints` were pushed.
+
+**Changes Made**
+- Added the waypoint stone block and item, original Pillow-generated 16×16 textures, recipe (stone bricks around one mana crystal shard), pickaxe mining tag, loot, creative tab entry, translated names and a dimension-type tag blocking dungeon/Library placement.
+- Added per-dimension SavedData for position/name/owner UUID and player-persistent attunement keys copied on clone. First use attunes; known use opens a System-style list; owners can sneak-use to rename, including an anvil name on placement.
+- Added server-validated travel and rename packets, protocol version 11, safe arrival search, sounds and particles, 30-second cooldown, natural/skylit dimension checks, and cyan known-waypoint minimap diamonds with rim arrows.
+- Updated `DESIGN-DOCUMENT.md` §16f, `PROGRESS.md`, and current handoff reference sections.
+
+**Verification Executed**
+- On Java 21, ran `$env:JAVA_HOME = "C:\Users\Jaime\AppData\Roaming\.minecraft\runtime\java-runtime-delta\windows\java-runtime-delta"; .\gradlew.bat build --no-daemon` after the merge and at each waypoint checkpoint. Final result: **BUILD SUCCESSFUL**.
+- Parsed all 955 resource JSON files with Python's `json` module. Result: all valid.
+- I could not test this gameplay or UI in a live world. The owner should test in `runClient`: craft and place the stone, verify light/mining/drop and rejected placement in the dungeon and Library; check default and anvil names; attune a stone and reopen its list; rename as owner and confirm another player cannot; travel from a nearby known stone, verify safe arrival, particles/sound and cooldown, and check cross-dimension restrictions; break a known stone and verify the stale entry greys out then prunes; confirm cyan minimap markers and off-map arrows.
+
+**Remaining Recommendations**
+1. Inspect the block model, glow, screen layout and minimap marker visibility in `runClient`.
+2. Civilization generation should place a waypoint stone in each house (§16a, §16e).
+3. Connect quest and civilization discovery to the minimap objective/discovery work (§11).
 
 ---

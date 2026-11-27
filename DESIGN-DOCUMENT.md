@@ -418,7 +418,7 @@ Our biomes are placed with **TerraBlender** (`worldgen/ProjectZeroRegion`, weigh
 - **Subways** look like Japanese subways: tiled stations, ticket gates, platform screen doors, **escalators**, maps on the walls.
 - **Planes** work like the train with an airport instead of a station: ticket, gate, seat, then the flight (skippable).
 - Hunter rank gives transport discounts (16c).
-- **Waypoint stones [Planned]:** craftable and placeable, so you can return to places you've been. One in every house. **They can't be placed in a dungeon** (or any gate dimension).
+- **Waypoint stones [Built]:** craftable and placeable rune markers (stone bricks surrounding a mana crystal shard), stored per dimension with an owner and a name. First right-click attunes a marker to the player; using an attuned marker opens a System-style list of known locations with dimension and distance. Sneak + right-click lets the owner rename their marker. Travel is server-validated, requires a known nearby departure marker, checks that the destination still exists, searches for a safe standing position, plays effects at both ends, and has a 30-second cooldown. The top-right minimap shows known markers as cyan diamonds and rim arrows. Stones cannot be placed in the dungeon or Library; cross-dimension travel is limited to natural, skylit, non-ceiling dimensions and never enters or leaves those domains. House placement remains part of civilization generation.
 
 ### 16g. Continents (owner direction 2026-11-27)
 
