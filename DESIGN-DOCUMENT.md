@@ -364,6 +364,8 @@ Our biomes are placed with **TerraBlender** (`worldgen/ProjectZeroRegion`, weigh
 - **Awakening Stones:** every civilization has an Awakening Stone formation in its center (bigger city, bigger stone, section 6). That's where you reawaken.
 - What a civilization has depends on its type and tier. Arenas, auctions and apartments are examples, not a fixed list per tier.
 
+- **Elves** (owner direction 2026-11-27): the elven capital **revolves around the World Tree** in Elderwood (section 15). It is built on and into the tree: halls in the trunk, platforms on the great branches, spiral stairs and rope bridges (section 15) between them, and the Awakening Stone at its roots. Elves live in **tree houses**: smaller elven towns are built up in the giant elder trees, not on the ground.
+
 ### 16b. NPCs (owner direction 2026-11-27)
 
 - NPCs have **roles**, each with its own functions. Higher tiers have better versions (more stock, better work, rarer services).
