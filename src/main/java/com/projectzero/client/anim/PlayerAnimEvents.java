@@ -225,8 +225,9 @@ public final class PlayerAnimEvents {
 
     /**
      * One bare fist in first person. At rest it sits where vanilla's empty arm does; while you've been
-     * punching both fists come up and in (the guard). The main fist throws the jab and the hook, the
-     * other fist the cross and the uppercut, and the idle fist tucks in while its partner punches.
+     * punching both fists come up into a guard: the main fist is the lead (it throws the jab and the
+     * hook), the other is the rear fist at the chin (cross and uppercut). The idle fist tucks in while
+     * its partner punches.
      */
     private static void renderFist(PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers, int light,
                                    LocalPlayer player, HumanoidArm arm, boolean main, float pt, float dip) {
@@ -243,8 +244,10 @@ public final class PlayerAnimEvents {
         boolean throwing = swing > 0F && (punch % 2 == 0) == main;
         float x = 0.64F, y = -0.6F - dip * 0.6F * (1F - g), z = -0.72F;
         float rx = 0F, ry = 0F, rz = 0F;
-        // Guard: fists up by the chin, a little in and back.
-        x -= 0.13F * g; y += 0.13F * g; z += 0.08F * g; rz -= 10F * g; rx -= 6F * g;
+        // Guard, not a mirror: the main fist leads (out front, near eye level, forearm upright);
+        // the other fist is the rear hand, tucked in low by the chin and angled across the face.
+        if (main) { x -= 0.10F * g; y += 0.17F * g; z -= 0.06F * g; rz -= 4F * g; rx -= 14F * g; }
+        else      { x -= 0.22F * g; y += 0.06F * g; z += 0.14F * g; rz -= 24F * g; ry -= 14F * g; rx -= 2F * g; }
         if (throwing) {
             switch (punch) {
                 case 0 -> { x -= 0.12F * e; y += 0.04F * e; z -= 0.34F * e; }                       // jab: straight
