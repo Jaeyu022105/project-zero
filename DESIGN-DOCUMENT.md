@@ -432,7 +432,8 @@ Our biomes are placed with **TerraBlender** (`worldgen/ProjectZeroRegion`, weigh
 
 ## 18. Monster materials and drops (owner direction 2026-11-27)
 
-- **[Planned]** Our mobs drop an item plus **parts of their bodies**, and the parts are what crafting needs. A wolf type drops **teeth, claws and fur** (the most wanted parts) and **meat** you can cook and eat.
-- **All parts sell** (Hunter's Association, merchants). Better and rarer parts from higher-rank monsters sell for more.
-- Gate monsters also drop **monster crystals** (cores), worth the most money and used in stations like the Synthesizer.
-- Recipes that use parts and biome blocks are designed together with the mobs (roadmap Phase 2 and 4).
+- **[Built]** Vanilla beasts drop `beast_fang`, `beast_claw`, `beast_pelt`, and `raw_beast_meat`; spider types drop `chitin_plate` and `venom_gland`; skeleton types drop `bone_shard`; zombie types drop `rotten_sinew`. Beast meat cooks into `cooked_beast_meat` by smelting, smoking, or campfire cooking.
+- **[Built]** All nine parts and the six crystals (`monster_crystal_e`, `_d`, `_c`, `_b`, `_a`, `_s`) have a sell value in `MaterialRules` and display a translated source and `Value` tooltip. The values are reserved for future Association and merchant trading; no currency item or shop is added yet.
+- **[Built]** Player kills roll material drops from an entity table in `MaterialRules`. Base part chances are 20 to 40%; Looting adds up to 15 percentage points. Ranked mobs gain one extra part roll and 4 percentage points of chance per rank above E.
+- **[Built]** Gate monsters drop the crystal matching their rank: 20% at E, rising by 8 percentage points per rank to 60% at S. Bosses always drop one matching crystal. A and S crystals have an enchantment glint.
+- **[Planned]** Extend the table as original Project Zero mobs arrive. Crafting uses for parts and crystals will be designed with those mobs and stations (roadmap Phase 2 and 4).

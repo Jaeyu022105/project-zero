@@ -77,6 +77,7 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Skills Foundation & Mana (`skills/`): current mana + max mana from Intelligence (`10 * INT`), regenerating `1 + 2% of max` per second. 14 skills in `data/projectzero/skills/*.json` (`SkillRegistry` + `SkillBehaviors` + `SkillEffects`): 4 basic skills auto-learned at levels 3/8/15/25 (`dash`, `second_wind`, `focus`, `bloodlust`) and 10 job signature skills granted on job assignment (`iron_knuckle`, `ricochet_bolt`, `riposte_stance`, `aegis_bastion`, `cursed_edge`, `pack_howl`, `tempest_call`, `shadow_step`, `soul_shackle`, `solar_cataclysm`). Player state (`projectzero:skills`) stores mana, learned skills, 4 active slots (`Z`, `X`, `C`, `V`), and cooldowns; Awakening Stone rerolls retain up to 3 random old-job skills. Includes `projectzero:skillbook` item and plain-text bottom-left `SkillHudOverlay`.
 - Titles & Milestones (`titles/`): `MilestoneTracker` (`projectzero:milestones` NBT) tracks kills per entity type/tag, total kills, boss kills, deaths, highest level, rerolls, and gates cleared. 6 starter JSON titles in `data/projectzero/titles/*.json` (`wolf_slayer`, `hundred_cuts`, `undead_bane`, `survivor`, `giant_killer` granting milestone skill `colossus_breaker`, `awakened_one`). Equipped title (`projectzero:titles` NBT) applies transient attributes, stat bonuses, damage-vs-entity/tag multipliers, or XP bonuses, and cycles on click in `StatusScreen`.
 - Equipment & Accessories (`equipment/`): 8 active custom slots (`gauntlets`, `ring` Ã—2, `amulet`, `earrings`, `belt`, `charm` Ã—2) + 1 spare locked `relic` slot (`PlayerAccessories` in `projectzero:accessories` NBT; copied on clone, dropped on death only when `keepInventory` is false). 9 starter `AccessoryItem`s (`iron_gauntlets`, `copper_ring`, `silver_ring`, `gold_ring`, `bone_amulet`, `obsidian_earrings`, `leather_belt`, `hunter_charm`, `mana_charm`) with rolled `AccessoryData` component (rarity, `GateRank` E..S, flat stats, optional `crit_chance`/`mana_regen`/`lifesteal`/`xp_bonus`/`damage_vs_undead` affix), `AccessoryMenu` + `AccessoryScreen`, and `AccessoryLootModifier` (1.5% vanilla hostile, 3% modded, 8% gate monster, 100% boss).
+- Monster materials (`materials/`): `MaterialRules` owns the entity-to-part table, part chances, rank scaling, crystal chances, food values and sell values. `MaterialLootModifier` adds server-side drops on player kills; `ModMaterials` registers nine parts and six rank crystals. A/S crystals glint, beast meat cooks in a furnace, smoker or campfire, and `MaterialItem` shows a translated source and value tooltip.
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
 - Data saved with the player and kept on death (accessories follow `keepInventory`).
 - Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`, `/pz gate spawn <rank> <size> [sea|ancient]`, `/pz gate leave`, `/pz gate age <days>`, `/pz gate break`.
@@ -121,7 +122,7 @@ Package layout (`src/main/java/com/projectzero/`):
   - `ModItems.java`: block items, `AWAKENING_SHARD`, `SHARD_VESSEL`, `SKILLBOOK`, `MANA_CRYSTAL_SHARD`, and 9 starter `AccessoryItem`s.
   - `ModEntities.java`: `JOB_CARD` (`JobCardEntity`).
   - `ModFeatures.java`: `ANCIENT_GATE` (`AncientGateFeature` worldgen).
-  - `ModMenus.java` & `ModLootModifiers.java`: `ACCESSORIES` (`AccessoryMenu`) and `ACCESSORY_DROPS` (`AccessoryLootModifier`).
+  - `ModMenus.java` & `ModLootModifiers.java`: `ACCESSORIES` (`AccessoryMenu`), `ACCESSORY_DROPS` (`AccessoryLootModifier`) and `MATERIAL_DROPS` (`MaterialLootModifier`).
   - `ModCreativeTabs.java`: `projectzero` creative tab.
 - `skills/`: `SkillRules`, `SkillType`, `SkillSource`, `Skill`, `SkillBehavior`, `SkillBehaviors`, `SkillEffects`, `SkillRegistry` (`data/<ns>/skills/*.json`), `PlayerSkills` (`projectzero:skills`), `SkillService`, `SkillbookItem`, `SkillCommands`, `SkillEvents`.
 - `titles/`: `MilestoneTracker` (`projectzero:milestones`), `Title`, `TitleRegistry` (`data/<ns>/titles/*.json`), `PlayerTitles` (`projectzero:titles`), `TitleService`, `TitleCommands`, `TitleEvents`.
@@ -150,9 +151,10 @@ Package layout (`src/main/java/com/projectzero/`):
 Resources:
 
 - `META-INF/mods.toml`, `pack.mcmeta` (pack format 34): filled from `gradle.properties` at build time.
-- `assets/projectzero/lang/en_us.json`: all user-facing text that goes through translation keys.
+- `assets/projectzero/lang/en_us.json`: all user-facing text that goes through translation keys, including monster part/crystal names and source/value tooltips.
 - `assets/projectzero/blockstates/`, `models/`, `textures/`: Awakening Stone two-block crystal model, glassy animated `awakening_crystal` (`.png` + `.png.mcmeta`) and `awakening_core` block/item models/textures, and Awakening Shard item model/texture.
 - `data/projectzero/tags/entity_type/gate_monsters.json`: gate monster tag (empty).
+- `data/projectzero/loot_modifiers/material_drops.json`, registered in `data/forge/loot_modifiers/global_loot_modifiers.json`; meat cooking recipes and generated 16×16 material icons live under the usual data/assets paths.
 - `data/projectzero/jobs/*.json`: job definitions. Format: `{"id": "projectzero:duelist", "rarity": "uncommon", "upgradesTo": "projectzero:veilstalker", "trial": "projectzero:trial/veilstalker"}`; `upgradesTo` and `trial` are optional, `id` is only checked against the file name. Placeholder jobs: Brawler, Slinger (common); Duelist (upgrades to Veilstalker), Bulwark (uncommon); Hexblade (upgrades to Stormweaver), Beastcaller (rare); Stormweaver, Veilstalker (epic); Gravewarden, Sunbreaker (legendary).
 
 ---
@@ -222,7 +224,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ## Current Git Caveats
 
-- One branch so far: `main`. Suggested flow once work grows: `feat/`, `fix/`, `docs/` branches merged into `main`.
+- Work is split across task branches (this task uses `codex/3-monster-parts`); merge completed work into `main` through the owner's normal review flow.
 - The owner keeps a working clone at `C:\Users\Jaime\Downloads\project-zero` for uncommitted work. Do not assume the GitHub copy has everything; ask before overwriting local changes there.
 - Commits are authored by the owner. **No `Co-Authored-By` or AI attribution lines.**
 - `run/` and `build/` are ignored. Do not commit worlds, logs or jars.
@@ -1041,5 +1043,30 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 **Remaining Recommendations**
 1. In-game check of each new feature in a new world (floating parts, chunk seams).
 2. Still to polish: Sky Pillars, Skyfall Isles, Tsingy, Karst Tower Bay.
+
+---
+
+### Session Log — 2026-11-28 (Codex 3: monster parts)
+
+**Context & Direction Check**
+
+- Followed `.agents/prompts/codex-3.md` through stages 1 to 3 and its Finish checklist. Work stayed in the listed material, registry, loot, assets, texture, and documentation files. Commits use `Jaeyu022105` with no attribution lines and were pushed only to `codex/3-monster-parts`.
+
+**Changes Made**
+
+- Added nine monster parts and a server-side player-kill loot modifier with a table in `MaterialRules`; added raw/cooked meat and furnace, smoker, and campfire recipes.
+- Added six rank-colored crystals. Gate monsters roll their rank crystal, bosses always drop one, and ranked mobs get additional part rolls and higher chances.
+- Added sell values, translated source/value tooltips, original 16×16 textures and item models; updated §18, `PROGRESS.md`, and current handoff references.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon` on Java 21: **BUILD SUCCESSFUL** at each stage and after the final rules adjustment.
+- `gradlew.bat runClient --no-daemon`: **BUILD SUCCESSFUL**; the client opened a new `materials_test` world, loaded recipes and accepted `/give @s projectzero:monster_crystal_c`. A summoned zombie with `projectzero:gate_boss`, `projectzero:gate_monster`, and S-rank NBT was killed by the player, but the quick check did not conclusively identify the additional crystal drop or hover-test tooltips.
+- The owner should check in `runClient`: kill a wolf with Looting III and compare drops over several kills; kill E- and S-rank gate monsters and a gate boss to verify crystal chances, rank and guaranteed boss drop; inspect part/crystal tooltips and cook raw beast meat in a furnace, smoker and campfire.
+
+**Remaining Recommendations**
+
+1. Add original Project Zero mobs to the `MaterialRules` part table as they are implemented.
+2. Decide crafting uses for parts and crystals alongside those mobs and the Synthesizer; currency remains unnamed and no shop or coin item was added.
 
 ---
