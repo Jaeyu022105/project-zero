@@ -231,6 +231,7 @@ Our own mechanic, not in Solo Leveling.
 
 - Blue translucent windows with cyan borders, all caps headers (status window is the reference). **[Built]**
 - [System] chat lines, on-screen titles for level ups, quest windows that slide in. Quest windows **[Planned]**.
+- **[Planned] System notices** (owner idea 2026-11-27): small blue System panels that slide in at the **bottom right**, hold for a few seconds, then fade out. Several stack upward, and the oldest leaves first. They're used for level ups, skills unlocked, quest updates, gate alerts (opened nearby, surge, rank up), item pickups worth noting, and cooldown-ready pings. They use the same style as the status window, with a soft chime by type. Important ones (job change, dungeon break) still also get the center title. Chat lines become optional, behind a client config toggle, so notices don't spam chat.
 - Notification sound: a soft chime. Avoid vanilla sounds long term.
 - Daily quest ("Preparation to Become Strong": push-ups, sit-ups, running) is a fun nod. **[Idea]**, only if the owner wants it.
 
