@@ -86,6 +86,11 @@ def features():
     placed("kopje", "projectzero:kopje", rarity=6)
     placed("salt_mound", "projectzero:salt_mound", rarity=5, water=False)
     placed("bone_remains", "projectzero:bone_remains", rarity=9)
+    # Polish round 2: travertine terraces, frozen ponds.
+    for n in ["travertine_terrace", "frozen_pond"]:
+        configured(n, {"type": "projectzero:" + n, "config": {}})
+    placed("travertine_terrace", "projectzero:travertine_terrace", rarity=3)
+    placed("frozen_pond", "projectzero:frozen_pond", rarity=4)
     gen.plant_patch("bloodmoon_brush", [("minecraft:dead_bush", 3, {}), ("minecraft:short_grass", 2, {})], tries=24)
     placed("bloodmoon_brush", "projectzero:bloodmoon_brush", count=1, heightmap="MOTION_BLOCKING")
     gen.plant_patch("bamboo_shoots", [("minecraft:bamboo", 1, {"age": 0, "leaves": "small", "stage": 0})], tries=32, spread=5)
@@ -123,7 +128,7 @@ BIOMES = {
         {"effects": {"fog_color": 15791352, "sky_color": 11063551, "water_color": 10475760, "water_fog_color": 12642552}}),
     "geyser_basin": ("old_growth_pine_taiga", [],
         ["boulder_stone_rare", "fallen_spruce_rare", "fern_carpet"],
-        {VEG: ["projectzero:geyser"]},
+        {VEG: ["projectzero:geyser", "projectzero:travertine_terrace"]},
         {"effects": {"fog_color": 14212304, "sky_color": 8364543, "water_color": 4245728, "water_fog_color": 2140320,
          "grass_color": 9084000, "foliage_color": 7311436}}),
     "ice_cathedral": ("ice_spikes", [],
@@ -132,7 +137,7 @@ BIOMES = {
         {"effects": {"fog_color": 13697279, "sky_color": 8364543, "water_color": 4020182, "water_fog_color": 329011}}),
     "crystal_tundra": ("snowy_plains", [],
         ["boulder_stone_rare", "snow_scrub"],
-        {VEG: ["projectzero:crystal_outcrop"]},
+        {VEG: ["projectzero:crystal_outcrop", "projectzero:frozen_pond"]},
         {"effects": {"fog_color": 13690111, "sky_color": 10273023, "water_color": 4159204, "water_fog_color": 329011}}),
     # Round 5.
     "mana_wastes": ("windswept_savanna", ["minecraft:trees_windswept_savanna"],
