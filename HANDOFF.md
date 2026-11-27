@@ -1042,4 +1042,28 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 1. In-game check of each new feature in a new world (floating parts, chunk seams).
 2. Still to polish: Sky Pillars, Skyfall Isles, Tsingy, Karst Tower Bay.
 
+### Session Log — 2026-11-28 (Codex 1: biome polish)
+
+**Context & Direction Check**
+
+- Completed all four stages in `.agents/prompts/codex-1.md` on `codex/1-biome-polish`, using vanilla blocks and existing Project Zero blocks. Each stage was built and pushed to that branch before continuing.
+
+**Changes Made**
+
+- Sky Pillars: added self-supporting banded stone arches, valley-floor mossy boulder heaps and ferns. Tightened the crown build-height guard.
+- Skyfall Isles: waterfall springs can feed small lined splash pools; added loose floating rock fragment clusters.
+- Tsingy Blade Forest: added weathered dark needle tips, limestone rubble, shallow slot pools, ferns and vines.
+- Karst Tower Bay: added low limestone islets with sand coves and jungle crowns, plus occasional sea arches.
+- Registered the new features and generated their configured/placed feature data; appended biome placements at the end of the vegetal step. Updated the biome polish status in `PROGRESS.md` and `DESIGN-DOCUMENT.md`.
+
+**Verification Executed**
+
+- After each stage, ran `python tools/biomes/ours.py ..\mcmeta-1.21.1\data\minecraft\worldgen\biome ..\mcmeta-1.21.1\data\minecraft\worldgen\configured_feature` and `python tools/biomes/gen.py ..\mcmeta-1.21.1\data\minecraft\worldgen\biome`. Each run reported 36 biome overrides and no feature order cycles. Unrelated generator rewrites were restored before commits.
+- Ran `$env:JAVA_HOME = "C:\Users\Jaime\AppData\Roaming\.minecraft\runtime\java-runtime-delta\windows\java-runtime-delta"; .\gradlew.bat build --no-daemon` at every stage and after the Sky Pillars height-guard fix: **BUILD SUCCESSFUL**.
+- Validated `karst_bay.json` parses as JSON. I could not look at these features in game; no `runClient` check was performed.
+
+**Remaining Recommendations**
+
+1. Inspect all four features in a new world, especially arch silhouettes, floating island splash pools, Tsingy pool placement and sea-arch/islet shapes. Check seams while crossing chunk boundaries.
+
 ---
