@@ -5,6 +5,8 @@ import com.projectzero.fx.Fx;
 import com.projectzero.registry.ModBlocks;
 import com.projectzero.registry.ModItems;
 import com.projectzero.titles.MilestoneTracker;
+import com.projectzero.ui.NoticeType;
+import com.projectzero.ui.SystemNotices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -252,7 +254,7 @@ public final class GateService {
                 .append(Component.literal(" grows unstable. (Surge " + newSurges + "/" + GateRules.AGING_MAX_SURGES + ")")
                         .withStyle(ChatFormatting.WHITE));
         for (ServerPlayer p : playersWithin(level, anchorPos, GateRules.AGING_MESSAGE_RADIUS)) {
-            system(p, msg);
+            SystemNotices.system(p, NoticeType.GATE, Component.literal("GATE SURGE"), msg, msg);
         }
         level.playSound(null, anchorPos, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.BLOCKS, 0.9F, 0.75F);
     }
@@ -297,7 +299,7 @@ public final class GateService {
         for (ServerPlayer p : playersWithin(level, anchorPos, GateRules.AGING_MESSAGE_RADIUS)) {
             p.connection.send(new ClientboundSetTitleTextPacket(title));
             p.connection.send(new ClientboundSetSubtitleTextPacket(sub));
-            system(p, chat);
+            SystemNotices.system(p, NoticeType.GATE, Component.literal("GATE RANK UP"), sub, chat);
         }
         level.playSound(null, anchorPos, SoundEvents.END_PORTAL_SPAWN, SoundSource.BLOCKS, 1.0F, 0.7F);
     }
@@ -386,7 +388,7 @@ public final class GateService {
         for (ServerPlayer p : playersWithin(level, anchorPos, GateRules.AGING_MESSAGE_RADIUS)) {
             p.connection.send(new ClientboundSetTitleTextPacket(title));
             p.connection.send(new ClientboundSetSubtitleTextPacket(sub));
-            system(p, chat);
+            SystemNotices.system(p, NoticeType.WARNING, Component.literal("DUNGEON BREAK"), sub, chat);
         }
         level.playSound(null, anchorPos, SoundEvents.WITHER_SPAWN, SoundSource.HOSTILE, 0.9F, 0.8F);
 
@@ -556,8 +558,9 @@ public final class GateService {
                         + ": The Dungeon Boss has emerged from the rift!").withStyle(ChatFormatting.RED, ChatFormatting.BOLD)
                 : Component.literal("Dungeon Break Wave " + waveNumber + "/" + GateRules.BREAK_WAVES + " emerging!")
                         .withStyle(ChatFormatting.GOLD);
+        NoticeType waveNotice = finalWave ? NoticeType.WARNING : NoticeType.GATE;
         for (ServerPlayer p : playersWithin(level, anchorPos, GateRules.AGING_MESSAGE_RADIUS)) {
-            system(p, waveMsg);
+            SystemNotices.system(p, waveNotice, waveMsg);
         }
         level.playSound(null, anchorPos, SoundEvents.RAID_HORN.value(), SoundSource.HOSTILE, 1.2F, 0.85F);
     }
@@ -600,8 +603,9 @@ public final class GateService {
         }
 
         if (state.getValue(GateBlock.BROKEN)) {
-            system(player, Component.literal("Dungeon break in progress! The rift cannot be entered.")
-                    .withStyle(ChatFormatting.RED));
+            SystemNotices.system(player, NoticeType.WARNING,
+                    Component.literal("Dungeon break in progress! The rift cannot be entered.")
+                            .withStyle(ChatFormatting.RED));
             return;
         }
 
@@ -609,8 +613,9 @@ public final class GateService {
         BlockPos anchorPos = touchedBe.anchorPos();
         GateBlockEntity anchorBe = player.level().getBlockEntity(anchorPos) instanceof GateBlockEntity abe ? abe : touchedBe;
         if (anchorBe.isBreaking()) {
-            system(player, Component.literal("Dungeon break in progress! The rift cannot be entered.")
-                    .withStyle(ChatFormatting.RED));
+            SystemNotices.system(player, NoticeType.WARNING,
+                    Component.literal("Dungeon break in progress! The rift cannot be entered.")
+                            .withStyle(ChatFormatting.RED));
             return;
         }
 
@@ -624,12 +629,14 @@ public final class GateService {
         if (rec == null) return;
 
         if (rec.cleared) {
-            system(player, Component.literal("This gate has already collapsed.").withStyle(ChatFormatting.GRAY));
+            SystemNotices.system(player, NoticeType.WARNING,
+                    Component.literal("This gate has already collapsed.").withStyle(ChatFormatting.GRAY));
             return;
         }
         if (rec.broken) {
-            system(player, Component.literal("Dungeon break in progress! The rift cannot be entered.")
-                    .withStyle(ChatFormatting.RED));
+            SystemNotices.system(player, NoticeType.WARNING,
+                    Component.literal("Dungeon break in progress! The rift cannot be entered.")
+                            .withStyle(ChatFormatting.RED));
             return;
         }
 
@@ -826,14 +833,15 @@ public final class GateService {
                 : spawnGate(level, pos, rank, size, alongX, sea);
         if (rec != null) {
             String kind = sea ? "Sea Gate" : ancient ? "Ancient Gate" : "Gate";
-            system(anchor, Component.literal("A ")
+            Component msg = Component.literal("A ")
                     .withStyle(ChatFormatting.WHITE)
                     .append(Component.literal(rank.name() + "-Rank " + kind).withStyle(rank.chatColor()))
-                    .append(Component.literal(" has opened nearby!").withStyle(ChatFormatting.WHITE)));
+                    .append(Component.literal(" has opened nearby!").withStyle(ChatFormatting.WHITE));
+            SystemNotices.system(anchor, NoticeType.GATE, Component.literal("GATE OPENED"), msg, msg);
         }
     }
 
     public static void system(ServerPlayer player, Component msg) {
-        player.sendSystemMessage(Component.literal("[System] ").withStyle(ChatFormatting.AQUA).append(msg));
+        SystemNotices.system(player, NoticeType.GATE, msg);
     }
 }

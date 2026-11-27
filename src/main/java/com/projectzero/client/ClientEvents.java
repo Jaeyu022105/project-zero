@@ -24,6 +24,7 @@ public final class ClientEvents {
         VisionOverlayState.reset();
         ClientWornGear.clear();
         ClientSkillVisuals.clear();
+        SystemNoticeOverlay.clear();
         GauntletLayer.clearCache();
     }
 

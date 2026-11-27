@@ -3,6 +3,8 @@ package com.projectzero.leveling;
 import com.projectzero.ProjectZero;
 import com.projectzero.network.ModNetwork;
 import com.projectzero.network.SyncStatsPacket;
+import com.projectzero.ui.NoticeType;
+import com.projectzero.ui.SystemNotices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -101,10 +103,12 @@ public final class LevelingService {
         player.connection.send(new ClientboundSetSubtitleTextPacket(
                 Component.literal("Level " + stats.level()).withStyle(ChatFormatting.WHITE)));
 
-        player.sendSystemMessage(Component.literal("[System] ").withStyle(ChatFormatting.AQUA)
-                .append(Component.literal("You have leveled up! ").withStyle(ChatFormatting.WHITE))
-                .append(Component.literal("+" + levelsGained * LevelingRules.STAT_POINTS_PER_LEVEL
-                        + " stat points").withStyle(ChatFormatting.YELLOW)));
+        int bonusPts = levelsGained * LevelingRules.STAT_POINTS_PER_LEVEL;
+        Component body = Component.literal("Level " + stats.level() + " · ").withStyle(ChatFormatting.WHITE)
+                .append(Component.literal("+" + bonusPts + " stat points").withStyle(ChatFormatting.YELLOW));
+        Component chat = Component.literal("You have leveled up! ").withStyle(ChatFormatting.WHITE)
+                .append(Component.literal("+" + bonusPts + " stat points").withStyle(ChatFormatting.YELLOW));
+        SystemNotices.system(player, NoticeType.LEVEL_UP, NoticeType.LEVEL_UP.defaultTitle(), body, chat);
 
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0F, 0.8F);

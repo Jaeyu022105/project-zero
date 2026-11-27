@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-27** (Gate review fixes: stripped PNG `caBX` metadata, batched paused-aging shifts, paused empty break waves, and 60s missing break boss respawn).
+Last caught up: **2026-11-27** (Reset backlog Task 1: bottom-right System notices HUD, `ui.noticeChatLines`, and shared notice routing).
 
 ---
 
@@ -137,14 +137,15 @@ Package layout (`src/main/java/com/projectzero/`):
   - `AwakeningCommands.java`: `/pz shard give [count] [tier]` and `/pz vessel charge <xp>`.
   - `CrystalCommands.java`: `/pz crystal small|large|colossal`.
   - `AwakeningEvents.java`: registers `AwakeningCommands` and `CrystalCommands`.
+- `ui/`: `NoticeRules`, `NoticeType` (`LEVEL_UP`, `SKILL`, `QUEST`, `GATE`, `ITEM`, `COOLDOWN`, `TITLE`, `WARNING`), `SystemNotices` (shared server notice + optional `[System]` chat helper), `NoticeCommands` (`/pz notice <type> <text>`), `NoticeEvents`.
 - `network/`
-  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version `6`. Bump the version when a packet's format changes.
-  - `SyncStatsPacket`, `AllocateStatPacket`, `SyncJobPacket`, `VisionOverlayPacket`, `SyncSkillsPacket`, `CastSkillPacket`, `SyncTitlesPacket`, `CycleTitlePacket`, `SyncStatBonusesPacket`, `OpenAccessoriesPacket`.
+  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version `9`. Bump the version when a packet's format changes.
+  - `SyncStatsPacket`, `AllocateStatPacket`, `SyncJobPacket`, `VisionOverlayPacket`, `SyncSkillsPacket`, `CastSkillPacket`, `SyncTitlesPacket`, `CycleTitlePacket`, `SyncStatBonusesPacket`, `OpenAccessoriesPacket`, `SyncWornGearPacket`, `SwitchPresetPacket`, `AssignSkillSlotPacket`, `SkillVisualPacket`, `SystemNoticePacket`.
 - `client/`
-  - `ClientStatsCache`, `ClientJobCache`, `ClientSkillsCache`, `ClientTitlesCache`, `ClientBonusCache`: synced local caches with zero client-only imports so packet handlers are server-safe.
+  - `ClientStatsCache`, `ClientJobCache`, `ClientSkillsCache`, `ClientTitlesCache`, `ClientBonusCache`, `ClientNoticeCache`: synced local caches with zero client-only imports so packet handlers are server-safe.
   - `ClientEvents.java` & `ClientModEvents.java`: logout cache reset, `JobCardRenderer`, and `MenuScreens.register` for `AccessoryScreen`.
-  - `ModKeyBindings.java`: `K` opens `StatusScreen`; `Z`, `X`, `C`, `V` cast active skill slots 1â€“4.
-  - `StatusScreen.java`, `AccessoryScreen.java`, `SkillHudOverlay.java`, `VisionOverlayRenderer.java`.
+  - `ModKeyBindings.java`: `K` opens `StatusScreen`; `J` opens `SkillLoadoutScreen`; `R` cycles presets; `Z`, `X`, `C`, `V` cast active skill slots 1–4.
+  - `StatusScreen.java`, `AccessoryScreen.java`, `SkillLoadoutScreen.java`, `SkillHudOverlay.java`, `SystemNoticeOverlay.java`, `VisionOverlayRenderer.java`.
 
 Resources:
 
@@ -806,6 +807,37 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 
 1. Implement `[Planned]` dungeon-break corruption spread & receding cleanup (`DESIGN-DOCUMENT.md` §9).
 2. Hook `GateBlockEntity#surges` in `client/GateRiftRenderer` for faster spin and extra motes on surging gates.
+
+---
+
+### Session Log — 2026-11-27 (Reset Backlog Task 1: Bottom-right System notices)
+
+**Context & Direction Check**
+
+- Implemented Task 1 of `.agents/prompts/gemini-reset-backlog.md` (`DESIGN-DOCUMENT.md` §11) on `gemini/reset-backlog`: bottom-right sliding System notice stack (`SystemNotices` + `SystemNoticeOverlay`), `ClientConfig.NOTICE_CHAT_LINES` (`ui.noticeChatLines`, default `false`), shared routing replacing private `system(...)` helpers across services, cooldown-ready pings (`≥10s` slotted skills), and `/pz notice <type> <text>`.
+
+**Changes Made**
+
+- `src/main/java/com/projectzero/ui/`: added `NoticeRules`, `NoticeType` (`LEVEL_UP`, `SKILL`, `QUEST`, `GATE`, `ITEM`, `COOLDOWN`, `TITLE`, `WARNING`), `SystemNotices`, `NoticeCommands`, and `NoticeEvents`.
+- `src/main/java/com/projectzero/network/`: added `SystemNoticePacket` and bumped `ModNetwork.PROTOCOL_VERSION` to `9`.
+- `src/main/java/com/projectzero/client/` & `config/ClientConfig.java`: added `ClientNoticeCache`, `SystemNoticeOverlay` (6t slide-in, 4s hold, 10t fade-out, upward stack capped at 4 with FIFO eviction, per-type left accent stripe, quiet vanilla placeholder chimes), logout clear in `ClientEvents`, and `ui.noticeChatLines` (default `false`).
+- Routed messages through `SystemNotices` across `LevelingService`, `SkillService` (+ `PlayerSkills.tickCooldownsReady()` for `≥10s` slotted skill ready pings), `TitleService`, `ShardVesselService`, `JobService`, `AwakeningService`, `LibraryDomain`, and `GateService` (keeping center titles on job change and dungeon break). Also improved `GateCommands.findLookedAtAnchor` ray-stepping so non-solid foliage never blocks targeting a free-floating rift.
+- `DESIGN-DOCUMENT.md` & `src/main/resources/assets/projectzero/lang/en_us.json`: marked System notices `[Built]` and added notice header translations.
+
+**Verification Executed**
+
+- `gradlew.bat build --no-daemon`: **BUILD SUCCESSFUL**.
+- `gradlew.bat runClient --no-daemon` (loaded `pz_backlog_test` creative world):
+  - Verified `/pz xp 500` + `/pz skill learn bloodlust` pushed `LEVEL_UP` and `SKILL` notices.
+  - Verified slotted `bloodlust` (`25s >= 10s`) emitted a `COOLDOWN` notice on expiry while slotted `dash` (`3s < 10s`) did not (`bodies=[Bloodlust]`).
+  - Verified `/pz gate age 7` emitted `The C-Rank gate grows unstable. (Surge 1/3)`.
+  - Spammed `/pz notice gate hi_1..6` with `ui.noticeChatLines=false` → verified `active=4`, `bodies=[hi_3, hi_4, hi_5, hi_6]` (oldest evicted first), and `chatDelta=0`.
+  - Toggled `ui.noticeChatLines=true` and ran `/pz notice warning config_on_check` → verified both notice and `[System]` chat line appeared (`chatDelta=1`). Zero errors in `run/logs/latest.log`.
+- Placeholders (`TODO(claude-art)`): `client/SystemNoticeOverlay.java` panel ornament styling and vanilla placeholder chimes.
+
+**Remaining Recommendations**
+
+1. Task 2: Level ceiling at 100 (`PlayerStats.ceilingBroken`, `MAX_LEVEL = 200`, `LevelingService.breakCeiling`, `"no_ceiling"` job JSON flag, `/pz ceiling`).
 
 ---
 

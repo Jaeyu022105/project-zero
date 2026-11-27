@@ -11,9 +11,14 @@ public final class ClientConfig {
     public static final ForgeConfigSpec.BooleanValue HIT_FLASH;
     public static final ForgeConfigSpec.BooleanValue GORE;
     public static final ForgeConfigSpec.BooleanValue FALLING_LEAVES;
+    public static final ForgeConfigSpec.BooleanValue NOTICE_CHAT_LINES;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
+        b.push("ui");
+        NOTICE_CHAT_LINES = b.comment("Also print [System] chat lines for events shown as bottom-right System notices.")
+                .define("noticeChatLines", false);
+        b.pop();
         b.push("feel");
         SCREEN_SHAKE = b.comment("Small camera shake and FOV punch-in on heavy skill hits.")
                 .define("screenShake", true);

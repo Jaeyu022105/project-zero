@@ -10,6 +10,8 @@ import com.projectzero.network.SyncTitlesPacket;
 import com.projectzero.skills.Skill;
 import com.projectzero.skills.SkillRegistry;
 import com.projectzero.skills.SkillService;
+import com.projectzero.ui.NoticeType;
+import com.projectzero.ui.SystemNotices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -198,9 +200,10 @@ public final class TitleService {
         player.connection.send(new ClientboundSetSubtitleTextPacket(
                 title.displayName().copy().withStyle(ChatFormatting.YELLOW)));
 
-        player.sendSystemMessage(Component.literal("[System] ").withStyle(ChatFormatting.AQUA)
-                .append(Component.literal("Title acquired: ").withStyle(ChatFormatting.WHITE))
-                .append(title.displayName().copy().withStyle(ChatFormatting.GOLD)));
+        Component chat = Component.literal("Title acquired: ").withStyle(ChatFormatting.WHITE)
+                .append(title.displayName().copy().withStyle(ChatFormatting.GOLD));
+        SystemNotices.system(player, NoticeType.TITLE, NoticeType.TITLE.defaultTitle(),
+                title.displayName().copy().withStyle(ChatFormatting.GOLD), chat);
 
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1.0F, 1.15F);

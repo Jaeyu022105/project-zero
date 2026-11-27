@@ -116,24 +116,29 @@ public final class GateCommands {
         return 1;
     }
 
-    private static @Nullable GateBlockEntity findLookedAtAnchor(ServerPlayer player, ServerLevel level) {
+    public static @Nullable GateBlockEntity findLookedAtAnchor(ServerPlayer player, ServerLevel level) {
         Vec3 eye = player.getEyePosition();
-        Vec3 end = eye.add(player.getLookAngle().normalize().scale(32.0));
-        BlockHitResult hit = level.clip(new ClipContext(eye, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
-        if (hit.getType() == HitResult.Type.MISS) return null;
-
-        BlockPos hitPos = hit.getBlockPos();
-        BlockState hitState = level.getBlockState(hitPos);
+        Vec3 dir = player.getLookAngle().normalize();
         BlockPos portalPos = null;
-        if (hitState.is(ModBlocks.GATE_PORTAL.get())) {
-            portalPos = hitPos;
-        } else if (hitState.is(ModBlocks.ANCIENT_GATE_STONE.get())) {
-            for (BlockPos p : BlockPos.betweenClosed(hitPos.offset(-4, -4, -4), hitPos.offset(4, 4, 4))) {
-                if (level.getBlockState(p).is(ModBlocks.GATE_PORTAL.get())) {
-                    portalPos = p.immutable();
-                    break;
-                }
+
+        // Step along the look ray so tall grass/vines in front of a free-floating rift never block targeting.
+        for (double d = 0.5; d <= 32.0; d += 0.5) {
+            BlockPos p = BlockPos.containing(eye.add(dir.scale(d)));
+            BlockState st = level.getBlockState(p);
+            if (st.is(ModBlocks.GATE_PORTAL.get())) {
+                portalPos = p;
+                break;
             }
+            if (st.is(ModBlocks.ANCIENT_GATE_STONE.get())) {
+                for (BlockPos q : BlockPos.betweenClosed(p.offset(-4, -4, -4), p.offset(4, 4, 4))) {
+                    if (level.getBlockState(q).is(ModBlocks.GATE_PORTAL.get())) {
+                        portalPos = q.immutable();
+                        break;
+                    }
+                }
+                if (portalPos != null) break;
+            }
+            if (st.isSolidRender(level, p)) break;
         }
         if (portalPos == null) return null;
         if (!(level.getBlockEntity(portalPos) instanceof GateBlockEntity be)) return null;
