@@ -24,7 +24,13 @@ public final class ClientSkillVisuals {
         /** Camera shake for the local player (heavy hits). */
         SHAKE,
         /** FOV punch-in that snaps back (finishers). */
-        PUNCH;
+        PUNCH,
+        /** A player body animation; rgb carries the {@code PlayerAnim} ordinal. */
+        ANIM,
+        /** A lingering skill mark on an enemy's body; rgb top byte = mark style (+0x80 = minimal, bosses). */
+        MARK,
+        /** A floating WEAK (rgb 1) or RESIST (rgb 0) tag above a boss, for the attacker. */
+        TAG;
 
         public static Kind byId(int id) {
             Kind[] all = values();
@@ -59,7 +65,7 @@ public final class ClientSkillVisuals {
     public static void add(int entityId, int kind, int rgb, int ticks) {
         Kind k = Kind.byId(kind);
         // One bubble per entity: a recast refreshes it.
-        if (k == Kind.BUBBLE || k == Kind.HIT_FLASH || k == Kind.SHAKE || k == Kind.PUNCH)
+        if (k == Kind.BUBBLE || k == Kind.HIT_FLASH || k == Kind.SHAKE || k == Kind.PUNCH || k == Kind.ANIM || k == Kind.MARK || k == Kind.TAG)
             ACTIVE.removeIf(v -> v.entityId == entityId && v.kind == k);
         ACTIVE.add(new Visual(entityId, k, rgb, ticks));
     }

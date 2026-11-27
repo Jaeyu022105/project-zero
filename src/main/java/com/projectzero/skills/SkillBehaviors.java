@@ -294,6 +294,7 @@ public final class SkillBehaviors {
                     target.hurt(player.damageSources().indirectMagic(player, player), damage);
                     target.addEffect(new MobEffectInstance(MobEffects.WITHER, witherTicks, 1));
                     HitJuice.impact(player, target, SkillFx.HEX, HitJuice.Weight.LIGHT);
+                    HitJuice.mark(target, 3, witherTicks);
                 }
             }
         }
@@ -370,6 +371,7 @@ public final class SkillBehaviors {
                 spawnVisualBolt(level, t.position());
                 t.hurt(skillDamage(player, DamageTypes.LIGHTNING_BOLT), damage);
                 HitJuice.impact(player, t, SkillFx.STORM, HitJuice.Weight.LIGHT);
+                HitJuice.mark(t, 2, 40);
             }
             HitJuice.casterFeel(player, HitJuice.Weight.HEAVY);
         }
@@ -439,6 +441,7 @@ public final class SkillBehaviors {
             target.hurt(player.damageSources().indirectMagic(player, player), damage);
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, rootTicks, 5));
             HitJuice.impact(player, target, SkillFx.SOUL, HitJuice.Weight.LIGHT);
+            HitJuice.mark(target, 4, rootTicks);
             totalDealt += damage;
             level.sendParticles(Fx.rune(SkillFx.SOUL, 1F), target.getX(), target.getY() + 0.8, target.getZ(),
                     10, 0.3, 0.4, 0.3, 0.03);
@@ -476,6 +479,7 @@ public final class SkillBehaviors {
             target.igniteForSeconds(burnSeconds);
             target.hurt(skillDamage(player, DamageTypes.IN_FIRE), damage);
             HitJuice.impact(player, target, SkillFx.SUN, HitJuice.Weight.HEAVY);
+            HitJuice.mark(target, 1, burnSeconds * 20);
         }
         if (!burned.isEmpty()) HitJuice.casterFeel(player, HitJuice.Weight.FINISHER);
 

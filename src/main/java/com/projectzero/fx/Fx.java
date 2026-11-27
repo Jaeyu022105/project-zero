@@ -18,5 +18,6 @@ public final class Fx {
     public static ParticleOptions inflow(int rgb, float size) { return new ManaParticleOptions(ModParticles.INFLOW.get(), rgb, size); }
     public static final int INFLOW_TICKS = 22;
     public static final double INFLOW_DIVISOR = 34.25;
+    public static ParticleOptions drop(int rgb, float size) { return new ManaParticleOptions(ModParticles.DROP.get(), rgb, size); }
     public static ParticleOptions streak(int rgb, float size) { return new ManaParticleOptions(ModParticles.STREAK.get(), rgb, size); }
 }

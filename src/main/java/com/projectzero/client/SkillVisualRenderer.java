@@ -65,6 +65,7 @@ public final class SkillVisualRenderer {
                     if (Float.isNaN(v.yaw)) v.yaw = e.getViewYRot(partial);
                     slash(pose, buffers, e, v.yaw, life, r, g, b);
                 }
+                case TAG -> tag(pose, buffers, mc, e, life, v.rgb == 1);
                 default -> {}
             }
             pose.popPose();
@@ -72,6 +73,7 @@ public final class SkillVisualRenderer {
         buffers.endBatch(RenderType.eyes(EMBLEM));
         buffers.endBatch(RenderType.eyes(BUBBLE));
         buffers.endBatch(RenderType.eyes(SLASH));
+        buffers.endBatch();
     }
 
     /** Pops up (overshoot), holds, fades; faces where the caster's body faces, ~1.2 blocks ahead. */
@@ -132,6 +134,23 @@ public final class SkillVisualRenderer {
             for (float[] c : q) vertex(vc, p, c[0], 0, c[1], c[2], c[3], r * c[4], g * c[4], b * c[4], 0, 1, 0);
             for (int k = 3; k >= 0; k--) { float[] c = q[k]; vertex(vc, p, c[0], 0, c[1], c[2], c[3], r * c[4], g * c[4], b * c[4], 0, -1, 0); }
         }
+    }
+
+    /** A System-style [WEAK] / [RESIST] tag that rises over the boss and fades. */
+    private static void tag(PoseStack pose, MultiBufferSource buffers, Minecraft mc, Entity e, float life, boolean weak) {
+        net.minecraft.client.gui.Font font = mc.font;
+        String text = weak ? "[WEAK]" : "[RESIST]";
+        int rgb = weak ? 0xFFD24A : 0x8FA6C8;
+        float fade = life < 0.6F ? 1F : 1F - (life - 0.6F) / 0.4F;
+        int alpha = Math.max(8, (int) (255 * fade));
+        float pop = life < 0.12F ? Mth.lerp(life / 0.12F, 1.6F, 1F) : 1F;
+        pose.translate(0, e.getBbHeight() + 0.75 + life * 0.5, 0);
+        pose.mulPose(mc.getEntityRenderDispatcher().cameraOrientation());
+        float s = 0.028F * pop;
+        pose.scale(s, -s, s);
+        float x = -font.width(text) / 2F;
+        font.drawInBatch(text, x, 0, (alpha << 24) | rgb, false, pose.last().pose(), buffers,
+                net.minecraft.client.gui.Font.DisplayMode.SEE_THROUGH, (int) (0x55 * fade) << 24, 0xF000F0);
     }
 
     private static void quad(PoseStack pose, VertexConsumer vc, float s, float r, float g, float b) {

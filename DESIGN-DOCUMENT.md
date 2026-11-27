@@ -177,6 +177,32 @@ Our own mechanic, not in Solo Leveling.
   - Every hit gets hitstop in tiers: light 1-2 ticks, heavy 3-4, finisher 5-6. The hitstop is client visual only.
   - Finishers and ultimates also get the "anime hit" extras: a longer freeze, an inverted frame, burst lines and an FOV punch-in.
 - Camera shake is small (≤0.5°, ≤6 ticks), used only for heavy and boss hits, and can be turned off in config.
+- **[Built] Boss weaknesses** (`combat/BossAffinity`):
+  - Bosses have a kind and skills have an element. Skill damage on a boss is x1.5 when it is weak to the element and x0.6 when it resists. The attacker sees a [WEAK] or [RESIST] tag.
+  - Elements: Physical, Sun, Storm, Hex, Soul.
+  - Kinds and matchups:
+
+    | Kind | Weak to | Resists |
+    |---|---|---|
+    | Undead | Sun, Soul | Hex |
+    | Beast | Hex | |
+    | Construct | Storm, Physical | Hex, Soul |
+    | Abyssal | Sun | Hex |
+    | Aquatic | Storm | Sun |
+    | Infernal | Soul | Sun |
+
+  - Our own bosses set `pz_boss_kind`. A boss is anything in `#projectzero:bosses`, `#c:bosses`, or a gate boss.
+- **[Built] Enemy body reactions** (`client/EnemyReactions`):
+  - Blood depends on the creature: red, rot, bone dust, goo, embers, stone, snow, void, ichor or leaf.
+  - Blood sprays away from the hit, and death gives a bigger burst. A `gore` client option hides the red blood and rot.
+  - Skill marks linger on the body: burn, storm sparks, hex aura, soul wisps. Bosses get a third of the particles for a third of the time.
+  - Our own mobs should pick a blood type when we add them.
+- **[Built] Player animations** (`client/anim`):
+  - These are our own code; there is no animation library.
+  - Skills play keyframed body poses: wind-up, strike, end pose.
+  - Sword and axe swings become a diagonal slice with a faint swipe arc.
+  - Sprinting adds a slight forward lean.
+  - First person moves the held item to match.
 - **[Idea]** A dodge dash with i-frames needs the owner's approval. There is no separate stamina bar; cooldowns and mana are the commitment cost.
 
 ## 11. The System's feel (UI and messages)

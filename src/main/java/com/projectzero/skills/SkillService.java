@@ -152,8 +152,20 @@ public final class SkillService {
             return false;
         }
 
-        if (!behavior.execute(player, skill, skill.params())) {
+        boolean cast;
+        com.projectzero.combat.BossAffinity.begin(player, skill.behavior());
+        try {
+            cast = behavior.execute(player, skill, skill.params());
+        } finally {
+            com.projectzero.combat.BossAffinity.end();
+        }
+        if (!cast) {
             return false;
+        }
+        com.projectzero.anim.PlayerAnim anim = com.projectzero.anim.PlayerAnim.forBehavior(skill.behavior());
+        if (anim != null) {
+            com.projectzero.network.ModNetwork.sendToTrackingAndSelf(player, new com.projectzero.network.SkillVisualPacket(
+                    player.getId(), com.projectzero.client.ClientSkillVisuals.Kind.ANIM.ordinal(), anim.ordinal(), anim.ticks));
         }
 
         int max = maxMana(player);

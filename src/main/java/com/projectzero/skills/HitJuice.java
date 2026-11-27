@@ -55,6 +55,17 @@ public final class HitJuice {
                 SoundSource.PLAYERS, 0.6F + w.ordinal() * 0.2F, pitch);
     }
 
+    /**
+     * A lingering mark on the body (EnemyReactions.MARK_*). Bosses get a minimal, shorter version so
+     * their attack reads stay clean.
+     */
+    public static void mark(LivingEntity target, int style, int ticks) {
+        boolean boss = com.projectzero.combat.BossAffinity.isBoss(target);
+        int flags = style | (boss ? 0x80 : 0);
+        ModNetwork.sendToTrackingEntity(target, new SkillVisualPacket(target.getId(),
+                ClientSkillVisuals.Kind.MARK.ordinal(), flags << 24, boss ? ticks / 3 : ticks));
+    }
+
     /** Once per cast, after a hit: camera shake for heavy hits, plus a punch-in for finishers. */
     public static void casterFeel(ServerPlayer caster, Weight w) {
         if (w == Weight.LIGHT) return;

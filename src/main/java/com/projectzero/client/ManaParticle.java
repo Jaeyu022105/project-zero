@@ -16,7 +16,7 @@ import net.minecraft.util.Mth;
  * the options color; each family moves and fades in its own way.
  */
 public class ManaParticle extends TextureSheetParticle {
-    private enum Style { GLOW, SPARK, RUNE, SHARD, MOTE, STREAK, INFLOW }
+    private enum Style { GLOW, SPARK, RUNE, SHARD, MOTE, STREAK, INFLOW, DROP }
 
     private final Style style;
     private final SpriteSet sprites;
@@ -51,10 +51,12 @@ public class ManaParticle extends TextureSheetParticle {
                             zd += (random.nextDouble() - 0.5) * 0.12; friction = 0.96F; }
             case MOTE -> { lifetime = 40 + random.nextInt(30); baseSize = 0.07F * size; friction = 0.98F; }
             case INFLOW -> { lifetime = com.projectzero.fx.Fx.INFLOW_TICKS; baseSize = 0.08F * size; friction = 1F; }
+            case DROP -> { lifetime = 30 + random.nextInt(25); baseSize = 0.06F * size * (0.7F + random.nextFloat() * 0.6F);
+                           gravity = 1.0F; hasPhysics = true; friction = 0.98F; }
             default -> { lifetime = 6 + random.nextInt(3); baseSize = 0.13F * size; friction = 0.7F; }
         }
         this.quadSize = baseSize;
-        if (style == Style.RUNE || style == Style.SHARD) setSprite(sprites.get(random));
+        if (style == Style.RUNE || style == Style.SHARD || style == Style.DROP) setSprite(sprites.get(random));
         else setSpriteFromAge(sprites);
     }
 
@@ -65,6 +67,7 @@ public class ManaParticle extends TextureSheetParticle {
         if (type == ModParticles.MOTE.get()) return Style.MOTE;
         if (type == ModParticles.STREAK.get()) return Style.STREAK;
         if (type == ModParticles.INFLOW.get()) return Style.INFLOW;
+        if (type == ModParticles.DROP.get()) return Style.DROP;
         return Style.GLOW;
     }
 
@@ -91,9 +94,14 @@ public class ManaParticle extends TextureSheetParticle {
                 alpha = Math.min(1F, life * 4F);
                 quadSize = baseSize * (1F - life * life);
             }
+            case DROP -> {
+                // Splats when it lands: stops, spreads a little, then fades.
+                if (onGround) { xd = 0; zd = 0; quadSize = Math.min(baseSize * 1.6F, quadSize * 1.08F); }
+                alpha = life < 0.75F ? 1F : (1F - life) / 0.25F;
+            }
             default -> { quadSize = baseSize * (1F - life); alpha = 1F - life; }
         }
-        if (style != Style.RUNE && style != Style.SHARD) setSpriteFromAge(sprites);
+        if (style != Style.RUNE && style != Style.SHARD && style != Style.DROP) setSpriteFromAge(sprites);
     }
 
     @Override
@@ -103,7 +111,7 @@ public class ManaParticle extends TextureSheetParticle {
 
     @Override
     protected int getLightColor(float partialTick) {
-        return 0xF000F0;
+        return style == Style.DROP ? super.getLightColor(partialTick) : 0xF000F0;
     }
 
     public static final class Provider implements ParticleProvider<ManaParticleOptions> {

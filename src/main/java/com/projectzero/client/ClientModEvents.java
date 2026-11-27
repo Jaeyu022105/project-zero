@@ -39,6 +39,7 @@ public final class ClientModEvents {
         event.registerSpriteSet(ModParticles.MOTE.get(), ManaParticle.Provider::new);
         event.registerSpriteSet(ModParticles.STREAK.get(), ManaParticle.Provider::new);
         event.registerSpriteSet(ModParticles.INFLOW.get(), ManaParticle.Provider::new);
+        event.registerSpriteSet(ModParticles.DROP.get(), ManaParticle.Provider::new);
     }
 
     @SubscribeEvent
@@ -51,6 +52,7 @@ public final class ClientModEvents {
     public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
         for (PlayerSkin.Model skin : event.getSkins()) {
             if (event.getPlayerSkin(skin) instanceof PlayerRenderer renderer) {
+                com.projectzero.client.anim.PlayerAnimEvents.install(renderer, event.getEntityModels(), skin == PlayerSkin.Model.SLIM);
                 renderer.addLayer(new GauntletLayer(renderer, event.getEntityModels(), skin == PlayerSkin.Model.SLIM));
             }
         }

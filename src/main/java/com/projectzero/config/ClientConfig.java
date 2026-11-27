@@ -9,6 +9,7 @@ public final class ClientConfig {
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.BooleanValue SCREEN_SHAKE;
     public static final ForgeConfigSpec.BooleanValue HIT_FLASH;
+    public static final ForgeConfigSpec.BooleanValue GORE;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -17,6 +18,8 @@ public final class ClientConfig {
                 .define("screenShake", true);
         HIT_FLASH = b.comment("White flash and shake on entities hit by skills.")
                 .define("hitFlash", true);
+        GORE = b.comment("Red blood and rot when creatures are hit. Off keeps bone dust, ichor and sparks.")
+                .define("gore", true);
         b.pop();
         SPEC = b.build();
     }

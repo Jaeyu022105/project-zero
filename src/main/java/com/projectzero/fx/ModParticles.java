@@ -30,4 +30,6 @@ public final class ModParticles {
     public static final RegistryObject<ManaParticleType> INFLOW = PARTICLES.register("inflow", ManaParticleType::new);
     /** A thin streak stretched along its motion: slashes and dashes. */
     public static final RegistryObject<ManaParticleType> STREAK = PARTICLES.register("streak", ManaParticleType::new);
+    /** A lit (not glowing) droplet that falls, lands and lingers: blood, ichor, bone dust. */
+    public static final RegistryObject<ManaParticleType> DROP = PARTICLES.register("blood_drop", ManaParticleType::new);
 }
