@@ -38,7 +38,7 @@ public final class CompanionCommands {
                         .then(Commands.literal("add")
                                 .then(Commands.argument("entity", ResourceLocationArgument.id())
                                         .suggests((ctx, builder) -> SharedSuggestionProvider.suggestResource(BuiltInRegistries.ENTITY_TYPE.keySet(), builder))
-                                        .then(Commands.argument("name", StringArgumentType.word()).executes(ctx -> {
+                                        .then(Commands.argument("name", StringArgumentType.string()).executes(ctx -> {
                                             ServerPlayer player = ctx.getSource().getPlayerOrException();
                                             ResourceLocation id = ResourceLocationArgument.getId(ctx, "entity");
                                             if (!BuiltInRegistries.ENTITY_TYPE.containsKey(id)) throw UNKNOWN_TYPE.create(id);
@@ -48,7 +48,7 @@ public final class CompanionCommands {
                                             return 1;
                                         }))))
                         .then(Commands.literal("xp")
-                                .then(Commands.argument("name", StringArgumentType.word())
+                                .then(Commands.argument("name", StringArgumentType.string())
                                         .then(Commands.argument("amount", LongArgumentType.longArg(1, 1_000_000_000L))
                                                 .executes(ctx -> {
                                                     ServerPlayer player = ctx.getSource().getPlayerOrException();
