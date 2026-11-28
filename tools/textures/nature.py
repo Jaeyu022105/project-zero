@@ -258,6 +258,79 @@ def skywood_door_item():
     item_out = "src/main/resources/assets/projectzero/textures/item/"
     im.save(item_out + "skywood_door.png")
 
+def baobab_stripped_log():
+    """Warm, smooth core wood with subtle bottle-tree grain."""
+    r = random.Random(81)
+    im = Image.new("RGBA", (16, 16))
+    for x in range(16):
+        fold = -9 if x % 5 == 0 else (5 if x % 4 == 1 else 0)
+        for y in range(16):
+            n = r.randint(-7, 7) + fold
+            c = (201, 173, 137) if (x + y // 4) % 6 else (177, 146, 116)
+            im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
+    im.save(OUT + "stripped_baobab_log.png")
+
+def baobab_stripped_log_top():
+    r = random.Random(82)
+    im = Image.new("RGBA", (16, 16))
+    for x in range(16):
+        for y in range(16):
+            d = ((x - 7.5) ** 2 + (y - 7.5) ** 2) ** 0.5
+            n = r.randint(-5, 5)
+            c = (136, 116, 99) if d > 7 else ((223, 195, 160) if int(d * 0.8) % 2 == 0 else (204, 174, 143))
+            im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
+    im.save(OUT + "stripped_baobab_log_top.png")
+
+def baobab_door_textures():
+    for part, seed, seam in (("bottom", 83, 14), ("top", 84, 1)):
+        r = random.Random(seed)
+        im = Image.new("RGBA", (16, 16))
+        d = ImageDraw.Draw(im)
+        for y in range(16):
+            for x in range(16):
+                n = r.randint(-6, 6)
+                c = (175, 145, 115) if x not in (0, 15) else (119, 94, 77)
+                im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
+        d.rectangle((2, 2, 12, 13), outline=(108, 83, 66, 255))
+        d.line((7, 3, 7, 12), fill=(143, 111, 85, 255))
+        d.rectangle((10, seam, 11, seam + 1), fill=(93, 123, 77, 255))
+        im.save(OUT + f"baobab_door_{part}.png")
+
+def baobab_trapdoor():
+    r = random.Random(85)
+    im = Image.new("RGBA", (16, 16))
+    d = ImageDraw.Draw(im)
+    for y in range(16):
+        for x in range(16):
+            n = r.randint(-7, 7)
+            c = (171, 141, 111)
+            if x in (0, 15) or y in (0, 15): c = (107, 82, 64)
+            if x in (6, 9) or y in (6, 9): c = (136, 106, 82)
+            im.putpixel((x, y), (clamp(c[0] + n), clamp(c[1] + n), clamp(c[2] + n), 255))
+    d.rectangle((6, 6, 9, 9), fill=(91, 118, 73, 255))
+    im.save(OUT + "baobab_trapdoor.png")
+
+def baobab_sapling():
+    r = random.Random(86)
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.line((7, 15, 8, 8, 8, 3), fill=(125, 103, 76, 255), width=2)
+    for box in ((2, 2, 8, 7), (7, 0, 13, 5), (5, 5, 11, 9)):
+        base = (130, 161, 86)
+        d.ellipse(box, fill=(base[0] + r.randint(-12, 12), base[1] + r.randint(-12, 12), base[2] + r.randint(-8, 8), 255))
+    d.point((4, 4), fill=(188, 205, 126, 255))
+    d.point((10, 2), fill=(188, 205, 126, 255))
+    im.save(OUT + "baobab_sapling.png")
+
+def baobab_door_item():
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.rectangle((4, 1, 11, 14), fill=(179, 148, 116, 255), outline=(103, 77, 60, 255))
+    d.rectangle((6, 3, 9, 6), fill=(133, 157, 98, 255), outline=(121, 94, 72, 255))
+    d.rectangle((6, 9, 9, 12), fill=(133, 157, 98, 255), outline=(121, 94, 72, 255))
+    d.point((10, 8), fill=(228, 194, 126, 255))
+    im.save("src/main/resources/assets/projectzero/textures/item/baobab_door.png")
+
 if __name__ == "__main__":
     glowcap_gills(); violet_cap()
     skywood_log(); skywood_log_top(); skywood_planks(); skywood_leaves()
@@ -265,3 +338,5 @@ if __name__ == "__main__":
     salt_crust(); mana_crystal_block()
     skywood_stripped_log(); skywood_stripped_log_top(); skywood_door_textures()
     skywood_trapdoor(); skywood_sapling(); skywood_door_item()
+    baobab_stripped_log(); baobab_stripped_log_top(); baobab_door_textures()
+    baobab_trapdoor(); baobab_sapling(); baobab_door_item()

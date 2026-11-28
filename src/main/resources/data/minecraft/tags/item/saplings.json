@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "projectzero:skywood_sapling"
+    "projectzero:skywood_sapling",
+    "projectzero:baobab_sapling"
   ]
 }

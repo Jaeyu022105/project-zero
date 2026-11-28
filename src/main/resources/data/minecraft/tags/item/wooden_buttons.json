@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "projectzero:skywood_button"
+    "projectzero:skywood_button",
+    "projectzero:baobab_button"
   ]
 }

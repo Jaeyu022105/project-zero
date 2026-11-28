@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "projectzero:block/baobab_sapling"
+  }
+}

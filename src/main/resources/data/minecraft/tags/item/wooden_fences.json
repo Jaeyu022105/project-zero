@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "projectzero:skywood_fence"
+    "projectzero:skywood_fence",
+    "projectzero:baobab_fence"
   ]
 }

@@ -3,11 +3,11 @@
   "category": "building",
   "ingredients": [
     {
-      "item": "stripped_skywood_log"
+      "item": "projectzero:stripped_skywood_log"
     }
   ],
   "result": {
-    "id": "projectzero:skywood_planks_from_stripped_log",
+    "id": "projectzero:skywood_planks",
     "count": 4
   }
 }

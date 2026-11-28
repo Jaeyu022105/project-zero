@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "projectzero:skywood_stairs"
+    "projectzero:skywood_stairs",
+    "projectzero:baobab_stairs"
   ]
 }

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "LL",
+    "LL"
+  ],
+  "key": {
+    "L": {
+      "item": "projectzero:baobab_log"
+    }
+  },
+  "result": {
+    "id": "projectzero:baobab_wood",
+    "count": 3
+  }
+}

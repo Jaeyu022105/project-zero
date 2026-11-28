@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "projectzero:stripped_baobab_log"
+    }
+  ],
+  "result": {
+    "id": "projectzero:baobab_planks",
+    "count": 4
+  }
+}

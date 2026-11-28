@@ -101,6 +101,37 @@ public final class ModNature {
     public static final RegistryObject<Block> BAOBAB_PLANKS = block("baobab_planks",
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.ACACIA_PLANKS)
                     .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)));
+    public static final RegistryObject<Block> STRIPPED_BAOBAB_LOG = block("stripped_baobab_log",
+            () -> new net.minecraft.world.level.block.RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_ACACIA_LOG)
+                    .mapColor(MapColor.TERRACOTTA_GRAY)));
+    public static final RegistryObject<Block> BAOBAB_WOOD = block("baobab_wood",
+            () -> new net.minecraft.world.level.block.RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_WOOD)
+                    .mapColor(MapColor.TERRACOTTA_GRAY)));
+    public static final RegistryObject<Block> STRIPPED_BAOBAB_WOOD = block("stripped_baobab_wood",
+            () -> new net.minecraft.world.level.block.RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_ACACIA_WOOD)
+                    .mapColor(MapColor.TERRACOTTA_GRAY)));
+    public static final RegistryObject<Block> BAOBAB_SLAB = block("baobab_slab",
+            () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_SLAB)));
+    public static final RegistryObject<Block> BAOBAB_STAIRS = block("baobab_stairs",
+            () -> new StairBlock(BAOBAB_PLANKS.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_STAIRS)));
+    public static final RegistryObject<Block> BAOBAB_FENCE = block("baobab_fence",
+            () -> new FenceBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_FENCE)));
+    public static final RegistryObject<Block> BAOBAB_FENCE_GATE = block("baobab_fence_gate",
+            () -> new FenceGateBlock(WoodType.ACACIA, BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_FENCE_GATE)));
+    public static final RegistryObject<Block> BAOBAB_DOOR = block("baobab_door",
+            () -> new DoorBlock(BlockSetType.ACACIA, BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_DOOR)));
+    public static final RegistryObject<Block> BAOBAB_TRAPDOOR = block("baobab_trapdoor",
+            () -> new TrapDoorBlock(BlockSetType.ACACIA, BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_TRAPDOOR)));
+    public static final RegistryObject<Block> BAOBAB_BUTTON = block("baobab_button",
+            () -> new ButtonBlock(BlockSetType.ACACIA, com.projectzero.nature.NatureRules.BUTTON_TICKS,
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_BUTTON)));
+    public static final RegistryObject<Block> BAOBAB_PRESSURE_PLATE = block("baobab_pressure_plate",
+            () -> new PressurePlateBlock(BlockSetType.ACACIA, BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_PRESSURE_PLATE)));
+    private static final ResourceKey<ConfiguredFeature<?, ?>> BAOBAB_TREE = ResourceKey.create(Registries.CONFIGURED_FEATURE,
+            com.projectzero.ProjectZero.id("baobab"));
+    public static final RegistryObject<Block> BAOBAB_SAPLING = block("baobab_sapling",
+            () -> new SaplingBlock(new TreeGrower("baobab", Optional.of(BAOBAB_TREE), Optional.empty(), Optional.empty()),
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_SAPLING)));
     // ---- Round 4 ----
     /** White salt crust with hexagon cracks: Salt Mirror Flats ground. */
     public static final RegistryObject<Block> SALT_CRUST = block("salt_crust",

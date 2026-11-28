@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "PP"
+  ],
+  "key": {
+    "P": {
+      "item": "projectzero:baobab_planks"
+    }
+  },
+  "result": {
+    "id": "projectzero:baobab_pressure_plate",
+    "count": 1
+  }
+}

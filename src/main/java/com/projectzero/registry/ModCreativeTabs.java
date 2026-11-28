@@ -56,6 +56,18 @@ public final class ModCreativeTabs {
                         output.accept(ModNature.LIMESTONE.get());
                         output.accept(ModNature.BAOBAB_LOG.get());
                         output.accept(ModNature.BAOBAB_PLANKS.get());
+                        output.accept(ModNature.STRIPPED_BAOBAB_LOG.get());
+                        output.accept(ModNature.BAOBAB_WOOD.get());
+                        output.accept(ModNature.STRIPPED_BAOBAB_WOOD.get());
+                        output.accept(ModNature.BAOBAB_SLAB.get());
+                        output.accept(ModNature.BAOBAB_STAIRS.get());
+                        output.accept(ModNature.BAOBAB_FENCE.get());
+                        output.accept(ModNature.BAOBAB_FENCE_GATE.get());
+                        output.accept(ModNature.BAOBAB_DOOR.get());
+                        output.accept(ModNature.BAOBAB_TRAPDOOR.get());
+                        output.accept(ModNature.BAOBAB_BUTTON.get());
+                        output.accept(ModNature.BAOBAB_PRESSURE_PLATE.get());
+                        output.accept(ModNature.BAOBAB_SAPLING.get());
                         output.accept(ModNature.SALT_CRUST.get());
                         output.accept(ModNature.MANA_CRYSTAL_BLOCK.get());
                         output.accept(ModNature.FIREFLY_BUSH.get());

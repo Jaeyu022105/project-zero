@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "projectzero:block/stripped_baobab_log"
+    },
+    "axis=x": {
+      "model": "projectzero:block/stripped_baobab_log",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z": {
+      "model": "projectzero:block/stripped_baobab_log",
+      "x": 90
+    }
+  }
+}

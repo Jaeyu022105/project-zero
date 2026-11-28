@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "P  ",
+    "PP ",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "item": "projectzero:baobab_planks"
+    }
+  },
+  "result": {
+    "id": "projectzero:baobab_stairs",
+    "count": 4
+  }
+}

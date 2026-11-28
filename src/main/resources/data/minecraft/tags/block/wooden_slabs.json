@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "projectzero:skywood_slab"
+    "projectzero:skywood_slab",
+    "projectzero:baobab_slab"
   ]
 }

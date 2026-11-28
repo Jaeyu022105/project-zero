@@ -17,6 +17,17 @@
     "projectzero:skywood_door",
     "projectzero:skywood_trapdoor",
     "projectzero:skywood_button",
-    "projectzero:skywood_pressure_plate"
+    "projectzero:skywood_pressure_plate",
+    "projectzero:stripped_baobab_log",
+    "projectzero:baobab_wood",
+    "projectzero:stripped_baobab_wood",
+    "projectzero:baobab_slab",
+    "projectzero:baobab_stairs",
+    "projectzero:baobab_fence",
+    "projectzero:baobab_fence_gate",
+    "projectzero:baobab_door",
+    "projectzero:baobab_trapdoor",
+    "projectzero:baobab_button",
+    "projectzero:baobab_pressure_plate"
   ]
 }

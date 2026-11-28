@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "projectzero:skywood_trapdoor"
+    "projectzero:skywood_trapdoor",
+    "projectzero:baobab_trapdoor"
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "projectzero:baobab_planks"
+    }
+  ],
+  "result": {
+    "id": "projectzero:baobab_button",
+    "count": 1
+  }
+}

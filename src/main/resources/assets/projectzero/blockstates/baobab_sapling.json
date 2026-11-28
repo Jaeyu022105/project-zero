@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "stage=0": {
+      "model": "projectzero:block/baobab_sapling"
+    },
+    "stage=1": {
+      "model": "projectzero:block/baobab_sapling"
+    }
+  }
+}

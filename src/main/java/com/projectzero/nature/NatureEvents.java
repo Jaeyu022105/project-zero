@@ -9,7 +9,7 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-/** Maps axe stripping actions onto the original pale Skywood blocks. */
+/** Maps axe stripping actions onto our original wood species. */
 @Mod.EventBusSubscriber(modid = ProjectZero.MOD_ID)
 public final class NatureEvents {
     private NatureEvents() {}
@@ -27,6 +27,8 @@ public final class NatureEvents {
     private static net.minecraft.world.level.block.Block strippedSkywood(net.minecraft.world.level.block.Block block) {
         if (block == ModNature.SKYWOOD_LOG.get()) return ModNature.STRIPPED_SKYWOOD_LOG.get();
         if (block == ModNature.SKYWOOD_WOOD.get()) return ModNature.STRIPPED_SKYWOOD_WOOD.get();
+        if (block == ModNature.BAOBAB_LOG.get()) return ModNature.STRIPPED_BAOBAB_LOG.get();
+        if (block == ModNature.BAOBAB_WOOD.get()) return ModNature.STRIPPED_BAOBAB_WOOD.get();
         return null;
     }
 }

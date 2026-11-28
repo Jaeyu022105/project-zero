@@ -163,6 +163,18 @@ public final class PlayerPoses {
     public static final Key[] PLACE_SKYWOOD_BUTTON = placement(-0.40F, 0.08F, -6F, 76F);
     public static final Key[] PLACE_SKYWOOD_PRESSURE_PLATE = placement(0.42F, 0.09F, 6F, 84F);
     public static final Key[] PLACE_SKYWOOD_SAPLING = placement(0.05F, 0.04F, 0F, 92F);
+    public static final Key[] PLACE_BAOBAB_STRIPPED_LOG = placement(0.22F, 0.20F, -4F, 101F);
+    public static final Key[] PLACE_BAOBAB_WOOD = placement(0.12F, 0.28F, -2F, 109F);
+    public static final Key[] PLACE_BAOBAB_STRIPPED_WOOD = placement(0.32F, 0.16F, -5F, 117F);
+    public static final Key[] PLACE_BAOBAB_SLAB = placement(-0.12F, 0.11F, -2F, 125F);
+    public static final Key[] PLACE_BAOBAB_STAIRS = placement(-0.22F, 0.25F, 2F, 133F);
+    public static final Key[] PLACE_BAOBAB_FENCE = placement(0.18F, 0.33F, -3F, 141F);
+    public static final Key[] PLACE_BAOBAB_FENCE_GATE = placement(0.28F, 0.40F, -6F, 149F);
+    public static final Key[] PLACE_BAOBAB_DOOR = placement(-0.34F, 0.42F, 5F, 157F);
+    public static final Key[] PLACE_BAOBAB_TRAPDOOR = placement(-0.18F, 0.14F, 2F, 165F);
+    public static final Key[] PLACE_BAOBAB_BUTTON = placement(0.40F, 0.06F, -7F, 173F);
+    public static final Key[] PLACE_BAOBAB_PRESSURE_PLATE = placement(-0.42F, 0.07F, 7F, 181F);
+    public static final Key[] PLACE_BAOBAB_SAPLING = placement(-0.05F, 0.05F, 0F, 189F);
 
     private static Key[] placement(float rx, float rz, float lean, float firstPersonTurn) {
         return new Key[] {
@@ -202,6 +214,18 @@ public final class PlayerPoses {
         if (item == com.projectzero.registry.ModNature.SKYWOOD_BUTTON.get().asItem()) return PLACE_SKYWOOD_BUTTON;
         if (item == com.projectzero.registry.ModNature.SKYWOOD_PRESSURE_PLATE.get().asItem()) return PLACE_SKYWOOD_PRESSURE_PLATE;
         if (item == com.projectzero.registry.ModNature.SKYWOOD_SAPLING.get().asItem()) return PLACE_SKYWOOD_SAPLING;
+        if (item == com.projectzero.registry.ModNature.STRIPPED_BAOBAB_LOG.get().asItem()) return PLACE_BAOBAB_STRIPPED_LOG;
+        if (item == com.projectzero.registry.ModNature.BAOBAB_WOOD.get().asItem()) return PLACE_BAOBAB_WOOD;
+        if (item == com.projectzero.registry.ModNature.STRIPPED_BAOBAB_WOOD.get().asItem()) return PLACE_BAOBAB_STRIPPED_WOOD;
+        if (item == com.projectzero.registry.ModNature.BAOBAB_SLAB.get().asItem()) return PLACE_BAOBAB_SLAB;
+        if (item == com.projectzero.registry.ModNature.BAOBAB_STAIRS.get().asItem()) return PLACE_BAOBAB_STAIRS;
+        if (item == com.projectzero.registry.ModNature.BAOBAB_FENCE.get().asItem()) return PLACE_BAOBAB_FENCE;
+        if (item == com.projectzero.registry.ModNature.BAOBAB_FENCE_GATE.get().asItem()) return PLACE_BAOBAB_FENCE_GATE;
+        if (item == com.projectzero.registry.ModNature.BAOBAB_DOOR.get().asItem()) return PLACE_BAOBAB_DOOR;
+        if (item == com.projectzero.registry.ModNature.BAOBAB_TRAPDOOR.get().asItem()) return PLACE_BAOBAB_TRAPDOOR;
+        if (item == com.projectzero.registry.ModNature.BAOBAB_BUTTON.get().asItem()) return PLACE_BAOBAB_BUTTON;
+        if (item == com.projectzero.registry.ModNature.BAOBAB_PRESSURE_PLATE.get().asItem()) return PLACE_BAOBAB_PRESSURE_PLATE;
+        if (item == com.projectzero.registry.ModNature.BAOBAB_SAPLING.get().asItem()) return PLACE_BAOBAB_SAPLING;
         if (item instanceof net.minecraft.world.item.BlockItem) return PLACE;
         return TAP;
     }
@@ -255,6 +279,18 @@ public final class PlayerPoses {
         joints(PLACE_SKYWOOD_BUTTON, 0.5F, 0.25F, 0.1F, 0.15F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
         joints(PLACE_SKYWOOD_PRESSURE_PLATE, 0.55F, 0.25F, 0.1F, 0.15F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
         joints(PLACE_SKYWOOD_SAPLING, 0.45F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
+        joints(PLACE_BAOBAB_STRIPPED_LOG, 0.7F, 0.35F, 0.1F, 0.25F, 0.3F, 0.1F, 0.3F, 0.35F, 0.1F);
+        joints(PLACE_BAOBAB_WOOD, 0.7F, 0.35F, 0.1F, 0.25F, 0.3F, 0.1F, 0.3F, 0.35F, 0.1F);
+        joints(PLACE_BAOBAB_STRIPPED_WOOD, 0.7F, 0.35F, 0.1F, 0.25F, 0.3F, 0.1F, 0.3F, 0.35F, 0.1F);
+        joints(PLACE_BAOBAB_SLAB, 0.65F, 0.3F, 0.1F, 0.2F, 0.35F, 0.1F, 0.2F, 0.3F, 0.1F);
+        joints(PLACE_BAOBAB_STAIRS, 0.8F, 0.35F, 0.1F, 0.25F, 0.35F, 0.1F, 0.3F, 0.35F, 0.1F);
+        joints(PLACE_BAOBAB_FENCE, 0.75F, 0.35F, 0.15F, 0.3F, 0.35F, 0.1F, 0.3F, 0.3F, 0.1F);
+        joints(PLACE_BAOBAB_FENCE_GATE, 0.85F, 0.4F, 0.15F, 0.3F, 0.4F, 0.15F, 0.35F, 0.4F, 0.15F);
+        joints(PLACE_BAOBAB_DOOR, 0.8F, 0.45F, 0.15F, 0.25F, 0.4F, 0.15F, 0.3F, 0.4F, 0.15F);
+        joints(PLACE_BAOBAB_TRAPDOOR, 0.6F, 0.3F, 0.1F, 0.2F, 0.3F, 0.1F, 0.2F, 0.3F, 0.1F);
+        joints(PLACE_BAOBAB_BUTTON, 0.5F, 0.25F, 0.1F, 0.15F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
+        joints(PLACE_BAOBAB_PRESSURE_PLATE, 0.55F, 0.25F, 0.1F, 0.15F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
+        joints(PLACE_BAOBAB_SAPLING, 0.45F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
     }
 
     private static void joints(Key[] keys, float... v) {

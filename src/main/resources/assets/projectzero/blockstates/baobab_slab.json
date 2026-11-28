@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "projectzero:block/baobab_slab"
+    },
+    "type=double": {
+      "model": "projectzero:block/baobab_planks"
+    },
+    "type=top": {
+      "model": "projectzero:block/baobab_slab_top"
+    }
+  }
+}
