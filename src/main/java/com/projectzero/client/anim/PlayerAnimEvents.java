@@ -161,6 +161,7 @@ public final class PlayerAnimEvents {
         }
         // Bare hands box: both fists come up into a guard and throw jab, cross, hook, uppercut.
         if (stack.isEmpty() && player.getMainHandItem().isEmpty() && !player.isUsingItem() && !player.isInvisible()
+                && !interacting
                 && (mainHand || MoveState.of(player).boxing(partial) > 0.01F || player.getAttackAnim(partial) > 0F)) {
             event.setCanceled(true);
             float dip = mainHand ? event.getEquipProgress() : 0F;
