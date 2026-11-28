@@ -322,6 +322,9 @@ public final class SkillBehaviors {
     private static boolean castPackHowl(ServerPlayer player, Skill skill, JsonObject params) {
         int count = GsonHelper.getAsInt(params, "count", 2);
         int duration = GsonHelper.getAsInt(params, "duration_ticks", 240);
+        com.projectzero.companions.CompanionEntry companion =
+                com.projectzero.companions.CompanionService.spiritHound(player, true);
+        if (companion == null) return false;
 
         ServerLevel level = player.serverLevel();
         long expireAt = level.getGameTime() + duration;
@@ -336,9 +339,11 @@ public final class SkillBehaviors {
             hound.moveTo(player.getX() + Math.cos(angle) * 1.5, player.getY(),
                     player.getZ() + Math.sin(angle) * 1.5, player.getYRot(), 0);
             hound.tame(player);
-            hound.setCustomName(Component.literal("Spirit Hound").withStyle(ChatFormatting.AQUA));
+            hound.setCustomName(Component.translatable("companion.projectzero.spirit_hound").withStyle(ChatFormatting.AQUA));
             hound.getPersistentData().putBoolean(SkillEffects.SUMMON_TAG, true);
             hound.getPersistentData().putLong(SkillEffects.SUMMON_EXPIRE_TAG, expireAt);
+            com.projectzero.companions.CompanionService.applySpiritHoundStats(hound, companion);
+            com.projectzero.companions.CompanionService.markSpawned(player, companion, hound, i == 0);
             hound.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, duration, 0, false, false));
             hound.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, duration, 1, false, false));
             if (nearestFoe != null) hound.setTarget(nearestFoe);

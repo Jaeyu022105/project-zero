@@ -145,6 +145,7 @@ public final class SkillEffects {
                     if (now >= expire) {
                         level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
                                 entity.getX(), entity.getY() + 0.5, entity.getZ(), 10, 0.25, 0.25, 0.25, 0.02);
+                        com.projectzero.companions.CompanionService.clearLiveId(entity);
                         entity.discard();
                     }
                 }

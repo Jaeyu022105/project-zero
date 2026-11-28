@@ -244,5 +244,12 @@
   "notice.projectzero.title": "Title Acquired",
   "notice.projectzero.warning": "System Warning",
   "notice.projectzero.vessel_tier": "Shard Vessel",
-  "block.projectzero.firefly_bush": "Firefly Bush"
+  "block.projectzero.firefly_bush": "Firefly Bush",
+  "companion.projectzero.spirit_hound": "Spirit Hound",
+  "command.projectzero.companion.unknown_type": "Unknown entity type: %s",
+  "command.projectzero.companion.unknown": "No companion named %s exists.",
+  "command.projectzero.companion.empty": "Your companion roster is empty.",
+  "command.projectzero.companion.entry": "%s — Level %s, %s XP",
+  "command.projectzero.companion.added": "Added %s to the companion roster.",
+  "command.projectzero.companion.xp_added": "Granted companion experience to %s."
 }

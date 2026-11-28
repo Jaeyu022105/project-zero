@@ -18,7 +18,8 @@ public final class ModNetwork {
     // 9: SystemNoticePacket.
     // 10: level ceiling sync (PlayerStats.ceilingBroken + SyncJobPacket.noCeiling).
     // 11: waypoint list sync, travel and rename.
-    private static final int PROTOCOL_VERSION = 11;
+    // 12: companion roster sync.
+    private static final int PROTOCOL_VERSION = 12;
 
     public static final SimpleChannel CHANNEL = ChannelBuilder
             .named(ProjectZero.id("main"))
@@ -129,6 +130,12 @@ public final class ModNetwork {
                 .encoder(RenameWaypointPacket::encode)
                 .decoder(RenameWaypointPacket::decode)
                 .consumerMainThread(RenameWaypointPacket::handle)
+                .add();
+
+        CHANNEL.messageBuilder(SyncCompanionsPacket.class, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(SyncCompanionsPacket::encode)
+                .decoder(SyncCompanionsPacket::decode)
+                .consumerMainThread(SyncCompanionsPacket::handle)
                 .add();
     }
 
