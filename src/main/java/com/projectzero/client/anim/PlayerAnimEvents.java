@@ -142,6 +142,23 @@ public final class PlayerAnimEvents {
         if (!player.isUsingItem()) locomotion(pose, player, partial, i, mainHand);
 
         ItemStack stack = event.getItemStack();
+        ClientSkillVisuals.Visual v = ClientSkillVisuals.find(player.getId(), ClientSkillVisuals.Kind.ANIM);
+        boolean interacting = v != null && PlayerAnim.byId(v.rgb) == PlayerAnim.INTERACT;
+        if (mainHand && interacting && stack.isEmpty()) {
+            event.setCanceled(true);
+            float t = v.progress(partial);
+            PlayerPoses.Key[] keys = PlayerPoses.INTERACT;
+            float w = PlayerPoses.weight(t, keys);
+            float[] fp = PlayerPoses.sample(keys, t).fp();
+            pose.pushPose();
+            pose.translate(i * 0.56F + i * fp[0] * w, -0.52F + fp[1] * w, -0.72F + fp[2] * w);
+            pose.mulPose(Axis.YP.rotationDegrees(i * fp[4] * w));
+            pose.mulPose(Axis.ZP.rotationDegrees(i * fp[5] * w));
+            pose.mulPose(Axis.XP.rotationDegrees(fp[3] * w));
+            renderGripArm(pose, event.getMultiBufferSource(), event.getPackedLight(), player, arm, i);
+            pose.popPose();
+            return;
+        }
         // Bare hands box: both fists come up into a guard and throw jab, cross, hook, uppercut.
         if (stack.isEmpty() && player.getMainHandItem().isEmpty() && !player.isUsingItem() && !player.isInvisible()
                 && (mainHand || MoveState.of(player).boxing(partial) > 0.01F || player.getAttackAnim(partial) > 0F)) {
@@ -160,14 +177,17 @@ public final class PlayerAnimEvents {
         }
         PlayerPoses.Key[] keys = null;
         float t = 0F;
-        ClientSkillVisuals.Visual v = ClientSkillVisuals.find(player.getId(), ClientSkillVisuals.Kind.ANIM);
         float swing = event.getSwingProgress();
         if (v != null) {
             keys = PlayerPoses.keys(PlayerAnim.byId(v.rgb));
             t = v.progress(partial);
         } else if (swing > 0F) {
             // Each item family swings its own way (see PlayerPoses.forHeld).
-            keys = PlayerPoses.forHeld(stack, MoveState.of(player).combo);
+            boolean logChop = Minecraft.getInstance().gameMode != null && Minecraft.getInstance().gameMode.isDestroying()
+                    && Minecraft.getInstance().hitResult instanceof net.minecraft.world.phys.BlockHitResult hit
+                    && Minecraft.getInstance().level != null
+                    && Minecraft.getInstance().level.getBlockState(hit.getBlockPos()).is(net.minecraft.tags.BlockTags.LOGS);
+            keys = PlayerPoses.forHeld(stack, MoveState.of(player).combo, logChop, player.isSprinting());
             t = swing;
         }
         event.setCanceled(true);

@@ -68,7 +68,7 @@ public final class WaypointService {
         if (!PlayerWaypoints.knows(player, dimension, pos.asLong())) {
             PlayerWaypoints.add(player, dimension, pos.asLong());
             SystemNotices.system(player, NoticeType.ITEM, Component.translatable("notice.projectzero.waypoint.attuned", waypoint.name()));
-            sync(player, false);
+            sendList(player);
         } else {
             sendList(player);
         }

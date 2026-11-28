@@ -182,6 +182,7 @@
   "dimension.projectzero.dungeon": "Gate Dungeon",
   "dimension.projectzero.library": "The Library",
   "key.projectzero.skills": "Open Skills Window",
+  "key.projectzero.companions": "Open Summons Window",
   "key.projectzero.cycle_preset": "Next Skill Preset",
   "screen.projectzero.skills": "Skills",
   "biome.projectzero.capwood": "Capwood",
@@ -267,8 +268,13 @@
   "screen.projectzero.companions.bond_crystal": "BOND CRYSTAL",
   "screen.projectzero.companions.abilities": "ABILITIES",
   "screen.projectzero.companions.gear": "GEAR",
+  "screen.projectzero.companions.slot.weapon": "WEAPON",
+  "screen.projectzero.companions.slot.armor": "ARMOR",
+  "screen.projectzero.companions.slot.charm": "CHARM",
+  "screen.projectzero.companions.slot.relic": "RELIC",
   "screen.projectzero.companions.gear_empty": "—",
   "screen.projectzero.companions.none": "None",
   "companion.projectzero.ability.pack_howl": "Pack Howl",
-  "item.projectzero.bond_crystal.desc": "Refunds a companion's spent stat points."
+  "item.projectzero.bond_crystal.desc": "Refunds a companion's spent stat points.",
+  "notice.projectzero.companions.job_required": "This path does not grant access to summons."
 }

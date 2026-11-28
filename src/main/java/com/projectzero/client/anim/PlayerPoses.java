@@ -111,9 +111,24 @@ public final class PlayerPoses {
             k(0.75F, -0.95F, -0.10F, 0F, -0.20F, 0F, -0.1F, -0.10F, 5F, 0F, -0.02F, -0.15F, -45, 0, 5)};
     /** Axe: a heavy two-step, big wind-up chop then a rising backhand. */
     public static final Key[] AXE_CHOP = {
-            k(0.18F, -2.60F, 0.70F, 0.5F, -0.50F, 0F, -0.2F, 0.45F, -3F, 0.25F, 0.20F, 0.05F, 30, 40, -35),
-            k(0.48F, -0.70F, -0.70F, 0.1F, 0.10F, 0F, -0.2F, -0.45F, 8F, -0.30F, -0.02F, -0.15F, -40, -45, 30),
-            k(0.80F, -0.65F, -0.70F, 0.1F, 0.10F, 0F, -0.2F, -0.45F, 7F, -0.30F, -0.02F, -0.15F, -40, -45, 30)};
+            k(0.16F, -2.85F, 0.55F, 0.35F, -1.45F, 0.25F, -0.35F, 0.35F, -5F, 0.22F, 0.24F, -0.02F, 42, 30, -28),
+            k(0.46F, -0.62F, -0.82F, 0.08F, -0.40F, -0.25F, -0.10F, -0.55F, 10F, -0.24F, -0.04F, -0.18F, -52, -42, 28),
+            k(0.78F, -0.55F, -0.78F, 0.08F, -0.34F, -0.20F, -0.10F, -0.50F, 8F, -0.22F, -0.02F, -0.16F, -48, -40, 25)};
+    /** Overhead log chop, with the off hand bracing the haft through the strike. */
+    public static final Key[] AXE_LOG_CHOP = {
+            k(0.16F, -3.05F, 0.05F, 0.12F, -2.05F, 0.12F, -0.15F, 0F, -7F, 0.04F, 0.30F, -0.08F, 58, 4, -8),
+            k(0.46F, -0.42F, -0.10F, 0F, -0.86F, -0.08F, 0F, 0F, 13F, -0.02F, -0.02F, -0.26F, -48, -4, 4),
+            k(0.80F, -0.38F, -0.10F, 0F, -0.72F, -0.05F, 0F, 0F, 10F, -0.02F, -0.02F, -0.23F, -42, -4, 4)};
+    /** Sprinting axe attack: a broad horizontal sweep with the torso carrying through. */
+    public static final Key[] AXE_SPRINT = {
+            k(0.14F, -1.90F, 1.12F, 0.30F, -0.95F, 0.48F, -0.20F, 0.58F, -5F, 0.24F, 0.14F, 0.04F, 8, 48, -25),
+            k(0.44F, -1.18F, -1.10F, 0.04F, -0.35F, -0.45F, -0.08F, -0.78F, 10F, -0.34F, -0.04F, -0.16F, -5, -62, 38),
+            k(0.80F, -1.05F, -1.02F, 0.04F, -0.30F, -0.40F, -0.08F, -0.70F, 8F, -0.30F, -0.02F, -0.14F, -5, -58, 34)};
+    /** Bare-hand block/entity interaction: reach with an open hand, then ease it back. */
+    public static final Key[] INTERACT = {
+            k(0.12F, -0.78F, -0.18F, 0.12F, -0.25F, 0.10F, -0.05F, 0.08F, -2F, 0.08F, -0.01F, -0.12F, -32, -4, 14),
+            k(0.42F, -1.15F, -0.06F, 0.02F, -0.42F, 0.02F, -0.04F, -0.08F, 3F, 0.03F, 0.02F, -0.48F, -48, 0, 4),
+            k(0.78F, -1.02F, -0.05F, 0.02F, -0.34F, 0.02F, -0.04F, -0.06F, 2F, 0.01F, 0.01F, -0.30F, -26, 0, 2)};
     public static final Key[][] AXE = {AXE_CHOP, SWING_BACK};
     /**
      * Shovel: both hands on the shaft (off hand reaching across), lean in and drive it down and
@@ -190,10 +205,16 @@ public final class PlayerPoses {
 
     /** The swing for whatever is in the main hand, at this step of the chain. */
     public static Key[] forHeld(net.minecraft.world.item.ItemStack stack, int combo) {
+        return forHeld(stack, combo, false, false);
+    }
+
+    /** Chooses the context-specific axe swing when logging or sprinting. */
+    public static Key[] forHeld(net.minecraft.world.item.ItemStack stack, int combo, boolean choppingLog, boolean sprinting) {
         net.minecraft.world.item.Item item = stack.getItem();
         if (stack.isEmpty()) return FIST_COMBO[combo % FIST_COMBO.length];
         if (item instanceof net.minecraft.world.item.SwordItem) return COMBO[combo % COMBO.length];
-        if (item instanceof net.minecraft.world.item.AxeItem) return AXE[combo % AXE.length];
+        if (item instanceof net.minecraft.world.item.AxeItem) return choppingLog ? AXE_LOG_CHOP
+                : sprinting ? AXE_SPRINT : AXE[combo % AXE.length];
         if (item instanceof net.minecraft.world.item.PickaxeItem) return PICK;
         if (item instanceof net.minecraft.world.item.ShovelItem) return SHOVEL;
         if (item instanceof net.minecraft.world.item.HoeItem) return HOE;
@@ -263,6 +284,9 @@ public final class PlayerPoses {
         joints(UPPERCUT, 1.9F, 1.8F, 0.55F, 1.0F, 1.8F, 0.1F, 1.1F, 1.8F, 0.1F);
         joints(PICK, 1.3F, 0.4F, 0.15F, 0.2F, 0.4F, 0.3F, 0.25F, 0.4F, 0.3F);
         joints(AXE_CHOP, 1.2F, 0.6F, 0.2F, 0.1F, 0.6F, 0.45F, 0.15F, 0.6F, 0.4F);
+        joints(AXE_LOG_CHOP, 1.35F, 0.6F, 0.2F, 1.25F, 0.6F, 0.4F, 0.15F, 0.6F, 0.35F);
+        joints(AXE_SPRINT, 1.35F, 0.7F, 0.2F, 1.0F, 0.7F, 0.35F, 0.18F, 0.65F, 0.3F);
+        joints(INTERACT, 0.35F, 0.25F, 0.05F, 0.3F, 0.25F, 0.05F, 0.1F, 0.2F, 0.05F);
         joints(SHOVEL, 0.6F, 0.7F, 0.35F, 0.5F, 0.6F, 0.7F, 0.6F, 0.7F, 0.25F, 0.6F, 0.7F, 0.2F);
         joints(HOE, 0.2F, 0.3F, 0.2F, 1.0F, 0.3F, 0.15F, 1.0F, 0.3F, 0.15F);
         joints(STAB, 1.6F, 0.6F, 0.3F, 0.05F, 0.6F, 0.35F, 0.1F, 0.6F, 0.35F);
@@ -324,6 +348,7 @@ public final class PlayerPoses {
             case SLASH -> SLASH; case SLAM -> SLAM; case PUNCH -> PUNCH; case THROW -> THROW; case GUARD -> GUARD;
             case CAST_UP -> CAST_UP; case NOVA -> NOVA; case PUSH -> PUSH; case ROAR -> ROAR; case DASH -> DASH;
             case BOND_CRYSTAL -> USE_BOND_CRYSTAL;
+            case INTERACT -> INTERACT;
         };
     }
 

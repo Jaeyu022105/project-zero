@@ -54,6 +54,12 @@ public final class ModKeyBindings {
             GLFW.GLFW_KEY_J,
             CATEGORY);
 
+    public static final KeyMapping OPEN_COMPANIONS = new KeyMapping(
+            "key." + ProjectZero.MOD_ID + ".companions",
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_U,
+            CATEGORY);
+
     /** Swaps to the next skill preset, usable mid-fight. */
     public static final KeyMapping CYCLE_PRESET = new KeyMapping(
             "key." + ProjectZero.MOD_ID + ".cycle_preset",
@@ -69,6 +75,7 @@ public final class ModKeyBindings {
         public static void onRegisterKeys(RegisterKeyMappingsEvent event) {
             event.register(OPEN_STATUS);
             event.register(OPEN_SKILLS);
+            event.register(OPEN_COMPANIONS);
             event.register(CYCLE_PRESET);
             for (KeyMapping key : SKILL_KEYS) {
                 event.register(key);
@@ -89,6 +96,18 @@ public final class ModKeyBindings {
             while (OPEN_SKILLS.consumeClick()) {
                 if (mc.player != null && mc.screen == null) {
                     mc.setScreen(new SkillLoadoutScreen());
+                }
+            }
+            while (OPEN_COMPANIONS.consumeClick()) {
+                if (mc.player != null && mc.screen == null) {
+                    if (ClientJobCache.hasCompanions()) {
+                        mc.setScreen(new CompanionsScreen());
+                    } else {
+                        mc.player.displayClientMessage(net.minecraft.network.chat.Component.literal("[System] ")
+                                .withStyle(net.minecraft.ChatFormatting.AQUA)
+                                .append(net.minecraft.network.chat.Component.translatable("notice.projectzero.companions.job_required")
+                                        .withStyle(net.minecraft.ChatFormatting.WHITE)), true);
+                    }
                 }
             }
             while (CYCLE_PRESET.consumeClick()) {

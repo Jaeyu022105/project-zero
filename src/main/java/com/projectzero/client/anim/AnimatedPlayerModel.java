@@ -4,12 +4,15 @@ import com.projectzero.anim.PlayerAnim;
 import com.projectzero.client.ClientSkillVisuals;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.phys.BlockHitResult;
 
 /**
  * The player model with our animations layered on top of vanilla: skill poses ({@link PlayerAnim})
@@ -52,7 +55,13 @@ public class AnimatedPlayerModel extends PlayerModel<AbstractClientPlayer> {
             t = v.progress(partial);
         } else if (attackTime > 0F && !player.isUsingItem()) {
             // Every item family has its own swing (fists box, swords combo, picks peck, shovels scoop...).
-            keys = PlayerPoses.forHeld(player.getMainHandItem(), st.combo);
+            boolean logChop = false;
+            Minecraft mc = Minecraft.getInstance();
+            if (player == mc.player && mc.gameMode != null && mc.gameMode.isDestroying()
+                    && mc.hitResult instanceof BlockHitResult hit && mc.level != null) {
+                logChop = mc.level.getBlockState(hit.getBlockPos()).is(BlockTags.LOGS);
+            }
+            keys = PlayerPoses.forHeld(player.getMainHandItem(), st.combo, logChop, player.isSprinting());
             t = attackTime;
         }
         if (keys != null) applyPose(keys, t, PlayerPoses.weight(t, keys), left);

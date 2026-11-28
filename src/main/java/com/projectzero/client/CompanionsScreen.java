@@ -142,18 +142,18 @@ public final class CompanionsScreen extends Screen {
         for (int slot = 0; slot < CompanionRules.GEAR_SLOTS.length; slot++) {
             String slotName = CompanionRules.GEAR_SLOTS[slot];
             int x = gearX + slot * 46;
-            int boxY = INFO_Y + 167;
+            int boxY = INFO_Y + 182;
             ItemStack stack = selected.gear().getOrDefault(slotName, ItemStack.EMPTY);
-            g.fill(x, boxY, x + 43, boxY + 34, PANEL);
-            g.renderOutline(x, boxY, 43, 34, BORDER_DIM);
+            g.fill(x, boxY, x + 43, boxY + 24, PANEL);
+            g.renderOutline(x, boxY, 43, 24, BORDER_DIM);
             g.drawCenteredString(font, Component.translatable("screen.projectzero.companions.slot." + slotName),
                     x + 21, boxY + 2, MUTED);
             if (!stack.isEmpty()) {
-                g.renderItem(stack, x + 13, boxY + 14);
-                g.renderItemDecorations(font, stack, x + 13, boxY + 14);
+                g.renderItem(stack, x + 13, boxY + 8);
+                g.renderItemDecorations(font, stack, x + 13, boxY + 8);
             } else {
                 g.drawCenteredString(font, Component.translatable("screen.projectzero.companions.gear_empty"),
-                        x + 21, boxY + 18, MUTED);
+                        x + 21, boxY + 14, MUTED);
             }
         }
     }
