@@ -252,6 +252,7 @@ Our own mechanic, not in Solo Leveling.
 
 ## 13. Summons and pets
 
+- **Owner direction 2026-11-29: no vanilla mobs.** Every summon, pet, gate monster and boss will be an original mob of ours. Anything that uses a vanilla mob today (Spirit Hounds as wolves, gate monsters as zombies and skeletons, monster parts dropping from wolves and spiders) is a placeholder, replaced as our mobs land.
 - **[Planned]** (owner idea 2026-11-26) Two kinds of companions.
 - **Summons (job-based, combat).** Summoner-type jobs (Summoner, Beastcaller, Gravewarden...) call creatures with a skill and mana. Each summon has its own level, stats and a few abilities, follows the player, fights, and returns to the player's **roster** when dismissed or killed (it comes back after a cooldown, never lost for good). Leveled summons evolve into stronger forms. This is also the road to the Monarch path (§8): a Shadow Monarch can raise defeated bosses as summons.
 - **Pets (anyone, light).** Small creatures anyone can tame or hatch (eggs from gates and hidden dungeons). They follow you, give a small passive bonus (e.g. pick up XP orbs, glow in dark dungeons, warn of nearby gate monsters), and can wear one accessory. A few rare pets help a little in fights.
@@ -432,6 +433,7 @@ Our biomes are placed with **TerraBlender** (`worldgen/ProjectZeroRegion`, weigh
 
 ## 18. Monster materials and drops (owner direction 2026-11-27)
 
+- **No vanilla mobs (owner, 2026-11-29):** parts dropping from vanilla wolves, spiders and so on are placeholders until our own mobs exist; then the drop table moves to them.
 - **[Planned]** Our mobs drop an item plus **parts of their bodies**, and the parts are what crafting needs. A wolf type drops **teeth, claws and fur** (the most wanted parts) and **meat** you can cook and eat.
 - **All parts sell** (Hunter's Association, merchants). Better and rarer parts from higher-rank monsters sell for more.
 - Gate monsters also drop **monster crystals** (cores), worth the most money and used in stations like the Synthesizer.

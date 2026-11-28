@@ -76,3 +76,4 @@ Additions and changes to the plan, newest last. One line each, with the design d
   - Continents, each its own dimension with its own biome set, spawn continent is the player's choice; 5 hidden mythical bosses per continent (§16g).
 - 2026-11-27: Rope bridges that sag between anchors and sway and shake as you walk; players can build them (§15).
 - 2026-11-27: Elves live in tree houses; their main civilization is built around the World Tree (§16a).
+- 2026-11-29: No vanilla mobs: every summon, pet, gate monster and boss will be our own; vanilla stand-ins (Spirit Hounds, gate zombies, part drops) get replaced (§13, §18).
