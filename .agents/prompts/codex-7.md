@@ -28,7 +28,9 @@ Read: `AGENTS.md` (especially §4b, everything is animated), `PROGRESS.md`, `HAN
 1. **Right-clicking a block plays a punch.** When the player uses (right-clicks) a block that has an interaction (waypoint stone, chest, door, crafting table, button, lever...), our animation system shows the bare-hand boxing punch. Add a separate short **"touch / interact" pose** in `PlayerPoses` (hand reaches forward, palm open, eases back; in third and first person) and play it for block and entity *use*, keeping the punch only for *attack* (left click). Held items keep their own use animations.
 2. **Waypoint stone:** the first right-click attunes and then also opens the travel list right away (today it only attunes, so it looks like nothing happened). Show the "Waypoint attuned" notice as well.
 3. **SUMMONS key:** a key binding (default `U`, category Project Zero) that opens `CompanionsScreen` directly for jobs with companions; for other jobs it shows a short System notice instead. Keep the button in the status window.
-**Checkpoint 1:** build, commit `fix: interact pose, waypoint first use, summons key`, push. If you've used more than about 60% of your budget, skip to "Finish".
+4. **SUMMONS screen gear row:** the owner's screenshot shows the gear label as raw translation keys (`screen.projectzero.companions...`) drawn on top of each other across the gear slots. Add the missing `en_us.json` keys for the gear label and each slot name, and lay the label out on its own line above the 4 slots so nothing overlaps.
+5. **Axe animation:** the axe gets its own key set in `PlayerPoses` (mapped in `PlayerPoses.forHeld`), like swinging a real axe: two-handed feel, the axe drawn back over the shoulder in a wind-up, a heavy diagonal chop down and across with follow-through, a short recovery. Chopping a log uses an overhead chop; a sprint attack gets a wider horizontal swing. Third and first person, per `game-feel` timing.
+**Checkpoint 1:** build, commit `fix: interact pose, waypoint first use, summons key, axe swings`, push. If you've used more than about 60% of your budget, skip to "Finish".
 
 ## Stage 2: backpacks (foundation)
 
