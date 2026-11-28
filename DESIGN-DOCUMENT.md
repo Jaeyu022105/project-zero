@@ -248,7 +248,10 @@ Our own mechanic, not in Solo Leveling.
 - **[Built] Drops:** via `AccessoryLootModifier` (`EquipmentRules`): vanilla hostile mobs 1.5% (Common/Uncommon, rank E), other mods' mobs 3%, gate monsters 8%, bosses 100%. Named boss **set pieces** are **[Planned]**.
 - **[Built]** Stats from gear (and equipped Title) add to the status window as a separate `(+X)` (`SyncStatBonusesPacket`) so players see base vs. bonus.
 - Gear later ties into item 15 (materials and crafting): materials can reforge or upgrade pieces.
-- **[Planned] Backpacks** (owner idea 2026-11-27): wearable backpacks that add inventory rows, in tiers (leather satchel, hunter's pack, rank packs made from monster parts). Worn on the back and visible on the player model, opened with a key. Saved with the player. They share the chest slot problem with armor, so they get their own slot next to the accessory slots.
+- **[Built] Backpacks:** Leather Satchel (9 slots), Hunter's Pack (18) and Rank Pack (27) have shaped recipes and original 16×16 placeholder icons. Equip one in its own slot beside accessories in GEAR; the equipped item is saved under `projectzero:backpack`, copied on clone, and dropped on death only when `keepInventory` is false.
+- **[Built] Backpack contents and menu:** contents live on each backpack item in the vanilla container data component, so contents travel with the item if it is moved, traded or dropped. Press **B** to open its rows above the player inventory; shift-click moves items in both directions. The server blocks nested backpacks and slots beyond the equipped pack's capacity.
+- **[Built] Rank Pack recipe:** eight Beast Pelts around a C-rank Monster Crystal. The Hunter's Pack upgrades a Leather Satchel with eight leather; the satchel uses eight leather and string.
+- **[Planned] Backpack model display:** backpacks do not appear on the player model yet (`TODO(claude-art)`); replace the placeholder item icons in the later texture pass.
 
 ## 13. Summons and pets
 

@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-28** (Codex 6: Beastcaller companions have a saved roster, leveling Spirit Hounds, a SUMMONS screen and Bond Crystal reset).
+Last caught up: **2026-11-29** (Codex 7: interaction animation fixes and tiered backpacks with a dedicated slot and item-owned storage).
 
 ---
 
@@ -79,6 +79,10 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Equipment & Accessories (`equipment/`): 8 active custom slots (`gauntlets`, `ring` Ã—2, `amulet`, `earrings`, `belt`, `charm` Ã—2) + 1 spare locked `relic` slot (`PlayerAccessories` in `projectzero:accessories` NBT; copied on clone, dropped on death only when `keepInventory` is false). 9 starter `AccessoryItem`s (`iron_gauntlets`, `copper_ring`, `silver_ring`, `gold_ring`, `bone_amulet`, `obsidian_earrings`, `leather_belt`, `hunter_charm`, `mana_charm`) with rolled `AccessoryData` component (rarity, `GateRank` E..S, flat stats, optional `crit_chance`/`mana_regen`/`lifesteal`/`xp_bonus`/`damage_vs_undead` affix), `AccessoryMenu` + `AccessoryScreen`, and `AccessoryLootModifier` (1.5% vanilla hostile, 3% modded, 8% gate monster, 100% boss).
 - Monster materials (`materials/`): `MaterialRules` owns the entity-to-part table, part chances, rank scaling, crystal chances, food values and sell values. `MaterialLootModifier` adds server-side drops on player kills; `ModMaterials` registers nine parts and six rank crystals. A/S crystals glint, beast meat cooks in a furnace, smoker or campfire, and `MaterialItem` shows a translated source and value tooltip.
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), and a Beastcaller-only `SUMMONS` button (opens `CompanionsScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
+- Summons key **U** opens `CompanionsScreen` for companion-enabled jobs and shows a short System action-bar notice for other jobs. The Status window's SUMMONS button remains.
+- Bare-hand block and entity use play a dedicated open-hand touch pose; attacks retain the boxing punch. Axes use a heavy two-hand swing, overhead chops against logs and wider sprint swings, in third and first person.
+- First use of a waypoint stone attunes it, shows the attunement notice and opens the travel list immediately.
+- Backpacks: Leather Satchel (9 slots), Hunter's Pack (18), Rank Pack (27); equip in the extra GEAR slot, then press **B**. Contents persist on the item. Pack contents cannot contain another backpack.
 - Top-right minimap (`client/MinimapOverlay`): client-only dynamic terrain texture updated 12 rows per tick, loaded-chunk-only gate scan every 20 ticks, nearby player dots, objective-marker hook, biome tint and name, coordinates, and cave-floor sampling in ceiling/dungeon dimensions. Options are under `ui.minimap`, `ui.minimapSize`, `ui.minimapZoom`, and `ui.minimapCoords`.
 - Waypoint stones (`waypoints/`): craftable waist-high rune markers (light 7), placed-world records stored per dimension and player-known locations in persistent player NBT. First use attunes a stone; known use opens a System list; owners can sneak-use to rename; server-validated travel finds a safe arrival point, plays effects and enforces a 30-second cooldown. Placement and cross-dimension travel exclude the dungeon and Library; travel is limited to natural, skylit, non-ceiling dimensions. The minimap draws known stones as cyan diamonds with rim arrows.
 - Nature wood sets (`ModNature`, `NatureEvents`, `tools/textures/nature.py`): Skywood and Baobab have logs, planks, stripped logs, wood and stripped wood, slabs, stairs, fences, gates, doors, trapdoors, buttons, pressure plates and saplings. Axe stripping preserves pillar orientation; each set has recipes, loot, block/item tags, creative entries, translations, original 16×16 textures, and distinct held-item placement poses. Skywood leaves have a 5% sapling drop.
@@ -125,13 +129,15 @@ Package layout (`src/main/java/com/projectzero/`):
   - `ModDataComponents.java`: MC 1.21+ data components (`SHARD_CHARGE`, `SHARD_CHARGE_TIER`, `SKILL_ID`, `ACCESSORY_DATA`).
   - `ModBlocks.java` & `ModBlockEntities.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL`, `AWAKENING_CORE`, `AWAKENING_CRYSTAL_DEEP`, `AWAKENING_CLUSTER`, `VOID_SEA`, `VOID_MOTE`, `GATE_PORTAL` (`GateBlockEntity`), `MANA_CRYSTAL`, `ANCIENT_GATE_STONE`, `WAYPOINT_STONE`.
 - `ModItems.java`: block items including `WAYPOINT_STONE`, `AWAKENING_SHARD`, `SHARD_VESSEL`, `SKILLBOOK`, `MANA_CRYSTAL_SHARD`, `BOND_CRYSTAL`, and 9 starter `AccessoryItem`s.
+- `ModItems.java` also registers `LEATHER_SATCHEL`, `HUNTERS_PACK`, and `RANK_PACK` (`BackpackItem`, capacities 9/18/27); `ModMenus.java` registers `BACKPACK`.
   - `ModEntities.java`: `JOB_CARD` (`JobCardEntity`).
   - `ModFeatures.java`: `ANCIENT_GATE` (`AncientGateFeature` worldgen).
   - `ModMenus.java` & `ModLootModifiers.java`: `ACCESSORIES` (`AccessoryMenu`), `ACCESSORY_DROPS` (`AccessoryLootModifier`) and `MATERIAL_DROPS` (`MaterialLootModifier`).
   - `ModCreativeTabs.java`: `projectzero` creative tab.
 - `skills/`: `SkillRules`, `SkillType`, `SkillSource`, `Skill`, `SkillBehavior`, `SkillBehaviors`, `SkillEffects`, `SkillRegistry` (`data/<ns>/skills/*.json`), `PlayerSkills` (`projectzero:skills`), `SkillService`, `SkillbookItem`, `SkillCommands`, `SkillEvents`.
 - `titles/`: `MilestoneTracker` (`projectzero:milestones`), `Title`, `TitleRegistry` (`data/<ns>/titles/*.json`), `PlayerTitles` (`projectzero:titles`), `TitleService`, `TitleCommands`, `TitleEvents`.
-- `equipment/`: `AccessorySlotType`, `AccessoryData`, `EquipmentRules`, `AccessoryItem`, `PlayerAccessories` (`projectzero:accessories`), `EquipmentService`, `AccessoryMenu`, `AccessoryLootModifier`, `EquipmentCommands`, `EquipmentEvents`.
+- `equipment/`: accessories plus `BackpackItem`, `PlayerBackpack` (`projectzero:backpack`), `BackpackService`, `BackpackMenu`, and `BackpackEvents`. Backpack contents use the vanilla `minecraft:container` item data component.
+- `anim/InteractionAnimationEvents.java`: server-broadcast touch poses for bare-hand block and entity use. `client/anim/PlayerPoses` holds the interact and axe context poses.
 - `combat/`: `BossAffinity` (boss elemental weaknesses/resistances), hit feedback, player movement/action poses (`PlayerPoses`).
 - `gates/`: `GateRank` (`E..S`), `GateSize` (`SMALL`/`MEDIUM`/`LARGE`), `GateRules` (`projectzero:gateSpawning`, `projectzero:gateAging`, `projectzero:dungeonBreaks`, `projectzero:breakCorruption` gamerules + aging/break/storm/corruption constants), `MobScaling`, `GateBlock`, `GateBlockEntity`, `RiftShape`, `AncientGate`, `AncientGateStoneBlock`, `AncientStonePiece`, `AncientGateFeature`, `ManaCrystalBlock`, `DungeonSavedData`, `CorruptionSavedData`, `CorruptionService`, `GateDungeonArena`, `GateService`, `MobCommands`, `GateCommands`, `MobEvents`.
 - `awakening/`
@@ -147,14 +153,14 @@ Package layout (`src/main/java/com/projectzero/`):
 - `waypoints/`: `WaypointRules` (travel cooldown, range, safety search and forbidden dimension tag), `WaypointSavedData` (per-dimension marker records), `PlayerWaypoints` (attuned dimensions and positions, copied on clone), `WaypointService` (placement, attunement, list sync, safe travel and rename), `WaypointEvents`, `WaypointStoneBlock`, `WaypointStoneItem`.
 - `companions/`: `PlayerCompanions` (`projectzero:companions`, copied on clone), `CompanionEntry`, `CompanionKind`, `CompanionRules`, `CompanionService`, `CompanionEvents`, `CompanionCommands`; `CompanionService` owns roster writes and sync.
 - `network/`
-  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version `13`. Bump the version when a packet's format changes.
-  - `SyncStatsPacket`, `AllocateStatPacket`, `SyncJobPacket`, `VisionOverlayPacket`, `SyncSkillsPacket`, `CastSkillPacket`, `SyncTitlesPacket`, `CycleTitlePacket`, `SyncStatBonusesPacket`, `OpenAccessoriesPacket`, `SyncWornGearPacket`, `SwitchPresetPacket`, `AssignSkillSlotPacket`, `SkillVisualPacket`, `SystemNoticePacket`, `SyncWaypointsPacket`, `WaypointTravelPacket`, `RenameWaypointPacket`, `SyncCompanionsPacket`, `SpendCompanionPointPacket`, `UseBondCrystalPacket`.
+  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version `14`. Bump the version when a packet's format changes.
+  - `SyncStatsPacket`, `AllocateStatPacket`, `SyncJobPacket`, `VisionOverlayPacket`, `SyncSkillsPacket`, `CastSkillPacket`, `SyncTitlesPacket`, `CycleTitlePacket`, `SyncStatBonusesPacket`, `OpenAccessoriesPacket`, `SyncWornGearPacket`, `SwitchPresetPacket`, `AssignSkillSlotPacket`, `SkillVisualPacket`, `SystemNoticePacket`, `SyncWaypointsPacket`, `WaypointTravelPacket`, `RenameWaypointPacket`, `SyncCompanionsPacket`, `SpendCompanionPointPacket`, `UseBondCrystalPacket`, `OpenBackpackPacket`.
 - `client/`
   - `ClientStatsCache`, `ClientJobCache`, `ClientSkillsCache`, `ClientTitlesCache`, `ClientBonusCache`, `ClientNoticeCache`, `ClientWaypointCache`, `ClientCompanionsCache`: synced local caches with zero client-only imports so packet handlers are server-safe.
   - `WaypointScreen` and `WaypointRenameScreen`: System-style travel list and owner rename form.
-- `ClientEvents.java` & `ClientModEvents.java`: logout cache reset (including companions), `JobCardRenderer`, and `MenuScreens.register` for `AccessoryScreen`.
-  - `ModKeyBindings.java`: `K` opens `StatusScreen`; `J` opens `SkillLoadoutScreen`; `R` cycles presets; `Z`, `X`, `C`, `V` cast active skill slots 1–4.
-  - `StatusScreen.java`, `CompanionsScreen.java`, `AccessoryScreen.java`, `SkillLoadoutScreen.java`, `SkillHudOverlay.java`, `SystemNoticeOverlay.java`, `VisionOverlayRenderer.java`.
+- `ClientEvents.java` & `ClientModEvents.java`: logout cache reset (including companions), `JobCardRenderer`, and menu screens for `AccessoryScreen` and `BackpackScreen`.
+  - `ModKeyBindings.java`: `K` opens Status; `U` opens SUMMONS; `B` opens the equipped backpack; `J` opens Skills; `R` cycles presets; `Z`, `X`, `C`, `V` cast skill slots 1–4.
+  - `StatusScreen.java`, `CompanionsScreen.java`, `AccessoryScreen.java`, `BackpackScreen.java`, `SkillLoadoutScreen.java`, `SkillHudOverlay.java`, `SystemNoticeOverlay.java`, `VisionOverlayRenderer.java`.
 
 Resources:
 
@@ -165,6 +171,7 @@ Resources:
 - `data/projectzero/loot_modifiers/material_drops.json`, registered in `data/forge/loot_modifiers/global_loot_modifiers.json`; meat cooking recipes and generated 16×16 material icons live under the usual data/assets paths.
 - `data/projectzero/jobs/*.json`: job definitions. Format: `{"id": "projectzero:duelist", "rarity": "uncommon", "upgradesTo": "projectzero:veilstalker", "trial": "projectzero:trial/veilstalker"}`; `upgradesTo` and `trial` are optional, `id` is only checked against the file name. Placeholder jobs: Brawler, Slinger (common); Duelist (upgrades to Veilstalker), Bulwark (uncommon); Hexblade (upgrades to Stormweaver), Beastcaller (rare); Stormweaver, Veilstalker (epic); Gravewarden, Sunbreaker (legendary).
 - `data/projectzero/recipe/bond_crystal.json` crafts a Bond Crystal from eight Mana Crystal Shards around an amethyst shard; its 16×16 placeholder art is generated by `tools/textures/companions.py` (`TODO(claude-art)`).
+- `data/projectzero/recipe/{leather_satchel,hunters_pack,rank_pack}.json` define the three backpack recipes. Their original placeholder icons and the GEAR backpack-slot icon are generated by `tools/textures/backpacks.py` (`TODO(claude-art)`).
 
 ---
 
@@ -195,6 +202,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 - `projectzero:accessories`: 8 active equipped accessory `ItemStack`s (+1 spare locked Relic slot); cleared & dropped on `LivingDropsEvent` when `keepInventory` is `false`.
 - `projectzero:waypoints`: a string list of `<dimension-id>|<packed-block-position>` keys the player has attuned. Per-dimension `projectzero_waypoints` SavedData stores each placed stone's position, display name and owner UUID.
 - `projectzero:companions`: roster entries with UUID, kind, entity type id, name, level, XP, five stats, unspent points, four named gear `ItemStack`s, and optional live entity UUID. Copied on clone and synchronized on login, respawn, dimension change and roster updates.
+- `projectzero:backpack`: the one equipped backpack `ItemStack`, including its item-owned `minecraft:container` contents. Copied on clone and dropped on death only when `keepInventory` is false.
 
 ---
 
@@ -217,6 +225,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 - Original gate monster models & animations, Souls-like boss attack state machines (`DESIGN-DOCUMENT.md` §10), and custom overworld fantasy biomes via TerraBlender (§15).
 - Custom Spirit Hound model and full animation set; hounds currently use the vanilla Wolf as a placeholder (`TODO(claude-art)`). Bond Crystal art is also a placeholder (`TODO(claude-art)`).
+- Backpack textures are placeholder art (`TODO(claude-art)`), and the equipped backpack is not rendered on the player model yet.
 - Surge visual spin/mote speed-up in `client/GateRiftRenderer` reading `GateBlockEntity#surges` (synced in the block entity update tag/packet).
 - Uses for `mana_crystal_shard` (vessel fuel, crafting, trading) and skillbook drops in dungeon loot chests.
 - Deeper job skill trees, job leveling XP, and job advancement trials (§5).
@@ -239,7 +248,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ## Current Git Caveats
 
-- Work is split across task branches (this task uses `codex/6-companions`); merge completed work into `main` through the owner's normal review flow.
+- Work is split across task branches (this task uses `codex/7-backpacks`); merge completed work into `main` through the owner's normal review flow.
 - The owner keeps a working clone at `C:\Users\Jaime\Downloads\project-zero` for uncommitted work. Do not assume the GitHub copy has everything; ask before overwriting local changes there.
 - Commits are authored by the owner. **No `Co-Authored-By` or AI attribution lines.**
 - `run/` and `build/` are ignored. Do not commit worlds, logs or jars.
@@ -1198,5 +1207,29 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 1. Run the listed Beastcaller, Spirit Hound, SUMMONS, Bond Crystal and relog checks in `runClient`.
 2. Have Claude replace the placeholder Bond Crystal texture and Spirit Hound visuals; give any new companion mob the full animation set.
 3. Continue with live pets, broader summon behavior and gear equipping/rendering after the owner decides their scope.
+
+---
+
+### Session Log — 2026-11-29 (Codex 7: interact pose, backpacks)
+
+**Context & Direction Check**
+- Followed `.agents/prompts/codex-7.md` in two implementation stages on `codex/7-backpacks`; built and pushed the first checkpoint before starting backpacks. Commits use `Jaeyu022105` without AI attribution lines and were pushed only to `codex/7-backpacks`.
+- The supplied prompt files were already staged at task start. They were kept local and excluded from the implementation and documentation commits.
+
+**Changes Made**
+- Stage 1: added a server-broadcast open-hand touch pose for bare-hand block and entity interactions, preserving the punch for attacks and leaving held item use animations alone. First waypoint use now attunes, keeps its notice, and opens the travel list. Added the U SUMMONS key with a System action-bar notice for incompatible jobs; the Status button remains. Added translated gear slot labels and moved the gear slots to their own row. Axe poses now brace with both hands, chop logs overhead and swing wider while sprinting in first and third person.
+- Stage 2: added Leather Satchel (9 slots), Hunter's Pack (18) and Rank Pack (27), recipes, Pillow-generated 16×16 placeholder icons, item models, names and creative entries. Added the persistent `projectzero:backpack` equipment slot next to accessories in GEAR and clone/death-drop handling. Contents use the vanilla item container component, travel with the backpack item, and cannot contain another backpack. Press B to open the server-backed rows above player inventory; shift-click works both ways and the server enforces capacity. Added a dedicated backpack-open pose. The backpack is not rendered on the player model yet.
+- Follow-up: kept the offhand relaxed during first-person touch interactions so it does not show a boxing fist during a right-click use.
+- Texture placeholder art in `tools/textures/backpacks.py` is marked `TODO(claude-art)`.
+
+**Verification Executed**
+- After Stage 1: `$env:JAVA_HOME = "C:\Users\Jaime\AppData\Roaming\.minecraft\runtime\java-runtime-delta\windows\java-runtime-delta"; .\gradlew.bat build --no-daemon` — **BUILD SUCCESSFUL** on Java 21.
+- After Stage 2: ran `python tools/textures/backpacks.py`, then the same Java 21 build command — **BUILD SUCCESSFUL**. Parsed all 1,145 resource JSON files with duplicate-key detection; no errors. Confirmed the three backpack icons are 16×16. `git diff --check` passed.
+- After the offhand follow-up commit, reran the Java 21 build — **BUILD SUCCESSFUL**.
+- I could not test in game. In `runClient`, check: bare-hand use on a chest, waypoint, door and entity versus a left-click attack; held item use; first waypoint attunement notice and immediate list; U as Beastcaller and another job; SUMMONS gear row labels; axe log and sprint swings; crafting all packs; inserting and removing packs in GEAR; B opening the correct 9/18/27 capacity; shift-click in both directions; contents after close/reopen and relog; backpack nesting rejection; and death drops with `keepInventory` on and off.
+
+**Remaining Recommendations**
+1. Run the listed interaction, waypoint, SUMMONS and backpack checks in `runClient`.
+2. Replace backpack placeholder icons and add backpack model rendering in the planned art pass (`TODO(claude-art)`).
 
 ---
