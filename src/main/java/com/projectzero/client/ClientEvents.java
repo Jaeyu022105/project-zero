@@ -21,6 +21,7 @@ public final class ClientEvents {
         ClientSkillsCache.reset();
         ClientTitlesCache.reset();
         ClientBonusCache.reset();
+        ClientCompanionsCache.reset();
         VisionOverlayState.reset();
         ClientWornGear.clear();
         ClientSkillVisuals.clear();
