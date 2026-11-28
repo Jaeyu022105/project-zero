@@ -21,6 +21,7 @@ Last updated: **2026-11-28**
 - Equipment: 8 accessory slots with rolled stats, mob drops, GEAR screen.
 - Awakening Stones and crystal formations, Awakening Shards, Shard Vessel charging, Reawakening vision, reroll that keeps 3 random skills.
 - Monster parts and monster crystals: player-kill drops from vanilla mobs, rank-scaled part rolls, rank-matched gate crystals, cooking recipes, original textures, sell values and tooltips (§18).
+- Companions foundation and screen: saved summon/pet roster, Spirit Hound leveling hook, Beastcaller-only SUMMONS screen, random companion stat growth, server-validated stat spending, Bond Crystal reset, and stored/displayed gear slots (§13).
 - Skywood and Baobab building sets: stripped logs, wood, slabs, stairs, fences, gates, doors, trapdoors, buttons, pressure plates, feature-growing saplings, crafting, loot, tags, original textures and item-specific placement animations (§15).
 - Player animations for every movement and held item; enemy blood and skill marks; boss weakness table.
 
@@ -35,7 +36,7 @@ Last updated: **2026-11-28**
 
 ## In progress
 
-- **Gemini's reset backlog** (`.agents/prompts/gemini-reset-backlog.md`): Tasks 1 to 5 are done and merged into this branch (System notices bottom right, level ceiling at 100, storming a breaking gate, corruption spread, fireflies). Gemini ran out of tokens there, so Task 6 (companions foundation and screen) is not started, and Task 7 moved to Claude (the bamboo and plateau polish threads).
+- **Gemini's reset backlog** (`.agents/prompts/gemini-reset-backlog.md`): Tasks 1 to 6 are done on their task branches (System notices bottom right, level ceiling at 100, storming a breaking gate, corruption spread, fireflies, companions foundation and screen). Task 7 (bamboo and plateau polish) moved to Claude.
 - **Spirit Bamboo Sea polish [Built] 2026-11-27:** thick 2x2/3x3 culms with node rings, per-grove lean and height, leaf sprays, noise lanes with stone lanterns, moss floor; biome enlarged by mapping Flower Forest to it.
 - **Shattered Sky Plateau polish [Built] 2026-11-27:** flat table, stepped misty chasms, big slabs and arches (in-game look not yet checked).
 - **Claude, polish pass on every existing biome** (DESIGN-DOCUMENT §15): built rounds 1 to 4 cover Bloodmoon Steppe, Baobab Savanna, Salt Mirror Flats, Geyser Basin, Crystal Tundra, Mana Wastes, Capwood, Elderwood, Cloud Forest, Ice Cathedral and Sunken Ruins Marsh. The separate Codex pass completed the remaining four: Sky Pillars arches and valley boulder heaps; Skyfall Isles splash pools and sky fragments; Tsingy weathered needle tips, rubble and slot pools; Karst Tower Bay low sand-coved islets and sea arches. The Spirit Bamboo Sea and the Shattered Sky Plateau each have their own polish thread.

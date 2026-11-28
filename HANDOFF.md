@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-28** (Codex 5: Skywood and Baobab now have complete building sets, saplings, stripping, crafting, and loot).
+Last caught up: **2026-11-28** (Codex 6: Beastcaller companions have a saved roster, leveling Spirit Hounds, a SUMMONS screen and Bond Crystal reset).
 
 ---
 
@@ -78,12 +78,13 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Titles & Milestones (`titles/`): `MilestoneTracker` (`projectzero:milestones` NBT) tracks kills per entity type/tag, total kills, boss kills, deaths, highest level, rerolls, and gates cleared. 6 starter JSON titles in `data/projectzero/titles/*.json` (`wolf_slayer`, `hundred_cuts`, `undead_bane`, `survivor`, `giant_killer` granting milestone skill `colossus_breaker`, `awakened_one`). Equipped title (`projectzero:titles` NBT) applies transient attributes, stat bonuses, damage-vs-entity/tag multipliers, or XP bonuses, and cycles on click in `StatusScreen`.
 - Equipment & Accessories (`equipment/`): 8 active custom slots (`gauntlets`, `ring` Ã—2, `amulet`, `earrings`, `belt`, `charm` Ã—2) + 1 spare locked `relic` slot (`PlayerAccessories` in `projectzero:accessories` NBT; copied on clone, dropped on death only when `keepInventory` is false). 9 starter `AccessoryItem`s (`iron_gauntlets`, `copper_ring`, `silver_ring`, `gold_ring`, `bone_amulet`, `obsidian_earrings`, `leather_belt`, `hunter_charm`, `mana_charm`) with rolled `AccessoryData` component (rarity, `GateRank` E..S, flat stats, optional `crit_chance`/`mana_regen`/`lifesteal`/`xp_bonus`/`damage_vs_undead` affix), `AccessoryMenu` + `AccessoryScreen`, and `AccessoryLootModifier` (1.5% vanilla hostile, 3% modded, 8% gate monster, 100% boss).
 - Monster materials (`materials/`): `MaterialRules` owns the entity-to-part table, part chances, rank scaling, crystal chances, food values and sell values. `MaterialLootModifier` adds server-side drops on player kills; `ModMaterials` registers nine parts and six rank crystals. A/S crystals glint, beast meat cooks in a furnace, smoker or campfire, and `MaterialItem` shows a translated source and value tooltip.
-- Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
+- Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), and a Beastcaller-only `SUMMONS` button (opens `CompanionsScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
 - Top-right minimap (`client/MinimapOverlay`): client-only dynamic terrain texture updated 12 rows per tick, loaded-chunk-only gate scan every 20 ticks, nearby player dots, objective-marker hook, biome tint and name, coordinates, and cave-floor sampling in ceiling/dungeon dimensions. Options are under `ui.minimap`, `ui.minimapSize`, `ui.minimapZoom`, and `ui.minimapCoords`.
 - Waypoint stones (`waypoints/`): craftable waist-high rune markers (light 7), placed-world records stored per dimension and player-known locations in persistent player NBT. First use attunes a stone; known use opens a System list; owners can sneak-use to rename; server-validated travel finds a safe arrival point, plays effects and enforces a 30-second cooldown. Placement and cross-dimension travel exclude the dungeon and Library; travel is limited to natural, skylit, non-ceiling dimensions. The minimap draws known stones as cyan diamonds with rim arrows.
 - Nature wood sets (`ModNature`, `NatureEvents`, `tools/textures/nature.py`): Skywood and Baobab have logs, planks, stripped logs, wood and stripped wood, slabs, stairs, fences, gates, doors, trapdoors, buttons, pressure plates and saplings. Axe stripping preserves pillar orientation; each set has recipes, loot, block/item tags, creative entries, translations, original 16×16 textures, and distinct held-item placement poses. Skywood leaves have a 5% sapling drop.
+- Companions (`companions/`): persistent player roster for summons and pets, XP from companion kills and owner finishing blows after a recent companion hit, three random stat points per level, and Pack Howl Spirit Hounds scaled from the roster entry. Beastcaller gets the SUMMONS screen from K; it shows stats, abilities and four named gear slots. Point-spend and Bond Crystal packets validate the job, roster ownership, points and inventory on the server. Bond Crystal resets spent points; its Pillow-drawn placeholder texture and Spirit Hound visuals are `TODO(claude-art)`.
 - Data saved with the player and kept on death (accessories follow `keepInventory`).
-- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`, `/pz gate spawn <rank> <size> [sea|ancient]`, `/pz gate leave`, `/pz gate age <days>`, `/pz gate break`.
+- Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz companion list|add <entity> <name>|xp <name> <amount>`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`, `/pz gate spawn <rank> <size> [sea|ancient]`, `/pz gate leave`, `/pz gate age <days>`, `/pz gate break`.
 
 **Built and verified in a loaded world (`gradlew runClient`).**
 
@@ -116,14 +117,14 @@ Package layout (`src/main/java/com/projectzero/`):
   - `JobRules.java`: job change level (10), starting job level (1), reroll kept job skills (3).
   - `JobRarity.java`: rarities with draw weights and colors (chat + ARGB).
   - `Job.java`: one job definition (id, rarity, optional `upgradesTo`, optional `trial`). Lang key `job.<ns>.<path>`.
-  - `JobRegistry.java`: datapack reload listener for `data/<ns>/jobs/*.json` (file name = id), weighted random draw. Server side only.
+- `JobRegistry.java`: datapack reload listener for `data/<ns>/jobs/*.json` (file name = id), weighted random draw. Server side only. The optional `companions` job flag defaults to false and is currently enabled for Beastcaller; it exposes the SUMMONS screen.
   - `PlayerJob.java`: plain data (job id, job level, first-job level) with NBT and network methods.
   - `JobEvents.java`: reload listener registration, level up -> quest, login/clone/respawn/dimension sync, commands.
   - `JobCommands.java`: `/pz job set|reroll|clear` (merged into the `/pz` node).
 - `registry/`
   - `ModDataComponents.java`: MC 1.21+ data components (`SHARD_CHARGE`, `SHARD_CHARGE_TIER`, `SKILL_ID`, `ACCESSORY_DATA`).
   - `ModBlocks.java` & `ModBlockEntities.java`: `AWAKENING_STONE`, `AWAKENING_CRYSTAL`, `AWAKENING_CORE`, `AWAKENING_CRYSTAL_DEEP`, `AWAKENING_CLUSTER`, `VOID_SEA`, `VOID_MOTE`, `GATE_PORTAL` (`GateBlockEntity`), `MANA_CRYSTAL`, `ANCIENT_GATE_STONE`, `WAYPOINT_STONE`.
-  - `ModItems.java`: block items including `WAYPOINT_STONE`, `AWAKENING_SHARD`, `SHARD_VESSEL`, `SKILLBOOK`, `MANA_CRYSTAL_SHARD`, and 9 starter `AccessoryItem`s.
+- `ModItems.java`: block items including `WAYPOINT_STONE`, `AWAKENING_SHARD`, `SHARD_VESSEL`, `SKILLBOOK`, `MANA_CRYSTAL_SHARD`, `BOND_CRYSTAL`, and 9 starter `AccessoryItem`s.
   - `ModEntities.java`: `JOB_CARD` (`JobCardEntity`).
   - `ModFeatures.java`: `ANCIENT_GATE` (`AncientGateFeature` worldgen).
   - `ModMenus.java` & `ModLootModifiers.java`: `ACCESSORIES` (`AccessoryMenu`), `ACCESSORY_DROPS` (`AccessoryLootModifier`) and `MATERIAL_DROPS` (`MaterialLootModifier`).
@@ -144,15 +145,16 @@ Package layout (`src/main/java/com/projectzero/`):
   - `AwakeningEvents.java`: registers `AwakeningCommands` and `CrystalCommands`.
 - `ui/`: `NoticeRules`, `NoticeType` (`LEVEL_UP`, `SKILL`, `QUEST`, `GATE`, `ITEM`, `COOLDOWN`, `TITLE`, `WARNING`), `SystemNotices` (shared server notice + optional `[System]` chat helper), `NoticeCommands` (`/pz notice <type> <text>`), `NoticeEvents`.
 - `waypoints/`: `WaypointRules` (travel cooldown, range, safety search and forbidden dimension tag), `WaypointSavedData` (per-dimension marker records), `PlayerWaypoints` (attuned dimensions and positions, copied on clone), `WaypointService` (placement, attunement, list sync, safe travel and rename), `WaypointEvents`, `WaypointStoneBlock`, `WaypointStoneItem`.
+- `companions/`: `PlayerCompanions` (`projectzero:companions`, copied on clone), `CompanionEntry`, `CompanionKind`, `CompanionRules`, `CompanionService`, `CompanionEvents`, `CompanionCommands`; `CompanionService` owns roster writes and sync.
 - `network/`
-  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version `11`. Bump the version when a packet's format changes.
-  - `SyncStatsPacket`, `AllocateStatPacket`, `SyncJobPacket`, `VisionOverlayPacket`, `SyncSkillsPacket`, `CastSkillPacket`, `SyncTitlesPacket`, `CycleTitlePacket`, `SyncStatBonusesPacket`, `OpenAccessoriesPacket`, `SyncWornGearPacket`, `SwitchPresetPacket`, `AssignSkillSlotPacket`, `SkillVisualPacket`, `SystemNoticePacket`, `SyncWaypointsPacket`, `WaypointTravelPacket`, `RenameWaypointPacket`.
+  - `ModNetwork.java`: Forge `SimpleChannel` (`projectzero:main`), protocol version `13`. Bump the version when a packet's format changes.
+  - `SyncStatsPacket`, `AllocateStatPacket`, `SyncJobPacket`, `VisionOverlayPacket`, `SyncSkillsPacket`, `CastSkillPacket`, `SyncTitlesPacket`, `CycleTitlePacket`, `SyncStatBonusesPacket`, `OpenAccessoriesPacket`, `SyncWornGearPacket`, `SwitchPresetPacket`, `AssignSkillSlotPacket`, `SkillVisualPacket`, `SystemNoticePacket`, `SyncWaypointsPacket`, `WaypointTravelPacket`, `RenameWaypointPacket`, `SyncCompanionsPacket`, `SpendCompanionPointPacket`, `UseBondCrystalPacket`.
 - `client/`
-  - `ClientStatsCache`, `ClientJobCache`, `ClientSkillsCache`, `ClientTitlesCache`, `ClientBonusCache`, `ClientNoticeCache`, `ClientWaypointCache`: synced local caches with zero client-only imports so packet handlers are server-safe.
+  - `ClientStatsCache`, `ClientJobCache`, `ClientSkillsCache`, `ClientTitlesCache`, `ClientBonusCache`, `ClientNoticeCache`, `ClientWaypointCache`, `ClientCompanionsCache`: synced local caches with zero client-only imports so packet handlers are server-safe.
   - `WaypointScreen` and `WaypointRenameScreen`: System-style travel list and owner rename form.
-  - `ClientEvents.java` & `ClientModEvents.java`: logout cache reset, `JobCardRenderer`, and `MenuScreens.register` for `AccessoryScreen`.
+- `ClientEvents.java` & `ClientModEvents.java`: logout cache reset (including companions), `JobCardRenderer`, and `MenuScreens.register` for `AccessoryScreen`.
   - `ModKeyBindings.java`: `K` opens `StatusScreen`; `J` opens `SkillLoadoutScreen`; `R` cycles presets; `Z`, `X`, `C`, `V` cast active skill slots 1–4.
-  - `StatusScreen.java`, `AccessoryScreen.java`, `SkillLoadoutScreen.java`, `SkillHudOverlay.java`, `SystemNoticeOverlay.java`, `VisionOverlayRenderer.java`.
+  - `StatusScreen.java`, `CompanionsScreen.java`, `AccessoryScreen.java`, `SkillLoadoutScreen.java`, `SkillHudOverlay.java`, `SystemNoticeOverlay.java`, `VisionOverlayRenderer.java`.
 
 Resources:
 
@@ -162,6 +164,7 @@ Resources:
 - `data/projectzero/tags/entity_type/gate_monsters.json`: gate monster tag (empty).
 - `data/projectzero/loot_modifiers/material_drops.json`, registered in `data/forge/loot_modifiers/global_loot_modifiers.json`; meat cooking recipes and generated 16×16 material icons live under the usual data/assets paths.
 - `data/projectzero/jobs/*.json`: job definitions. Format: `{"id": "projectzero:duelist", "rarity": "uncommon", "upgradesTo": "projectzero:veilstalker", "trial": "projectzero:trial/veilstalker"}`; `upgradesTo` and `trial` are optional, `id` is only checked against the file name. Placeholder jobs: Brawler, Slinger (common); Duelist (upgrades to Veilstalker), Bulwark (uncommon); Hexblade (upgrades to Stormweaver), Beastcaller (rare); Stormweaver, Veilstalker (epic); Gravewarden, Sunbreaker (legendary).
+- `data/projectzero/recipe/bond_crystal.json` crafts a Bond Crystal from eight Mana Crystal Shards around an amethyst shard; its 16×16 placeholder art is generated by `tools/textures/companions.py` (`TODO(claude-art)`).
 
 ---
 
@@ -191,6 +194,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 - `projectzero:titles`: unlocked title ids and single equipped title id.
 - `projectzero:accessories`: 8 active equipped accessory `ItemStack`s (+1 spare locked Relic slot); cleared & dropped on `LivingDropsEvent` when `keepInventory` is `false`.
 - `projectzero:waypoints`: a string list of `<dimension-id>|<packed-block-position>` keys the player has attuned. Per-dimension `projectzero_waypoints` SavedData stores each placed stone's position, display name and owner UUID.
+- `projectzero:companions`: roster entries with UUID, kind, entity type id, name, level, XP, five stats, unspent points, four named gear `ItemStack`s, and optional live entity UUID. Copied on clone and synchronized on login, respawn, dimension change and roster updates.
 
 ---
 
@@ -212,12 +216,15 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 ### High Priority
 
 - Original gate monster models & animations, Souls-like boss attack state machines (`DESIGN-DOCUMENT.md` §10), and custom overworld fantasy biomes via TerraBlender (§15).
+- Custom Spirit Hound model and full animation set; hounds currently use the vanilla Wolf as a placeholder (`TODO(claude-art)`). Bond Crystal art is also a placeholder (`TODO(claude-art)`).
 - Surge visual spin/mote speed-up in `client/GateRiftRenderer` reading `GateBlockEntity#surges` (synced in the block entity update tag/packet).
 - Uses for `mana_crystal_shard` (vessel fuel, crafting, trading) and skillbook drops in dungeon loot chests.
 - Deeper job skill trees, job leveling XP, and job advancement trials (§5).
 
 ### Medium Priority
 
+- Companion follow-ups: implement live pet behavior, more summon species, gear equipping/model display, and replace the Spirit Hound placeholder with an original model and full animation set (§13).
+- Open owner question: confirm the final level cap above 100.
 - Move `LevelingRules` numbers into a Forge config file so they can be tuned without rebuilding.
 - HUD: small level / XP / mana display.
 - Minimap follow-ups: connect Association quests and civilization discovery; implement the full-screen map (§11).
@@ -232,7 +239,7 @@ Additional player NBT keys (all copied on `PlayerEvent.Clone`):
 
 ## Current Git Caveats
 
-- Work is split across task branches (this task uses `codex/4-waypoints`); merge completed work into `main` through the owner's normal review flow.
+- Work is split across task branches (this task uses `codex/6-companions`); merge completed work into `main` through the owner's normal review flow.
 - The owner keeps a working clone at `C:\Users\Jaime\Downloads\project-zero` for uncommitted work. Do not assume the GitHub copy has everything; ask before overwriting local changes there.
 - Commits are authored by the owner. **No `Co-Authored-By` or AI attribution lines.**
 - `run/` and `build/` are ignored. Do not commit worlds, logs or jars.
@@ -1167,5 +1174,29 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 **Remaining Recommendations**
 1. Verify doors, axe stripping, and both sapling growth paths in `runClient`.
 2. Continue the planned unique plants, foliage, minerals and additional wood species for the remaining biomes (§15).
+
+---
+
+### Session Log — 2026-11-28 (Codex 6: companions)
+
+**Context & Direction Check**
+- Followed `.agents/prompts/codex-6.md` stage by stage on `codex/6-companions`. Stage 1 and Stage 2 are complete; nothing was stopped partial or reverted. All commits use `Jaeyu022105` without AI attribution lines and were pushed only to `codex/6-companions`.
+- The prompt file was already staged when work began and was briefly captured in the first checkpoint. It was removed from the branch's current tree in cleanup commit `292e54d`; the local prompt file is retained.
+
+**Changes Made**
+- Stage 1: added `companions/` roster persistence and clone handling, UUID entries with `SUMMON`/`PET` kinds, entity/name/level/XP/stats/points/four gear stacks/live UUID, server XP on companion kills and owner assists after a recent companion hit, and random stat allocation of three points per level. Added `/pz companion list|add <entity> <name>|xp <name> <amount>`, client roster sync/cache, and the Spirit Hound link to Pack Howl with level/stat-scaled health and damage.
+- Stage 2: added the Beastcaller-only `SUMMONS` button and System-style roster screen; optional `companions` job flag, default false and enabled on Beastcaller; validated server packets for stat spending and Bond Crystal use; Bond Crystal recipe (eight Mana Crystal Shards around an amethyst shard), 16×16 placeholder texture, creative entry, translation, and its own player animation. The screen displays four named gear slots and gear stat bonuses. Commands accept quoted multiword companion names; logout clears the roster cache.
+- Remaining `TODO(claude-art)` items: final Bond Crystal item texture; original Spirit Hound model and full animation set (the prototype uses vanilla Wolf visuals).
+- The built task scope does not implement live pet behavior, gear equipping or gear rendering on companion models. The open owner question about the final level cap above 100 remains.
+
+**Verification Executed**
+- `$env:JAVA_HOME = "C:\Users\Jaime\AppData\Roaming\.minecraft\runtime\java-runtime-delta\windows\java-runtime-delta"; .\gradlew.bat build --no-daemon` after both stages and both follow-up fixes: **BUILD SUCCESSFUL** on Java 21.
+- Ran `python tools/textures/companions.py`. Parsed all 1,139 resource JSON files with duplicate-key detection; no parse errors or duplicate keys. Checked projectzero model references from blockstates and item models; none unresolved. Confirmed Bond Crystal texture is 16×16. `git diff --check` passed.
+- I could not test in game. In `runClient`, set Beastcaller with `/pz job set beastcaller`, cast Pack Howl, open SUMMONS from K, run `/pz companion xp "Spirit Hound" 500`, give yourself a Bond Crystal, use it from the selected companion's screen, spend the refunded points, then relog and verify the roster and stats persist.
+
+**Remaining Recommendations**
+1. Run the listed Beastcaller, Spirit Hound, SUMMONS, Bond Crystal and relog checks in `runClient`.
+2. Have Claude replace the placeholder Bond Crystal texture and Spirit Hound visuals; give any new companion mob the full animation set.
+3. Continue with live pets, broader summon behavior and gear equipping/rendering after the owner decides their scope.
 
 ---

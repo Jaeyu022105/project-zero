@@ -252,14 +252,15 @@ Our own mechanic, not in Solo Leveling.
 
 ## 13. Summons and pets
 
-- **[Planned]** (owner idea 2026-11-26) Two kinds of companions.
-- **Summons (job-based, combat).** Summoner-type jobs (Summoner, Beastcaller, Gravewarden...) call creatures with a skill and mana. Each summon has its own level, stats and a few abilities, follows the player, fights, and returns to the player's **roster** when dismissed or killed (it comes back after a cooldown, never lost for good). Leveled summons evolve into stronger forms. This is also the road to the Monarch path (§8): a Shadow Monarch can raise defeated bosses as summons.
-- **Pets (anyone, light).** Small creatures anyone can tame or hatch (eggs from gates and hidden dungeons). They follow you, give a small passive bonus (e.g. pick up XP orbs, glow in dark dungeons, warn of nearby gate monsters), and can wear one accessory. A few rare pets help a little in fights.
-- Both are saved with the player, not the world, so they travel through gates and dimensions.
-- Look: original creature designs only, with a System-style summon effect (a blue sigil on the ground, the creature rising out of it).
-- **[Planned] Companions screen** (owner idea 2026-11-27): necromancers, summoners and beast tamers get a System-style window listing every summon and pet. Each entry shows its level, XP, stats and abilities, and what it has equipped.
-- **[Planned] Companion stat points:** when a summon or pet levels up, its new stat points go to **random** stats. A craftable item (name to decide, e.g. a "Bond Crystal") used on a companion resets its points so the owner can redistribute them on the screen.
-- **[Planned] Companion gear:** you can give summons and pets items, weapons and armor. Humanoid summons use normal gear slots; beasts use their own slots, such as a collar, barding or a charm. Gear shows on the model and adds to the companion's stats.
+- **[Built] Companion roster foundation:** saved per player with `SUMMON` and `PET` kinds, level, XP, five stats, unspent points, gear slots and a live entity UUID. The Beastcaller's Pack Howl creates a Spirit Hound entry; its temporary hounds scale from the entry and earn companion XP from their own kills or when their owner finishes a target they recently hit. Companion balance lives in `CompanionRules`.
+- **[Built] Spirit Hound roster hook:** the first Beastcaller Pack Howl creates a summon entry. Temporary hounds take health and damage from its level and stats, credit their kills (and recent-hit owner assists) with XP, and return to the roster when the temporary summon ends. They currently use vanilla Wolf visuals.
+- **[Planned] Summons (job-based, combat):** expand beyond the Spirit Hound prototype so summoner-type jobs (Summoner, Beastcaller, Gravewarden...) can call different creatures with skills and mana. Summons should follow the player, fight, return to the roster when dismissed or killed (never lost for good), and evolve into stronger forms. This remains the road to the Monarch path (§8): a Shadow Monarch can raise defeated bosses as summons.
+- **[Planned] Pets (anyone, light).** Small creatures anyone can tame or hatch (eggs from gates and hidden dungeons). They follow you, give a small passive bonus (e.g. pick up XP orbs, glow in dark dungeons, warn of nearby gate monsters), and can wear one accessory. A few rare pets help a little in fights.
+- **[Built] Player persistence:** companion entries are stored with the player rather than in the world, so they persist through death and dimensions.
+- **[Planned] Creature art and summon effect:** use original creature designs, with a System-style blue sigil as creatures rise. The Spirit Hound currently uses vanilla Wolf visuals as a placeholder.
+- **[Built] Companions screen:** jobs with `"companions": true` (currently Beastcaller) open a System-style roster from the status window. It shows each companion's level, XP, stats, abilities and four gear slots.
+- **[Built] Companion stat points:** companion kills and owner assists grant XP; each level grants three points that are assigned to **random** stats. A crafted **Bond Crystal** resets spent points for redistribution through the screen.
+- **[Built] Companion gear data and display:** four named slots store item stacks, show in the roster and add accessory stat bonuses. Equipping gear and rendering it on companion models remain planned.
 
 ---
 
