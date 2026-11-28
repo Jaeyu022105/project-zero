@@ -20,7 +20,8 @@ public final class ModNetwork {
     // 11: waypoint list sync, travel and rename.
     // 12: companion roster sync.
     // 13: companion stat spending and Bond Crystal use; job companion flag.
-    private static final int PROTOCOL_VERSION = 13;
+    // 14: backpack menu-open request.
+    private static final int PROTOCOL_VERSION = 14;
 
     public static final SimpleChannel CHANNEL = ChannelBuilder
             .named(ProjectZero.id("main"))
@@ -147,6 +148,12 @@ public final class ModNetwork {
                 .encoder(UseBondCrystalPacket::encode)
                 .decoder(UseBondCrystalPacket::decode)
                 .consumerMainThread(UseBondCrystalPacket::handle)
+                .add();
+
+        CHANNEL.messageBuilder(OpenBackpackPacket.class, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(OpenBackpackPacket::encode)
+                .decoder(OpenBackpackPacket::decode)
+                .consumerMainThread(OpenBackpackPacket::handle)
                 .add();
     }
 

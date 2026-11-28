@@ -2,6 +2,7 @@ package com.projectzero.registry;
 
 import com.projectzero.ProjectZero;
 import com.projectzero.equipment.AccessoryMenu;
+import com.projectzero.equipment.BackpackMenu;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.registries.DeferredRegister;
@@ -17,4 +18,7 @@ public final class ModMenus {
 
     public static final RegistryObject<MenuType<AccessoryMenu>> ACCESSORIES =
             MENUS.register("accessories", () -> new MenuType<>(AccessoryMenu::new, FeatureFlags.DEFAULT_FLAGS));
+
+    public static final RegistryObject<MenuType<BackpackMenu>> BACKPACK = MENUS.register("backpack",
+            () -> net.minecraftforge.common.extensions.IForgeMenuType.create(BackpackMenu::new));
 }

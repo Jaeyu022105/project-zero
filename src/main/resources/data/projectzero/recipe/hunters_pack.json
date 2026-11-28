@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["LLL", "LPL", "LLL"],
+  "key": {
+    "L": {"item": "minecraft:leather"},
+    "P": {"item": "projectzero:leather_satchel"}
+  },
+  "result": {"id": "projectzero:hunters_pack", "count": 1}
+}

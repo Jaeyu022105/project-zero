@@ -34,7 +34,7 @@ public class AccessoryScreen extends AbstractContainerScreen<AccessoryMenu> {
         this.imageWidth = 176;
         this.imageHeight = 166;
         this.titleLabelY = 6;
-        this.inventoryLabelY = 72;
+        this.inventoryLabelY = 77;
     }
 
     @Override
@@ -43,13 +43,13 @@ public class AccessoryScreen extends AbstractContainerScreen<AccessoryMenu> {
         renderTooltip(g, mouseX, mouseY);
 
         // Tooltip hint when hovering an empty accessory slot
-        for (int i = 0; i < PlayerAccessories.TOTAL_SLOTS; i++) {
+        for (int i = 0; i < AccessoryMenu.EQUIPMENT_SLOTS; i++) {
             Slot s = menu.slots.get(i);
             if (!s.hasItem() && isHovering(s.x, s.y, 16, 16, mouseX, mouseY)) {
-                AccessorySlotType type = PlayerAccessories.SLOT_LAYOUT[i];
-                Component tip = i == 8
-                        ? Component.translatable("slot.projectzero.relic_locked")
-                        : type.displayName();
+                Component tip = i == AccessoryMenu.BACKPACK_SLOT
+                        ? Component.translatable("slot.projectzero.backpack")
+                        : i == 8 ? Component.translatable("slot.projectzero.relic_locked")
+                        : PlayerAccessories.SLOT_LAYOUT[i].displayName();
                 g.renderTooltip(font, tip, mouseX, mouseY);
             }
         }
@@ -67,7 +67,7 @@ public class AccessoryScreen extends AbstractContainerScreen<AccessoryMenu> {
             Slot s = menu.slots.get(i);
             int sx = leftPos + s.x - 1;
             int sy = topPos + s.y - 1;
-            boolean locked = (i == 8);
+            boolean locked = (i == 8), backpack = i == AccessoryMenu.BACKPACK_SLOT;
             g.fill(sx, sy, sx + 18, sy + 18, locked ? LOCKED_BG : SLOT_BG);
             g.renderOutline(sx, sy, 18, 18, locked ? LOCKED_BORDER : SLOT_BORDER);
 
@@ -75,6 +75,8 @@ public class AccessoryScreen extends AbstractContainerScreen<AccessoryMenu> {
                 AccessorySlotType type = PlayerAccessories.SLOT_LAYOUT[i];
                 ResourceLocation icon = ProjectZero.id("textures/gui/slots/" + type.name().toLowerCase(Locale.ROOT) + ".png");
                 g.blit(icon, sx + 1, sy + 1, 0, 0, 16, 16, 16, 16);
+            } else if (backpack && !s.hasItem()) {
+                g.blit(ProjectZero.id("textures/gui/slots/backpack.png"), sx + 1, sy + 1, 0, 0, 16, 16, 16, 16);
             }
         }
     }

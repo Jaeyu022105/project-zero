@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public enum PlayerAnim {
     SLASH(12), SLAM(14), PUNCH(10), THROW(10), GUARD(16), CAST_UP(16), NOVA(18), PUSH(14), ROAR(16), DASH(10),
-    BOND_CRYSTAL(18), INTERACT(10);
+    BOND_CRYSTAL(18), INTERACT(10), BACKPACK_OPEN(12);
 
     public final int ticks;
 

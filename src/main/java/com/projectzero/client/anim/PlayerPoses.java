@@ -191,6 +191,13 @@ public final class PlayerPoses {
     public static final Key[] PLACE_BAOBAB_PRESSURE_PLATE = placement(-0.42F, 0.07F, 7F, 181F);
     public static final Key[] PLACE_BAOBAB_SAPLING = placement(-0.05F, 0.05F, 0F, 189F);
     public static final Key[] USE_BOND_CRYSTAL = placement(-0.31F, 0.26F, -4F, 204F);
+    public static final Key[] USE_LEATHER_SATCHEL = placement(0.08F, 0.13F, -2F, 196F);
+    public static final Key[] USE_HUNTERS_PACK = placement(-0.12F, 0.19F, -3F, 208F);
+    public static final Key[] USE_RANK_PACK = placement(-0.24F, 0.30F, -5F, 222F);
+    public static final Key[] OPEN_BACKPACK = {
+            k(0.16F, -1.05F, -0.38F, 0.2F, -0.55F, 0.3F, -0.15F, 0.2F, -4F, 0.05F, 0.12F, 0.05F, -8, 8, 0),
+            k(0.44F, -1.42F, -0.22F, 0.04F, -0.72F, 0.22F, -0.08F, -0.12F, 5F, 0.02F, 0.04F, -0.28F, -30, 0, 8),
+            k(0.78F, -1.15F, -0.12F, 0.02F, -0.46F, 0.12F, -0.04F, -0.06F, 2F, 0.01F, 0.02F, -0.16F, -18, 0, 4)};
 
     private static Key[] placement(float rx, float rz, float lean, float firstPersonTurn) {
         return new Key[] {
@@ -249,6 +256,9 @@ public final class PlayerPoses {
         if (item == com.projectzero.registry.ModNature.BAOBAB_PRESSURE_PLATE.get().asItem()) return PLACE_BAOBAB_PRESSURE_PLATE;
         if (item == com.projectzero.registry.ModNature.BAOBAB_SAPLING.get().asItem()) return PLACE_BAOBAB_SAPLING;
         if (item == com.projectzero.registry.ModItems.BOND_CRYSTAL.get()) return USE_BOND_CRYSTAL;
+        if (item == com.projectzero.registry.ModItems.LEATHER_SATCHEL.get()) return USE_LEATHER_SATCHEL;
+        if (item == com.projectzero.registry.ModItems.HUNTERS_PACK.get()) return USE_HUNTERS_PACK;
+        if (item == com.projectzero.registry.ModItems.RANK_PACK.get()) return USE_RANK_PACK;
         if (item instanceof net.minecraft.world.item.BlockItem) return PLACE;
         return TAP;
     }
@@ -318,6 +328,7 @@ public final class PlayerPoses {
         joints(PLACE_BAOBAB_PRESSURE_PLATE, 0.55F, 0.25F, 0.1F, 0.15F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
         joints(PLACE_BAOBAB_SAPLING, 0.45F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
         joints(USE_BOND_CRYSTAL, 0.72F, 0.34F, 0.08F, 0.22F, 0.32F, 0.08F, 0.31F, 0.3F, 0.08F);
+        joints(OPEN_BACKPACK, 0.9F, 0.6F, 0.12F, 0.55F, 0.6F, 0.12F, 0.15F, 0.4F, 0.08F);
     }
 
     private static void joints(Key[] keys, float... v) {
@@ -349,6 +360,7 @@ public final class PlayerPoses {
             case CAST_UP -> CAST_UP; case NOVA -> NOVA; case PUSH -> PUSH; case ROAR -> ROAR; case DASH -> DASH;
             case BOND_CRYSTAL -> USE_BOND_CRYSTAL;
             case INTERACT -> INTERACT;
+            case BACKPACK_OPEN -> OPEN_BACKPACK;
         };
     }
 

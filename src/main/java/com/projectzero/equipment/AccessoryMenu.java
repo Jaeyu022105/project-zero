@@ -14,11 +14,14 @@ import net.minecraft.world.item.ItemStack;
  * Container menu displaying the 8 active accessory slots (+ 1 locked Relic slot) above the player's inventory.
  */
 public class AccessoryMenu extends AbstractContainerMenu {
+    public static final int BACKPACK_SLOT = PlayerAccessories.TOTAL_SLOTS;
+    public static final int EQUIPMENT_SLOTS = PlayerAccessories.TOTAL_SLOTS + 1;
     private final Container accessoryContainer;
+    private final Container backpackContainer;
 
     /** Client constructor used by {@link net.minecraft.world.inventory.MenuType}. */
     public AccessoryMenu(int containerId, Inventory playerInv) {
-        this(containerId, playerInv, new SimpleContainer(PlayerAccessories.TOTAL_SLOTS));
+        this(containerId, playerInv, new SimpleContainer(PlayerAccessories.TOTAL_SLOTS), new SimpleContainer(1));
     }
 
     /** Server factory backed directly by {@link EquipmentService}. */
@@ -38,12 +41,31 @@ public class AccessoryMenu extends AbstractContainerMenu {
         for (int i = 0; i < PlayerAccessories.TOTAL_SLOTS; i++) {
             backing.setItem(i, initial.get(i));
         }
-        return new AccessoryMenu(containerId, playerInv, backing);
+        SimpleContainer backpack = new SimpleContainer(1) {
+            private boolean loading = true;
+            { super.setItem(0, BackpackService.get(player).item()); loading = false; }
+
+            @Override public void setChanged() {
+                super.setChanged();
+                if (!loading) {
+                    PlayerBackpack updated = new PlayerBackpack();
+                    ItemStack stack = getItem(0);
+                    if (stack.getItem() instanceof BackpackItem) updated.set(stack.copy());
+                    BackpackService.set(player, updated);
+                }
+            }
+
+            @Override public boolean canPlaceItem(int slot, ItemStack stack) {
+                return slot == 0 && stack.getItem() instanceof BackpackItem;
+            }
+        };
+        return new AccessoryMenu(containerId, playerInv, backing, backpack);
     }
 
-    private AccessoryMenu(int containerId, Inventory playerInv, Container accessoryContainer) {
+    private AccessoryMenu(int containerId, Inventory playerInv, Container accessoryContainer, Container backpackContainer) {
         super(ModMenus.ACCESSORIES.get(), containerId);
         this.accessoryContainer = accessoryContainer;
+        this.backpackContainer = backpackContainer;
 
         // 8 active slots in 2 rows of 4 (x = 26 + col*26, y = 22 + row*24), plus locked Relic slot at index 8
         for (int i = 0; i < PlayerAccessories.ACTIVE_SLOTS; i++) {
@@ -78,7 +100,17 @@ public class AccessoryMenu extends AbstractContainerMenu {
             }
         });
 
-        // Player main inventory (3 rows x 9) starting at y = 84
+        addSlot(new Slot(backpackContainer, 0, 138, 58) {
+            @Override public boolean mayPlace(ItemStack stack) { return stack.getItem() instanceof BackpackItem; }
+            @Override public boolean mayPickup(Player player) {
+                ItemStack pack = getItem();
+                var contents = pack.get(net.minecraft.core.component.DataComponents.CONTAINER);
+                return contents == null || contents.nonEmptyStream().findAny().isEmpty();
+            }
+            @Override public int getMaxStackSize() { return 1; }
+        });
+
+        // Player inventory follows all accessory and backpack equipment slots.
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(playerInv, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
@@ -99,13 +131,16 @@ public class AccessoryMenu extends AbstractContainerMenu {
         ItemStack stack = slot.getItem();
         ItemStack copy = stack.copy();
 
-        if (index < PlayerAccessories.TOTAL_SLOTS) {
+        if (index < EQUIPMENT_SLOTS) {
             // Accessory slot -> player inventory
-            if (!moveItemStackTo(stack, PlayerAccessories.TOTAL_SLOTS, slots.size(), true)) {
+            if (!moveItemStackTo(stack, EQUIPMENT_SLOTS, slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
         } else {
             // Player inventory -> matching active accessory slot
+            if (stack.getItem() instanceof BackpackItem && !slots.get(BACKPACK_SLOT).hasItem()) {
+                if (!moveItemStackTo(stack, BACKPACK_SLOT, BACKPACK_SLOT + 1, false)) return ItemStack.EMPTY;
+            } else {
             if (!(stack.getItem() instanceof AccessoryItem accItem)
                     || accItem.slotType() == AccessorySlotType.RELIC) {
                 return ItemStack.EMPTY;
@@ -120,6 +155,7 @@ public class AccessoryMenu extends AbstractContainerMenu {
                 }
             }
             if (!moved) return ItemStack.EMPTY;
+            }
         }
 
         if (stack.isEmpty()) {

@@ -5,6 +5,7 @@ import com.projectzero.awakening.AwakeningShardItem;
 import com.projectzero.awakening.ShardVesselItem;
 import com.projectzero.equipment.AccessoryItem;
 import com.projectzero.equipment.AccessorySlotType;
+import com.projectzero.equipment.BackpackItem;
 import com.projectzero.skills.SkillbookItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -58,6 +59,13 @@ public final class ModItems {
     /** Resets a companion's spent stat points when used from its roster screen. TODO(claude-art). */
     public static final RegistryObject<Item> BOND_CRYSTAL = ITEMS.register("bond_crystal",
             () -> new Item(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
+
+    public static final RegistryObject<BackpackItem> LEATHER_SATCHEL = ITEMS.register("leather_satchel",
+            () -> new BackpackItem(9, new Item.Properties().rarity(Rarity.COMMON)));
+    public static final RegistryObject<BackpackItem> HUNTERS_PACK = ITEMS.register("hunters_pack",
+            () -> new BackpackItem(18, new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final RegistryObject<BackpackItem> RANK_PACK = ITEMS.register("rank_pack",
+            () -> new BackpackItem(27, new Item.Properties().rarity(Rarity.RARE)));
 
     public static final RegistryObject<Item> WAYPOINT_STONE = ITEMS.register("waypoint_stone",
             () -> new com.projectzero.waypoints.WaypointStoneItem(ModBlocks.WAYPOINT_STONE.get(), new Item.Properties()));

@@ -80,6 +80,7 @@ public final class ClientModEvents {
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             MenuScreens.register(ModMenus.ACCESSORIES.get(), AccessoryScreen::new);
+            MenuScreens.register(ModMenus.BACKPACK.get(), BackpackScreen::new);
             // Vessel: 0 when empty, (tier + 1) / 10 with a shard inside. Picks shard_vessel_t<tier>.
             ItemProperties.register(ModItems.SHARD_VESSEL.get(), ProjectZero.id("fill"), (stack, level, entity, seed) -> {
                 ShardCharge charge = ShardCharge.get(stack);

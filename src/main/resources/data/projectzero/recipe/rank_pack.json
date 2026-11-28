@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["PPP", "PCP", "PPP"],
+  "key": {
+    "P": {"item": "projectzero:beast_pelt"},
+    "C": {"item": "projectzero:monster_crystal_c"}
+  },
+  "result": {"id": "projectzero:rank_pack", "count": 1}
+}

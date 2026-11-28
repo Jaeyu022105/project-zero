@@ -35,6 +35,7 @@ public final class EquipmentEvents {
     @SubscribeEvent
     public static void onClone(PlayerEvent.Clone event) {
         EquipmentService.copy(event.getOriginal(), event.getEntity());
+        BackpackService.copy(event.getOriginal(), event.getEntity());
     }
 
     @SubscribeEvent

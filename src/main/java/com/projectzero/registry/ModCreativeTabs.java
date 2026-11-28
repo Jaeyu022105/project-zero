@@ -77,6 +77,9 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.MANA_CRYSTAL_BLOCK.get());
                         output.accept(ModItems.MANA_CRYSTAL_SHARD.get());
                         output.accept(ModItems.BOND_CRYSTAL.get());
+                        output.accept(ModItems.LEATHER_SATCHEL.get());
+                        output.accept(ModItems.HUNTERS_PACK.get());
+                        output.accept(ModItems.RANK_PACK.get());
                         output.accept(ModItems.AWAKENING_CRYSTAL.get());
                         output.accept(ModItems.AWAKENING_CORE.get());
                         output.accept(ModItems.AWAKENING_CRYSTAL_DEEP.get());

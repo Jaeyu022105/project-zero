@@ -60,6 +60,12 @@ public final class ModKeyBindings {
             GLFW.GLFW_KEY_U,
             CATEGORY);
 
+    public static final KeyMapping OPEN_BACKPACK = new KeyMapping(
+            "key." + ProjectZero.MOD_ID + ".backpack",
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_B,
+            CATEGORY);
+
     /** Swaps to the next skill preset, usable mid-fight. */
     public static final KeyMapping CYCLE_PRESET = new KeyMapping(
             "key." + ProjectZero.MOD_ID + ".cycle_preset",
@@ -76,6 +82,7 @@ public final class ModKeyBindings {
             event.register(OPEN_STATUS);
             event.register(OPEN_SKILLS);
             event.register(OPEN_COMPANIONS);
+            event.register(OPEN_BACKPACK);
             event.register(CYCLE_PRESET);
             for (KeyMapping key : SKILL_KEYS) {
                 event.register(key);
@@ -108,6 +115,11 @@ public final class ModKeyBindings {
                                 .append(net.minecraft.network.chat.Component.translatable("notice.projectzero.companions.job_required")
                                         .withStyle(net.minecraft.ChatFormatting.WHITE)), true);
                     }
+                }
+            }
+            while (OPEN_BACKPACK.consumeClick()) {
+                if (mc.player != null && mc.screen == null) {
+                    ModNetwork.sendToServer(new com.projectzero.network.OpenBackpackPacket());
                 }
             }
             while (CYCLE_PRESET.consumeClick()) {
