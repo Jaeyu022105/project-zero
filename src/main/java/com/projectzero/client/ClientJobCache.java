@@ -11,6 +11,7 @@ public final class ClientJobCache {
     private static PlayerJob job = PlayerJob.NONE;
     private static @Nullable JobRarity rarity;
     private static boolean noCeiling;
+    private static boolean companions;
 
     public static PlayerJob get() {
         return job;
@@ -25,13 +26,20 @@ public final class ClientJobCache {
         return noCeiling;
     }
 
+    public static boolean hasCompanions() { return companions; }
+
     public static void set(PlayerJob newJob, @Nullable JobRarity newRarity) {
-        set(newJob, newRarity, false);
+        set(newJob, newRarity, false, false);
     }
 
     public static void set(PlayerJob newJob, @Nullable JobRarity newRarity, boolean newNoCeiling) {
+        set(newJob, newRarity, newNoCeiling, false);
+    }
+
+    public static void set(PlayerJob newJob, @Nullable JobRarity newRarity, boolean newNoCeiling, boolean newCompanions) {
         job = newJob;
         rarity = newRarity;
         noCeiling = newNoCeiling;
+        companions = newCompanions;
     }
 }

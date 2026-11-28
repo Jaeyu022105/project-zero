@@ -1,4 +1,5 @@
 {
   "id": "projectzero:beastcaller",
-  "rarity": "rare"
+  "rarity": "rare",
+  "companions": true
 }

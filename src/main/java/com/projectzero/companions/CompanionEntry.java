@@ -24,6 +24,7 @@ public final class CompanionEntry {
     private int level;
     private long xp;
     private final EnumMap<Stat, Integer> stats = new EnumMap<>(Stat.class);
+    private final EnumMap<Stat, Integer> gearBonuses = new EnumMap<>(Stat.class);
     private int unspentPoints;
     private final LinkedHashMap<String, ItemStack> gear = new LinkedHashMap<>();
     private UUID liveEntityId;
@@ -34,7 +35,10 @@ public final class CompanionEntry {
         this.entityType = entityType;
         this.name = name;
         this.level = 1;
-        for (Stat stat : Stat.values()) stats.put(stat, CompanionRules.BASE_STAT);
+        for (Stat stat : Stat.values()) {
+            stats.put(stat, CompanionRules.BASE_STAT);
+            gearBonuses.put(stat, 0);
+        }
         for (String slot : CompanionRules.GEAR_SLOTS) gear.put(slot, ItemStack.EMPTY);
     }
 
@@ -83,19 +87,27 @@ public final class CompanionEntry {
         return refunded;
     }
 
-    public int gearBonus(Stat stat) {
-        int total = 0;
-        for (ItemStack stack : gear.values()) {
-            if (!stack.isEmpty()) {
-                com.projectzero.equipment.AccessoryData data = com.projectzero.equipment.AccessoryData.get(stack);
-                if (data != null) total += data.stats().getOrDefault(stat, 0);
+    public int gearBonus(Stat stat) { return gearBonuses.getOrDefault(stat, 0); }
+    public int effectiveStat(Stat stat) { return stat(stat) + gearBonus(stat); }
+
+    private void recalculateGearBonuses() {
+        for (Stat stat : Stat.values()) {
+            int total = 0;
+            for (ItemStack stack : gear.values()) {
+                if (!stack.isEmpty()) {
+                    com.projectzero.equipment.AccessoryData data = com.projectzero.equipment.AccessoryData.get(stack);
+                    if (data != null) total += data.stats().getOrDefault(stat, 0);
+                }
             }
+            gearBonuses.put(stat, total);
         }
-        return total;
     }
 
     public void setGear(String slot, ItemStack stack) {
-        if (gear.containsKey(slot)) gear.put(slot, stack == null ? ItemStack.EMPTY : stack.copy());
+        if (gear.containsKey(slot)) {
+            gear.put(slot, stack == null ? ItemStack.EMPTY : stack.copy());
+            recalculateGearBonuses();
+        }
     }
 
     public CompoundTag save(HolderLookup.Provider registries) {
@@ -145,6 +157,7 @@ public final class CompanionEntry {
                 entry.setGear(slot, ItemStack.parseOptional(registries, item.getCompound("Stack")));
             }
         }
+        entry.recalculateGearBonuses();
         if (tag.hasUUID("LiveEntity")) entry.liveEntityId = tag.getUUID("LiveEntity");
         return entry;
     }
@@ -168,6 +181,7 @@ public final class CompanionEntry {
                 buf.writeVarInt(stack.getCount());
             }
         }
+        for (Stat stat : Stat.values()) buf.writeVarInt(gearBonus(stat));
         buf.writeBoolean(liveEntityId != null);
         if (liveEntityId != null) buf.writeUUID(liveEntityId);
     }
@@ -193,6 +207,10 @@ public final class CompanionEntry {
             if (entry.gear.containsKey(slot) && BuiltInRegistries.ITEM.containsKey(itemId)) {
                 entry.setGear(slot, new ItemStack(BuiltInRegistries.ITEM.get(itemId), count));
             }
+        }
+        for (Stat stat : Stat.values()) {
+            entry.gearBonuses.put(stat, Math.max(-CompanionRules.MAX_STAT_VALUE,
+                    Math.min(CompanionRules.MAX_STAT_VALUE, buf.readVarInt())));
         }
         if (buf.readBoolean()) entry.liveEntityId = buf.readUUID();
         return entry;

@@ -62,7 +62,8 @@ public final class JobService {
         ModNetwork.sendToPlayer(player, new SyncJobPacket(
                 job,
                 def != null ? def.rarity().ordinal() : -1,
-                def != null && def.noCeiling()));
+                def != null && def.noCeiling(),
+                def != null && def.companions()));
     }
 
     /**

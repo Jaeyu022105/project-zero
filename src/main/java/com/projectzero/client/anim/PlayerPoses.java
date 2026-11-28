@@ -175,6 +175,7 @@ public final class PlayerPoses {
     public static final Key[] PLACE_BAOBAB_BUTTON = placement(0.40F, 0.06F, -7F, 173F);
     public static final Key[] PLACE_BAOBAB_PRESSURE_PLATE = placement(-0.42F, 0.07F, 7F, 181F);
     public static final Key[] PLACE_BAOBAB_SAPLING = placement(-0.05F, 0.05F, 0F, 189F);
+    public static final Key[] USE_BOND_CRYSTAL = placement(-0.31F, 0.26F, -4F, 204F);
 
     private static Key[] placement(float rx, float rz, float lean, float firstPersonTurn) {
         return new Key[] {
@@ -226,6 +227,7 @@ public final class PlayerPoses {
         if (item == com.projectzero.registry.ModNature.BAOBAB_BUTTON.get().asItem()) return PLACE_BAOBAB_BUTTON;
         if (item == com.projectzero.registry.ModNature.BAOBAB_PRESSURE_PLATE.get().asItem()) return PLACE_BAOBAB_PRESSURE_PLATE;
         if (item == com.projectzero.registry.ModNature.BAOBAB_SAPLING.get().asItem()) return PLACE_BAOBAB_SAPLING;
+        if (item == com.projectzero.registry.ModItems.BOND_CRYSTAL.get()) return USE_BOND_CRYSTAL;
         if (item instanceof net.minecraft.world.item.BlockItem) return PLACE;
         return TAP;
     }
@@ -291,6 +293,7 @@ public final class PlayerPoses {
         joints(PLACE_BAOBAB_BUTTON, 0.5F, 0.25F, 0.1F, 0.15F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
         joints(PLACE_BAOBAB_PRESSURE_PLATE, 0.55F, 0.25F, 0.1F, 0.15F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
         joints(PLACE_BAOBAB_SAPLING, 0.45F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F, 0.2F, 0.25F, 0.1F);
+        joints(USE_BOND_CRYSTAL, 0.72F, 0.34F, 0.08F, 0.22F, 0.32F, 0.08F, 0.31F, 0.3F, 0.08F);
     }
 
     private static void joints(Key[] keys, float... v) {
@@ -320,6 +323,7 @@ public final class PlayerPoses {
         return switch (anim) {
             case SLASH -> SLASH; case SLAM -> SLAM; case PUNCH -> PUNCH; case THROW -> THROW; case GUARD -> GUARD;
             case CAST_UP -> CAST_UP; case NOVA -> NOVA; case PUSH -> PUSH; case ROAR -> ROAR; case DASH -> DASH;
+            case BOND_CRYSTAL -> USE_BOND_CRYSTAL;
         };
     }
 

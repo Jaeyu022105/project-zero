@@ -67,6 +67,7 @@ public class StatusScreen extends Screen {
     private static final int STAT_TOP = 104, STAT_ROW = 14;
     private static final int SKILL_Y = 180, SKILL_SLOT = 22;
     private static final int GEAR_X = W - 58, GEAR_Y = 6, GEAR_W = 48, GEAR_H = 14;
+    private static final int SUMMONS_X = W - 124, SUMMONS_Y = 6, SUMMONS_W = 60, SUMMONS_H = 14;
 
     private float scale = 1F;
     private int left;
@@ -207,6 +208,11 @@ public class StatusScreen extends Screen {
         // GEAR tab.
         boolean gearHover = in(mx, my, GEAR_X, GEAR_Y, GEAR_W, GEAR_H);
         button(g, GEAR_X, GEAR_Y, GEAR_W, GEAR_H, "GEAR", true, gearHover);
+        if (ClientJobCache.hasCompanions()) {
+            boolean summonsHover = in(mx, my, SUMMONS_X, SUMMONS_Y, SUMMONS_W, SUMMONS_H);
+            button(g, SUMMONS_X, SUMMONS_Y, SUMMONS_W, SUMMONS_H,
+                    Component.translatable("screen.projectzero.companions.button").getString(), true, summonsHover);
+        }
 
         int col1 = RX, col2 = RX + RW / 2 + 4;
         String name = player != null ? player.getGameProfile().getName() : "?";
@@ -377,6 +383,12 @@ public class StatusScreen extends Screen {
         if (button == 0 && in(mx, my, GEAR_X, GEAR_Y, GEAR_W, GEAR_H)) {
             click();
             ModNetwork.sendToServer(new OpenAccessoriesPacket());
+            return true;
+        }
+        if (button == 0 && ClientJobCache.hasCompanions()
+                && in(mx, my, SUMMONS_X, SUMMONS_Y, SUMMONS_W, SUMMONS_H)) {
+            click();
+            minecraft.setScreen(new CompanionsScreen());
             return true;
         }
         if (button == 0 && in(mx, my, RX + RW / 2 + 4, 44, RW / 2 - 4, 12)) {

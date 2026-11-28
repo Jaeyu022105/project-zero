@@ -9,7 +9,8 @@ import org.jetbrains.annotations.Nullable;
  * Timing follows the game-feel skill: short wind-up, snappy strike, a held end pose, then return.
  */
 public enum PlayerAnim {
-    SLASH(12), SLAM(14), PUNCH(10), THROW(10), GUARD(16), CAST_UP(16), NOVA(18), PUSH(14), ROAR(16), DASH(10);
+    SLASH(12), SLAM(14), PUNCH(10), THROW(10), GUARD(16), CAST_UP(16), NOVA(18), PUSH(14), ROAR(16), DASH(10),
+    BOND_CRYSTAL(18);
 
     public final int ticks;
 

@@ -19,7 +19,8 @@ public final class ModNetwork {
     // 10: level ceiling sync (PlayerStats.ceilingBroken + SyncJobPacket.noCeiling).
     // 11: waypoint list sync, travel and rename.
     // 12: companion roster sync.
-    private static final int PROTOCOL_VERSION = 12;
+    // 13: companion stat spending and Bond Crystal use; job companion flag.
+    private static final int PROTOCOL_VERSION = 13;
 
     public static final SimpleChannel CHANNEL = ChannelBuilder
             .named(ProjectZero.id("main"))
@@ -136,6 +137,16 @@ public final class ModNetwork {
                 .encoder(SyncCompanionsPacket::encode)
                 .decoder(SyncCompanionsPacket::decode)
                 .consumerMainThread(SyncCompanionsPacket::handle)
+                .add();
+        CHANNEL.messageBuilder(SpendCompanionPointPacket.class, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(SpendCompanionPointPacket::encode)
+                .decoder(SpendCompanionPointPacket::decode)
+                .consumerMainThread(SpendCompanionPointPacket::handle)
+                .add();
+        CHANNEL.messageBuilder(UseBondCrystalPacket.class, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(UseBondCrystalPacket::encode)
+                .decoder(UseBondCrystalPacket::decode)
+                .consumerMainThread(UseBondCrystalPacket::handle)
                 .add();
     }
 

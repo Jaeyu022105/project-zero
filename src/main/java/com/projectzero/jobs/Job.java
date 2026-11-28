@@ -14,11 +14,16 @@ import java.util.Optional;
  */
 public record Job(ResourceLocation id, JobRarity rarity,
                   Optional<ResourceLocation> upgradesTo, Optional<ResourceLocation> trial,
-                  boolean noCeiling) {
+                  boolean noCeiling, boolean companions) {
 
     public Job(ResourceLocation id, JobRarity rarity,
                Optional<ResourceLocation> upgradesTo, Optional<ResourceLocation> trial) {
-        this(id, rarity, upgradesTo, trial, false);
+        this(id, rarity, upgradesTo, trial, false, false);
+    }
+
+    public Job(ResourceLocation id, JobRarity rarity,
+               Optional<ResourceLocation> upgradesTo, Optional<ResourceLocation> trial, boolean noCeiling) {
+        this(id, rarity, upgradesTo, trial, noCeiling, false);
     }
 
     /** Lang key {@code job.<namespace>.<path>}, resolved on the client. */

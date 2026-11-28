@@ -116,20 +116,22 @@ public final class CompanionService {
     }
 
     public static void awardKill(Entity killer, Entity victim) {
+        if (!(victim.level() instanceof ServerLevel serverLevel)) return;
         if (victim instanceof Player || victim.getPersistentData().getBoolean(com.projectzero.skills.SkillEffects.SUMMON_TAG)) return;
         CompoundTag source = killer.getPersistentData();
         UUID ownerId = source.hasUUID(OWNER_TAG) ? source.getUUID(OWNER_TAG) : null;
         UUID entryId = source.hasUUID(ENTRY_TAG) ? source.getUUID(ENTRY_TAG) : null;
         if (ownerId == null || entryId == null) {
+            if (!(killer instanceof ServerPlayer playerKiller)) return;
             CompoundTag victimData = victim.getPersistentData();
             long elapsed = victim.level().getGameTime() - victimData.getLong(HIT_TIME_TAG);
             if (!victimData.hasUUID(HIT_OWNER_TAG) || !victimData.hasUUID(HIT_ENTRY_TAG)
+                    || !playerKiller.getUUID().equals(victimData.getUUID(HIT_OWNER_TAG))
                     || elapsed < 0 || elapsed > CompanionRules.OWNER_ASSIST_TICKS) return;
             ownerId = victimData.getUUID(HIT_OWNER_TAG);
             entryId = victimData.getUUID(HIT_ENTRY_TAG);
         }
-        net.minecraft.server.MinecraftServer server = ((ServerLevel) victim.level()).getServer();
-        ServerPlayer owner = server.getPlayerList().getPlayer(ownerId);
+        ServerPlayer owner = serverLevel.getServer().getPlayerList().getPlayer(ownerId);
         if (owner != null) gainXp(owner, entryId, CompanionRules.XP_PER_KILL);
     }
 
@@ -149,6 +151,41 @@ public final class CompanionService {
         }
         set(player, roster);
         return true;
+    }
+
+    public static boolean spendPoint(ServerPlayer player, UUID id, Stat stat) {
+        if (!isCompanionJob(player)) return false;
+        PlayerCompanions roster = get(player);
+        CompanionEntry entry = roster.get(id);
+        if (entry == null || stat == null || !entry.spendPoint(stat)) return false;
+        set(player, roster);
+        return true;
+    }
+
+    public static boolean useBondCrystal(ServerPlayer player, UUID id) {
+        if (!isCompanionJob(player)) return false;
+        PlayerCompanions roster = get(player);
+        CompanionEntry entry = roster.get(id);
+        if (entry == null) return false;
+        ItemStack crystal = ItemStack.EMPTY;
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.is(com.projectzero.registry.ModItems.BOND_CRYSTAL.get())) {
+                crystal = stack;
+                break;
+            }
+        }
+        if (crystal.isEmpty() || entry.refundSpentPoints() <= 0) return false;
+        crystal.shrink(1);
+        set(player, roster);
+        ModNetwork.sendToTrackingAndSelf(player, new com.projectzero.network.SkillVisualPacket(
+                player.getId(), com.projectzero.client.ClientSkillVisuals.Kind.ANIM.ordinal(),
+                com.projectzero.anim.PlayerAnim.BOND_CRYSTAL.ordinal(), com.projectzero.anim.PlayerAnim.BOND_CRYSTAL.ticks));
+        return true;
+    }
+
+    private static boolean isCompanionJob(ServerPlayer player) {
+        com.projectzero.jobs.Job job = com.projectzero.jobs.JobService.currentJob(player);
+        return job != null && job.companions();
     }
 
     public static void clearLiveId(Entity entity) {

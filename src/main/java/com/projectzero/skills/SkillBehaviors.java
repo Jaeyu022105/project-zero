@@ -318,7 +318,7 @@ public final class SkillBehaviors {
         return true;
     }
 
-    /** Beastcaller: summons temporary tamed Spirit Hounds that hunt nearby enemies. */
+    /** Beastcaller: summons temporary tamed Spirit Hounds that hunt nearby enemies. TODO(claude-art): dedicated hound model and full animation set. */
     private static boolean castPackHowl(ServerPlayer player, Skill skill, JsonObject params) {
         int count = GsonHelper.getAsInt(params, "count", 2);
         int duration = GsonHelper.getAsInt(params, "duration_ticks", 240);

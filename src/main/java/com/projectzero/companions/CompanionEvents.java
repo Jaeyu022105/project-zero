@@ -41,7 +41,8 @@ public final class CompanionEvents {
 
     @SubscribeEvent
     public static void onCompanionHit(LivingHurtEvent event) {
-        if (event.getSource().getEntity() != null && event.getSource().getEntity() != event.getEntity()) {
+        if (event.getEntity().level() instanceof net.minecraft.server.level.ServerLevel
+                && event.getSource().getEntity() != null && event.getSource().getEntity() != event.getEntity()) {
             CompanionService.markHit(event.getSource().getEntity(), event.getEntity());
         }
     }
