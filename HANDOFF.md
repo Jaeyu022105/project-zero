@@ -16,7 +16,7 @@ After every meaningful prompt or implementation pass, update this file with:
 - **Session logs (bottom, oldest first, newest last)** are history. Append one per task using the format `### Session Log â€” YYYY-MM-DD (Short Title)` with **Context & Direction Check**, **Changes Made**, **Verification Executed**, and **Remaining Recommendations**, separated by `---`. Do not rewrite old logs.
 - To find unlogged work, compare `git log -1 -- HANDOFF.md` with `git log` on `main`.
 
-Last caught up: **2026-11-28** (Codex 4: merged the biome, minimap and monster-parts branches; waypoint stones now support crafting, attunement, travel, renaming and minimap markers).
+Last caught up: **2026-11-28** (Codex 5: Skywood and Baobab now have complete building sets, saplings, stripping, crafting, and loot).
 
 ---
 
@@ -81,12 +81,14 @@ Version **0.1.0** plus the job system (no new version number yet). Implemented:
 - Status window on **K**: name, level, job (name in rarity color, hover for rarity and job level), clickable `TITLE` field (cycles unlocked titles, hover shows effect), `GEAR` button (opens `AccessoryScreen`), HP, live MP (`current / max`), XP bar, stats with `+` buttons and `(+X)` bonus points from gear/title, learned/slotted `SKILLS` list, available points, hover descriptions.
 - Top-right minimap (`client/MinimapOverlay`): client-only dynamic terrain texture updated 12 rows per tick, loaded-chunk-only gate scan every 20 ticks, nearby player dots, objective-marker hook, biome tint and name, coordinates, and cave-floor sampling in ceiling/dungeon dimensions. Options are under `ui.minimap`, `ui.minimapSize`, `ui.minimapZoom`, and `ui.minimapCoords`.
 - Waypoint stones (`waypoints/`): craftable waist-high rune markers (light 7), placed-world records stored per dimension and player-known locations in persistent player NBT. First use attunes a stone; known use opens a System list; owners can sneak-use to rename; server-validated travel finds a safe arrival point, plays effects and enforces a 30-second cooldown. Placement and cross-dimension travel exclude the dungeon and Library; travel is limited to natural, skylit, non-ceiling dimensions. The minimap draws known stones as cyan diamonds with rim arrows.
+- Nature wood sets (`ModNature`, `NatureEvents`, `tools/textures/nature.py`): Skywood and Baobab have logs, planks, stripped logs, wood and stripped wood, slabs, stairs, fences, gates, doors, trapdoors, buttons, pressure plates and saplings. Axe stripping preserves pillar orientation; each set has recipes, loot, block/item tags, creative entries, translations, original 16×16 textures, and distinct held-item placement poses. Skywood leaves have a 5% sapling drop.
 - Data saved with the player and kept on death (accessories follow `keepInventory`).
 - Operator test commands: `/pz xp <amount>`, `/pz info`, `/pz reset`, `/pz job set <id>`, `/pz job reroll`, `/pz job clear`, `/pz shard give [count] [tier]`, `/pz vessel charge <xp>`, `/pz crystal small|large|colossal`, `/pz domain`, `/pz reawaken`, `/pz skill learn|forget|list|slot|mana|book`, `/pz title list|equip <id|none>`, `/pz milestone add <stat> <n>`, `/pz gear roll <slot> <rarity> <rank>`, `/pz mob spawn <entity> <rank> [level]`, `/pz gate spawn <rank> <size> [sea|ancient]`, `/pz gate leave`, `/pz gate age <days>`, `/pz gate break`.
 
 **Built and verified in a loaded world (`gradlew runClient`).**
 
 ---
+
 
 ## Architecture Notes
 
@@ -1143,5 +1145,27 @@ Tested: `gradlew build` passes on the owner's PC. Not yet tested in game (runCli
 1. Inspect the block model, glow, screen layout and minimap marker visibility in `runClient`.
 2. Civilization generation should place a waypoint stone in each house (§16a, §16e).
 3. Connect quest and civilization discovery to the minimap objective/discovery work (§11).
+
+---
+
+### Session Log — 2026-11-28 (Codex 5: wood sets)
+
+**Context & Direction Check**
+- Followed `.agents/prompts/codex-5.md` stage by stage on `codex/5-wood-sets`, after Codex 4 was pushed. Committed as `Jaeyu022105` without AI attribution lines; pushed only to the requested `codex/` branch.
+
+**Changes Made**
+- Added the complete Skywood and Baobab building sets, with saplings growing their configured tree features, original 16×16 textures, recipes, block/item models, loot, tags, translations, creative tab entries and dedicated held-item placement poses.
+- Added Forge axe-stripping support for both species, preserving log axis; Skywood leaves drop saplings at 5%.
+- Corrected the stripped-log blockstate model references and the stripped wood/log planks recipe outputs for both species.
+- Updated `DESIGN-DOCUMENT.md` §15 and `PROGRESS.md` to reflect the completed sets.
+
+**Verification Executed**
+- `$env:JAVA_HOME = "C:\Users\Jaime\AppData\Roaming\.minecraft\runtime\java-runtime-delta\windows\java-runtime-delta"; .\gradlew.bat build --no-daemon` after each set: **BUILD SUCCESSFUL** on Java 21.
+- Parsed all 1,137 resource JSON files; all parsed. Checked projectzero model references from blockstates and item models; no unresolved references remain. `git diff --check` passed.
+- I could not test in game. In `runClient`, check placing and opening/closing both doors, stripping both logs and wood orientations, and growing Skywood and Baobab saplings.
+
+**Remaining Recommendations**
+1. Verify doors, axe stripping, and both sapling growth paths in `runClient`.
+2. Continue the planned unique plants, foliage, minerals and additional wood species for the remaining biomes (§15).
 
 ---
